@@ -1,8 +1,21 @@
 import { Link } from "react-router-dom";
 import { Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export default function VerifyEmailPage() {
+  const [resending, setResending] = useState(false);
+
+  const handleResend = async () => {
+    setResending(true);
+    const { error } = await supabase.auth.resend({ type: "signup", email: "" });
+    setResending(false);
+    if (error) toast.error("Please try signing up again");
+    else toast.success("Verification email resent");
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4">
       <div className="w-full max-w-md text-center">
@@ -17,7 +30,7 @@ export default function VerifyEmailPage() {
           <p className="text-sm text-muted-foreground">
             Didn't receive the email? Check your spam folder or
           </p>
-          <Button variant="link" className="text-primary p-0 h-auto mt-1">
+          <Button variant="link" className="text-primary p-0 h-auto mt-1" onClick={handleResend} disabled={resending}>
             Resend verification email
           </Button>
         </div>

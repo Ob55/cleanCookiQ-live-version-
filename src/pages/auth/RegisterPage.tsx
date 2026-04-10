@@ -3,7 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { Building2, Factory, Banknote, FlaskConical, Landmark, ArrowRight, ArrowLeft } from "lucide-react";
+import { Building2, Factory, Banknote, FlaskConical, Landmark, ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const orgTypes = [
   { value: "institution", label: "Institution", desc: "School, hospital, prison, factory", icon: Building2 },
@@ -16,7 +18,38 @@ const orgTypes = [
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [orgType, setOrgType] = useState("");
+  const [orgName, setOrgName] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password.length < 8) { toast.error("Password must be at least 8 characters"); return; }
+    setLoading(true);
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: window.location.origin,
+        data: {
+          full_name: fullName,
+          org_type: orgType,
+          org_name: orgName,
+          phone,
+        },
+      },
+    });
+    setLoading(false);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      navigate("/auth/verify-email");
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4">
@@ -44,9 +77,7 @@ export default function RegisterPage() {
                   key={org.value}
                   onClick={() => setOrgType(org.value)}
                   className={`w-full flex items-center gap-4 p-4 rounded-lg border transition-colors text-left ${
-                    orgType === org.value
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/30"
+                    orgType === org.value ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"
                   }`}
                 >
                   <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${
@@ -60,41 +91,37 @@ export default function RegisterPage() {
                   </div>
                 </button>
               ))}
-              <Button
-                className="w-full mt-4 bg-primary text-primary-foreground"
-                disabled={!orgType}
-                onClick={() => setStep(2)}
-              >
-                Continue
-                <ArrowRight className="ml-2 h-4 w-4" />
+              <Button className="w-full mt-4 bg-primary text-primary-foreground" disabled={!orgType} onClick={() => setStep(2)}>
+                Continue <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           ) : (
-            <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); navigate("/auth/verify-email"); }}>
+            <form className="space-y-4" onSubmit={handleRegister}>
               <button type="button" onClick={() => setStep(1)} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mb-2">
                 <ArrowLeft className="h-3 w-3" /> Back
               </button>
               <div>
                 <Label htmlFor="orgName">Organisation Name</Label>
-                <Input id="orgName" placeholder="e.g. Nairobi Primary School" className="mt-1" />
+                <Input id="orgName" value={orgName} onChange={e => setOrgName(e.target.value)} placeholder="e.g. Nairobi Primary School" className="mt-1" required />
               </div>
               <div>
                 <Label htmlFor="fullName">Full Name</Label>
-                <Input id="fullName" placeholder="Your full name" className="mt-1" />
+                <Input id="fullName" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Your full name" className="mt-1" required />
               </div>
               <div>
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="you@organisation.co.ke" className="mt-1" />
+                <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@organisation.co.ke" className="mt-1" required />
               </div>
               <div>
                 <Label htmlFor="phone">Phone (optional)</Label>
-                <Input id="phone" placeholder="+254 7XX XXX XXX" className="mt-1" />
+                <Input id="phone" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+254 7XX XXX XXX" className="mt-1" />
               </div>
               <div>
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" placeholder="Create a strong password" className="mt-1" />
+                <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Create a strong password" className="mt-1" required />
               </div>
-              <Button type="submit" className="w-full bg-primary text-primary-foreground">
+              <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={loading}>
+                {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                 Create Account
               </Button>
             </form>
