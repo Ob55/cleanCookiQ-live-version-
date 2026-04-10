@@ -26,6 +26,13 @@ import PipelineDashboard from "@/pages/admin/PipelineDashboard";
 import InstitutionManagement from "@/pages/admin/InstitutionManagement";
 import InstitutionDetail from "@/pages/admin/InstitutionDetail";
 import UserManagement from "@/pages/admin/UserManagement";
+import ProviderManagement from "@/pages/admin/ProviderManagement";
+import AssessmentQueue from "@/pages/admin/AssessmentQueue";
+import OpportunityManagement from "@/pages/admin/OpportunityManagement";
+import BDDashboard from "@/pages/admin/BDDashboard";
+import ScoringConfig from "@/pages/admin/ScoringConfig";
+import CostConfig from "@/pages/admin/CostConfig";
+import AuditLog from "@/pages/admin/AuditLog";
 import AdminPlaceholder from "@/pages/admin/AdminPlaceholder";
 
 import NotFound from "@/pages/NotFound";
