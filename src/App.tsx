@@ -69,14 +69,14 @@ const App = () => (
               <Route path="/admin/pipeline" element={<PipelineDashboard />} />
               <Route path="/admin/institutions" element={<InstitutionManagement />} />
               <Route path="/admin/institutions/:id" element={<InstitutionDetail />} />
-              <Route path="/admin/providers" element={<AdminPlaceholder title="Provider Management" />} />
-              <Route path="/admin/assessments" element={<AdminPlaceholder title="Assessment Review Queue" />} />
-              <Route path="/admin/opportunities" element={<AdminPlaceholder title="Opportunity Management" />} />
-              <Route path="/admin/bd" element={<AdminPlaceholder title="BD Dashboard" />} />
+              <Route path="/admin/providers" element={<ProviderManagement />} />
+              <Route path="/admin/assessments" element={<AssessmentQueue />} />
+              <Route path="/admin/opportunities" element={<OpportunityManagement />} />
+              <Route path="/admin/bd" element={<BDDashboard />} />
               <Route path="/admin/users" element={<UserManagement />} />
-              <Route path="/admin/scoring/config" element={<AdminPlaceholder title="Scoring Weight Configuration" />} />
-              <Route path="/admin/engine/costs" element={<AdminPlaceholder title="Cost Table Configuration" />} />
-              <Route path="/admin/audit" element={<AdminPlaceholder title="System Audit Log" />} />
+              <Route path="/admin/scoring/config" element={<ScoringConfig />} />
+              <Route path="/admin/engine/costs" element={<CostConfig />} />
+              <Route path="/admin/audit" element={<AuditLog />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
