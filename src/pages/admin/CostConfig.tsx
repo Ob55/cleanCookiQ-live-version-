@@ -40,7 +40,7 @@ export default function CostConfig() {
 
   useEffect(() => {
     if (config?.config_value) {
-      setParams(config.config_value as Record<string, TechParams>);
+      setParams(config.config_value as unknown as Record<string, TechParams>);
     }
   }, [config]);
 
