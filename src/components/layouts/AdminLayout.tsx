@@ -6,6 +6,7 @@ import {
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { useInactivityLogout } from "@/hooks/useInactivityLogout";
 
 const adminNav = [
   { label: "Pipeline", href: "/admin/pipeline", icon: TrendingUp },
@@ -25,6 +26,7 @@ export default function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut, profile } = useAuth();
+  useInactivityLogout(20000);
 
   const handleSignOut = async () => {
     await signOut();

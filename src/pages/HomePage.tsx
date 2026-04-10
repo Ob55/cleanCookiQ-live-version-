@@ -170,13 +170,13 @@ export default function HomePage() {
                 Create an Account
               </Button>
             </Link>
-            <Link to="/about">
+            <Link to="/auth/login">
               <Button
                 size="lg"
                 variant="outline"
                 className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
               >
-                Learn More
+                Admin Login
               </Button>
             </Link>
           </div>
