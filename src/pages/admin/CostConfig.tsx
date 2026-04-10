@@ -113,7 +113,7 @@ export default function CostConfig() {
       </div>
 
       <div className="flex gap-2 justify-end">
-        <Button variant="outline" onClick={() => config?.config_value && setParams(config.config_value as Record<string, TechParams>)}>
+        <Button variant="outline" onClick={() => config?.config_value && setParams(config.config_value as unknown as Record<string, TechParams>)}>
           <RotateCcw className="h-4 w-4 mr-2" /> Reset
         </Button>
         <Button onClick={() => saveParams.mutate()} disabled={saveParams.isPending}>
