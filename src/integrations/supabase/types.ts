@@ -215,6 +215,8 @@ export type Database = {
       }
       institutions: {
         Row: {
+          annual_savings_ksh: number | null
+          co2_reduction_tonnes_pa: number | null
           contact_email: string | null
           contact_person: string | null
           contact_phone: string | null
@@ -222,21 +224,30 @@ export type Database = {
           created_at: string
           created_by: string | null
           current_fuel: Database["public"]["Enums"]["fuel_type"] | null
+          fuel_of_choice: string | null
           id: string
           institution_type: Database["public"]["Enums"]["institution_type"]
           latitude: number | null
           longitude: number | null
           meals_per_day: number | null
+          meals_served_per_day: number | null
           name: string
           notes: string | null
           number_of_staff: number | null
           number_of_students: number | null
           organisation_id: string | null
           pipeline_stage: Database["public"]["Enums"]["pipeline_stage"]
+          recommended_solution: string | null
           sub_county: string | null
+          ta_required: boolean | null
+          ta_resource_window_end: string | null
+          ta_resource_window_start: string | null
+          ta_type_needed: string[] | null
           updated_at: string
         }
         Insert: {
+          annual_savings_ksh?: number | null
+          co2_reduction_tonnes_pa?: number | null
           contact_email?: string | null
           contact_person?: string | null
           contact_phone?: string | null
@@ -244,21 +255,30 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           current_fuel?: Database["public"]["Enums"]["fuel_type"] | null
+          fuel_of_choice?: string | null
           id?: string
           institution_type?: Database["public"]["Enums"]["institution_type"]
           latitude?: number | null
           longitude?: number | null
           meals_per_day?: number | null
+          meals_served_per_day?: number | null
           name: string
           notes?: string | null
           number_of_staff?: number | null
           number_of_students?: number | null
           organisation_id?: string | null
           pipeline_stage?: Database["public"]["Enums"]["pipeline_stage"]
+          recommended_solution?: string | null
           sub_county?: string | null
+          ta_required?: boolean | null
+          ta_resource_window_end?: string | null
+          ta_resource_window_start?: string | null
+          ta_type_needed?: string[] | null
           updated_at?: string
         }
         Update: {
+          annual_savings_ksh?: number | null
+          co2_reduction_tonnes_pa?: number | null
           contact_email?: string | null
           contact_person?: string | null
           contact_phone?: string | null
@@ -266,18 +286,25 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           current_fuel?: Database["public"]["Enums"]["fuel_type"] | null
+          fuel_of_choice?: string | null
           id?: string
           institution_type?: Database["public"]["Enums"]["institution_type"]
           latitude?: number | null
           longitude?: number | null
           meals_per_day?: number | null
+          meals_served_per_day?: number | null
           name?: string
           notes?: string | null
           number_of_staff?: number | null
           number_of_students?: number | null
           organisation_id?: string | null
           pipeline_stage?: Database["public"]["Enums"]["pipeline_stage"]
+          recommended_solution?: string | null
           sub_county?: string | null
+          ta_required?: boolean | null
+          ta_resource_window_end?: string | null
+          ta_resource_window_start?: string | null
+          ta_type_needed?: string[] | null
           updated_at?: string
         }
         Relationships: [
@@ -542,8 +569,13 @@ export type Database = {
           counties_served: string[] | null
           created_at: string
           id: string
+          mou_signed_at: string | null
           name: string
+          nda_signed_at: string | null
           organisation_id: string | null
+          provider_category:
+            | Database["public"]["Enums"]["provider_category"]
+            | null
           rating: number | null
           services: string[] | null
           technology_types: string[] | null
@@ -558,8 +590,13 @@ export type Database = {
           counties_served?: string[] | null
           created_at?: string
           id?: string
+          mou_signed_at?: string | null
           name: string
+          nda_signed_at?: string | null
           organisation_id?: string | null
+          provider_category?:
+            | Database["public"]["Enums"]["provider_category"]
+            | null
           rating?: number | null
           services?: string[] | null
           technology_types?: string[] | null
@@ -574,8 +611,13 @@ export type Database = {
           counties_served?: string[] | null
           created_at?: string
           id?: string
+          mou_signed_at?: string | null
           name?: string
+          nda_signed_at?: string | null
           organisation_id?: string | null
+          provider_category?:
+            | Database["public"]["Enums"]["provider_category"]
+            | null
           rating?: number | null
           services?: string[] | null
           technology_types?: string[] | null
@@ -712,9 +754,32 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "manager" | "field_agent" | "viewer"
+      app_role:
+        | "admin"
+        | "manager"
+        | "field_agent"
+        | "viewer"
+        | "ta_provider"
+        | "financing_partner"
+        | "programme_manager"
+        | "dmrv_verifier"
       approval_status: "pending" | "approved" | "rejected"
       assessment_status: "draft" | "submitted" | "reviewed" | "approved"
+      contract_status: "active" | "expiring_soon" | "expired" | "terminated"
+      contract_type: "maintenance" | "fuel_supply" | "spare_parts" | "other"
+      dmrv_status: "pending" | "verified" | "disputed"
+      financing_status:
+        | "draft"
+        | "submitted"
+        | "under_review"
+        | "approved"
+        | "disbursed"
+        | "rejected"
+      financing_type:
+        | "grant"
+        | "concessional_debt"
+        | "commercial_debt"
+        | "equity"
       fuel_type:
         | "firewood"
         | "charcoal"
@@ -739,6 +804,28 @@ export type Database = {
         | "contracted"
         | "installed"
         | "monitoring"
+        | "contacted"
+        | "scored"
+        | "least_cost_path_assigned"
+        | "provider_matched"
+        | "financed"
+        | "in_delivery"
+        | "monitored_dmrv"
+      programme_status: "planning" | "procurement" | "active" | "completed"
+      provider_category:
+        | "equipment_provider"
+        | "installation_technician"
+        | "logistics_provider"
+        | "service_product_provider"
+      rfq_response_status: "submitted" | "shortlisted" | "awarded" | "rejected"
+      rfq_status: "draft" | "published" | "closed" | "awarded"
+      ta_availability: "available" | "committed" | "unavailable"
+      ticket_priority: "low" | "medium" | "high" | "critical"
+      ticket_status: "open" | "in_progress" | "resolved" | "closed"
+      verification_method:
+        | "iot_sensor"
+        | "manual_survey"
+        | "platform_self_report"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -866,9 +953,35 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "manager", "field_agent", "viewer"],
+      app_role: [
+        "admin",
+        "manager",
+        "field_agent",
+        "viewer",
+        "ta_provider",
+        "financing_partner",
+        "programme_manager",
+        "dmrv_verifier",
+      ],
       approval_status: ["pending", "approved", "rejected"],
       assessment_status: ["draft", "submitted", "reviewed", "approved"],
+      contract_status: ["active", "expiring_soon", "expired", "terminated"],
+      contract_type: ["maintenance", "fuel_supply", "spare_parts", "other"],
+      dmrv_status: ["pending", "verified", "disputed"],
+      financing_status: [
+        "draft",
+        "submitted",
+        "under_review",
+        "approved",
+        "disbursed",
+        "rejected",
+      ],
+      financing_type: [
+        "grant",
+        "concessional_debt",
+        "commercial_debt",
+        "equity",
+      ],
       fuel_type: ["firewood", "charcoal", "lpg", "biogas", "electric", "other"],
       institution_type: [
         "school",
@@ -888,6 +1001,30 @@ export const Constants = {
         "contracted",
         "installed",
         "monitoring",
+        "contacted",
+        "scored",
+        "least_cost_path_assigned",
+        "provider_matched",
+        "financed",
+        "in_delivery",
+        "monitored_dmrv",
+      ],
+      programme_status: ["planning", "procurement", "active", "completed"],
+      provider_category: [
+        "equipment_provider",
+        "installation_technician",
+        "logistics_provider",
+        "service_product_provider",
+      ],
+      rfq_response_status: ["submitted", "shortlisted", "awarded", "rejected"],
+      rfq_status: ["draft", "published", "closed", "awarded"],
+      ta_availability: ["available", "committed", "unavailable"],
+      ticket_priority: ["low", "medium", "high", "critical"],
+      ticket_status: ["open", "in_progress", "resolved", "closed"],
+      verification_method: [
+        "iot_sensor",
+        "manual_survey",
+        "platform_self_report",
       ],
     },
   },
