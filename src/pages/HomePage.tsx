@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { MapPin, BarChart3, Users, TrendingUp, Leaf, Building2, ArrowRight, Flame } from "lucide-react";
+import { MapPin, BarChart3, Users, TrendingUp, Leaf, Building2, ArrowRight, Flame, Factory, Banknote, Briefcase, FolderKanban, GraduationCap } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const stats = [
@@ -11,23 +11,41 @@ const stats = [
   { label: "Tonnes CO₂ Avoided", value: "12,450", icon: Leaf },
 ];
 
-const steps = [
+const modules = [
   {
-    title: "Institutions Register",
-    desc: "Schools, hospitals, and factories submit their cooking data and energy profile to the platform.",
-    icon: Building2,
+    title: "Pipeline Intelligence & Map",
+    desc: "Interactive national map with institution-level transition data, readiness scores, and pipeline tracking from identification to monitored delivery.",
+    icon: MapPin,
     color: "bg-primary",
   },
   {
-    title: "We Analyse & Score",
-    desc: "Our engine calculates readiness scores and the optimal clean cooking pathway for each institution.",
-    icon: BarChart3,
+    title: "Provider & Partner Registry",
+    desc: "Vetted directory of equipment providers, installation technicians, logistics providers, and service partners — with NDA/MoU gating and category classification.",
+    icon: Factory,
     color: "bg-accent",
   },
   {
-    title: "Providers Deliver",
-    desc: "Vetted suppliers, funders, and CSR partners are matched to verified project opportunities.",
-    icon: Users,
+    title: "Technical Assistance (TA)",
+    desc: "Matching institutions needing capacity building, technical design, or training support with qualified TA providers by county and expertise.",
+    icon: GraduationCap,
+    color: "bg-emerald-light",
+  },
+  {
+    title: "Financing Platform",
+    desc: "Grant applications, concessional debt, and equity instruments — connecting institutions with verified pipeline data to funders and investors.",
+    icon: Banknote,
+    color: "bg-primary",
+  },
+  {
+    title: "Portfolio Management",
+    desc: "Post-installation monitoring with dMRV records, OPEX contract tracking, and support ticket management for active projects.",
+    icon: Briefcase,
+    color: "bg-accent",
+  },
+  {
+    title: "Program Management",
+    desc: "Multi-institution programme coordination with procurement RFQs, provider bidding, and financial due diligence workflows.",
+    icon: FolderKanban,
     color: "bg-emerald-light",
   },
 ];
@@ -56,8 +74,11 @@ export default function HomePage() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-primary-foreground leading-tight mb-6">
               Orchestrating Kenya's Clean Cooking Transition
             </h1>
-            <p className="text-lg text-primary-foreground/80 mb-8 max-w-xl font-body">
+            <p className="text-lg text-primary-foreground/80 mb-4 max-w-xl font-body">
               CleanCookIQ converts fragmented demand, dispersed supply, and available financing into a structured, verified national transition pipeline.
+            </p>
+            <p className="text-sm text-primary-foreground/60 mb-8 max-w-xl font-body italic">
+              CleanCookIQ builds a transition pipeline per institution — displaying fuel of choice, meals served, recommended solution, and savings potential on an interactive national map.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link to="/map">
@@ -98,29 +119,29 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How It Works */}
+      {/* 6 Modules */}
       <section className="py-20 lg:py-28 bg-background">
         <div className="container">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">How It Works</h2>
+            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">6 First-Class Modules</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              From data collection to project delivery — one integrated platform for the entire clean cooking transition.
+              From pipeline intelligence to post-installation monitoring — one integrated platform covering every layer of the clean cooking transition.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {steps.map((step, i) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {modules.map((mod, i) => (
               <div
-                key={step.title}
+                key={mod.title}
                 className="relative bg-card rounded-xl p-8 shadow-card border border-border hover:shadow-elevated transition-shadow"
               >
                 <div className="flex items-center gap-4 mb-5">
-                  <div className={`h-12 w-12 rounded-xl ${step.color} flex items-center justify-center`}>
-                    <step.icon className="h-6 w-6 text-primary-foreground" />
+                  <div className={`h-12 w-12 rounded-xl ${mod.color} flex items-center justify-center`}>
+                    <mod.icon className="h-6 w-6 text-primary-foreground" />
                   </div>
-                  <span className="text-sm font-bold text-muted-foreground font-body">Step {i + 1}</span>
+                  <span className="text-sm font-bold text-muted-foreground font-body">Module {i + 1}</span>
                 </div>
-                <h3 className="font-display font-bold text-xl mb-3">{step.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
+                <h3 className="font-display font-bold text-xl mb-3">{mod.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{mod.desc}</p>
               </div>
             ))}
           </div>
