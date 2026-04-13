@@ -196,10 +196,9 @@ export default function TransitionProductSelector({ institutionId, editable = tr
                       <p className="text-sm font-semibold">{item.name}</p>
                       <Badge variant="outline" className="text-[10px] px-1.5 py-0">{item.type === "product" ? "Product" : "Service"}</Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground">{item.provider}</p>
-                    {item.providerPhone && (
-                      <p className="text-xs text-muted-foreground flex items-center gap-1"><Phone className="h-3 w-3" />{item.providerPhone}</p>
-                    )}
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Phone className="h-3 w-3" /> {item.providerPhone || "No phone listed"}
+                    </p>
                   </div>
                   {editable && (
                     <Button
