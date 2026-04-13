@@ -35,6 +35,13 @@ export default function InstitutionDetail() {
     enabled: !!id,
   });
 
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const [needDialogOpen, setNeedDialogOpen] = useState(false);
+  const [needDesc, setNeedDesc] = useState("");
+  const [needTech, setNeedTech] = useState("");
+  const [needSaving, setNeedSaving] = useState(false);
+
   const { data: scores } = useQuery({
     queryKey: ["readiness_scores", id],
     queryFn: async () => {
