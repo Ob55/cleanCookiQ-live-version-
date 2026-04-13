@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,8 +11,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { FileText, Plus, Loader2, Search, DollarSign, Calendar } from "lucide-react";
 import { useState } from "react";
+import { notifyInstitutionOwner, notifyFunders } from "@/lib/notifications";
+import { useState } from "react";
 
 export default function OpportunityManagement() {
+  const { profile } = useAuth();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
@@ -44,6 +48,7 @@ export default function OpportunityManagement() {
 
   const createOpp = useMutation({
     mutationFn: async () => {
+      const createdByName = profile?.full_name || "Admin";
       const { error } = await supabase.from("opportunities").insert({
         title: form.title,
         description: form.description,
@@ -51,7 +56,26 @@ export default function OpportunityManagement() {
         estimated_value: form.estimated_value ? Number(form.estimated_value) : null,
         institution_id: form.institution_id,
         deadline: form.deadline ? new Date(form.deadline).toISOString() : null,
-      });
+        created_by_name: createdByName,
+      } as any);
+      if (error) throw error;
+
+      // Notify institution
+      const inst = institutions?.find(i => i.id === form.institution_id);
+      if (inst) {
+        await notifyInstitutionOwner(
+          form.institution_id,
+          "A New Opportunity Has Been Created For You",
+          `A new opportunity has been created for ${inst.name}. Opportunity: ${form.title}. Details: ${form.description || "N/A"}. Created by: ${createdByName}. Please log in to review this opportunity.`
+        );
+      }
+
+      // Notify funders
+      await notifyFunders(
+        "New Funding Opportunity Available",
+        "A new opportunity has been created on CleanCookIQ. An institution is ready for clean cooking transition and requires funding support. Log in to view the details and express your interest."
+      );
+    },
       if (error) throw error;
     },
     onSuccess: () => {
