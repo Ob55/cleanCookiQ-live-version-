@@ -5,7 +5,7 @@ import {
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { useInactivityLogout } from "@/hooks/useInactivityLogout";
+
 
 const institutionNav = [
   { label: "Dashboard", href: "/institution/dashboard", icon: LayoutDashboard },
@@ -20,7 +20,7 @@ export default function InstitutionLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut, profile } = useAuth();
-  useInactivityLogout(20000);
+  
 
   const handleSignOut = async () => {
     await signOut();
