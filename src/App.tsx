@@ -127,6 +127,8 @@ const App = () => (
             {/* Funder pages (with sidebar) */}
             <Route element={<ProtectedRoute><FunderLayout /></ProtectedRoute>}>
               <Route path="/funder/dashboard" element={<FunderDashboard />} />
+              <Route path="/funder/institution/:id" element={<FunderInstitutionDetail />} />
+            </Route>
             </Route>
 
             {/* Admin pages (protected) */}
