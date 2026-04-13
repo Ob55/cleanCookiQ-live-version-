@@ -304,6 +304,8 @@ export default function InstitutionProfile() {
           </div>
         </CardContent>
       </Card>
+      {/* Transition Needs */}
+      <TransitionNeedsSection institutionId={institution.id} />
     </div>
   );
 }
