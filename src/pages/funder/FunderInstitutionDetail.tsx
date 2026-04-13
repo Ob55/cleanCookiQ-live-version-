@@ -90,8 +90,8 @@ export default function FunderInstitutionDetail() {
 
   // What they have vs what they don't
   const checklist = [
-    { label: "Dedicated Kitchen", has: inst.has_dedicated_kitchen === true, value: inst.has_dedicated_kitchen === true ? "Yes" : inst.has_dedicated_kitchen === false ? "No" : "Unknown" },
-    { label: "Kitchen Condition", has: inst.kitchen_condition === "clean_ready", value: inst.kitchen_condition ? inst.kitchen_condition.replace(/_/g, " ") : "Not assessed" },
+    { label: "Dedicated Kitchen", has: inst.has_dedicated_kitchen !== null && inst.has_dedicated_kitchen !== undefined, value: inst.has_dedicated_kitchen === true ? "Yes" : inst.has_dedicated_kitchen === false ? "No" : "Not set" },
+    { label: "Kitchen Condition", has: !!inst.kitchen_condition, value: inst.kitchen_condition ? inst.kitchen_condition.replace(/_/g, " ") : "Not assessed" },
     { label: "Contact Person", has: !!inst.contact_person, value: inst.contact_person || "Not provided" },
     { label: "Contact Phone", has: !!inst.contact_phone, value: inst.contact_phone || "Not provided" },
     { label: "Contact Email", has: !!inst.contact_email, value: inst.contact_email || "Not provided" },
