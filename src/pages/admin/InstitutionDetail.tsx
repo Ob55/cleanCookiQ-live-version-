@@ -51,6 +51,35 @@ export default function InstitutionDetail() {
     enabled: !!id,
   });
 
+  const { data: needs } = useQuery({
+    queryKey: ["institution_needs", id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("institution_needs")
+        .select("*, supplier_interest(*, providers(name))")
+        .eq("institution_id", id!)
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+    enabled: !!id,
+  });
+
+  const addNeed = async () => {
+    if (!needDesc.trim() || !id || !user) return;
+    setNeedSaving(true);
+    const { error } = await supabase.from("institution_needs").insert({
+      institution_id: id,
+      description: needDesc.trim(),
+      technology_type: needTech || null,
+      created_by: user.id,
+    });
+    setNeedSaving(false);
+    if (error) { toast.error(error.message); return; }
+    setNeedDesc(""); setNeedTech(""); setNeedDialogOpen(false);
+    queryClient.invalidateQueries({ queryKey: ["institution_needs", id] });
+    toast.success("Need added — suppliers will be notified");
+  };
+
   if (isLoading) return <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!institution) return <div className="text-center py-16"><p>Institution not found</p></div>;
 
