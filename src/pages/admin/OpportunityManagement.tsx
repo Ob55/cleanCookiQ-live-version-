@@ -12,7 +12,6 @@ import { toast } from "sonner";
 import { FileText, Plus, Loader2, Search, DollarSign, Calendar } from "lucide-react";
 import { useState } from "react";
 import { notifyInstitutionOwner, notifyFunders } from "@/lib/notifications";
-import { useState } from "react";
 
 export default function OpportunityManagement() {
   const { profile } = useAuth();
