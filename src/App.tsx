@@ -43,7 +43,7 @@ import FinancingPage from "@/pages/FinancingPage";
 import InstitutionSetup from "@/pages/institution/InstitutionSetup";
 import InstitutionDashboard from "@/pages/institution/InstitutionDashboard";
 import InstitutionProfile from "@/pages/institution/InstitutionProfile";
-import InstitutionPathway from "@/pages/institution/InstitutionPathway";
+import CookingAlchemy from "@/pages/institution/CookingAlchemy";
 import InstitutionDocuments from "@/pages/institution/InstitutionDocuments";
 import InstitutionSupport from "@/pages/institution/InstitutionSupport";
 
@@ -95,7 +95,7 @@ const App = () => (
             <Route element={<ProtectedRoute><InstitutionLayout /></ProtectedRoute>}>
               <Route path="/institution/dashboard" element={<InstitutionDashboard />} />
               <Route path="/institution/profile" element={<InstitutionProfile />} />
-              <Route path="/institution/pathway" element={<InstitutionPathway />} />
+              <Route path="/institution/alchemy" element={<CookingAlchemy />} />
               <Route path="/institution/documents" element={<InstitutionDocuments />} />
               <Route path="/institution/support" element={<InstitutionSupport />} />
             </Route>
