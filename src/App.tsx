@@ -39,6 +39,11 @@ import ProgramManagement from "@/pages/admin/ProgramManagement";
 import TADashboard from "@/pages/ta/TADashboard";
 import FinancingPage from "@/pages/FinancingPage";
 
+import InstitutionLayout from "@/components/layouts/InstitutionLayout";
+import InstitutionSetup from "@/pages/institution/InstitutionSetup";
+import InstitutionDashboard from "@/pages/institution/InstitutionDashboard";
+import InstitutionPlaceholder from "@/pages/institution/InstitutionPlaceholder";
+
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();

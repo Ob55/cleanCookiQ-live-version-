@@ -22,6 +22,19 @@ export default function LoginPage() {
       toast.error(error.message);
     } else {
       toast.success("Logged in successfully");
+      // Check org_type to route institution users separately
+      const { data: { user: loggedUser } } = await supabase.auth.getUser();
+      if (loggedUser) {
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("org_type")
+          .eq("user_id", loggedUser.id)
+          .single();
+        if (profileData?.org_type === "institution") {
+          navigate("/institution/dashboard");
+          return;
+        }
+      }
       navigate("/admin/pipeline");
     }
   };
