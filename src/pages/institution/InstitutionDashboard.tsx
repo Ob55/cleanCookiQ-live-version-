@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Flame, UtensilsCrossed, Droplets, BarChart3, Loader2 } from "lucide-react";
+import { Flame, UtensilsCrossed, Droplets, BarChart3, Loader2, User, Phone, Mail, MapPin } from "lucide-react";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood", charcoal: "Charcoal", lpg: "LPG",
@@ -14,6 +14,7 @@ const FUEL_LABELS: Record<string, string> = {
 interface Institution {
   name: string;
   county: string;
+  sub_county: string | null;
   ownership_type: string | null;
   meals_per_day: number | null;
   current_fuel: string | null;
@@ -29,6 +30,8 @@ interface Institution {
   recommended_solution: string | null;
   annual_savings_ksh: number | null;
   co2_reduction_tonnes_pa: number | null;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 function computeCompletion(inst: Institution): number {
@@ -153,6 +156,71 @@ export default function InstitutionDashboard() {
           <CardContent>
             <p className="text-lg font-semibold text-muted-foreground">Pending Assessment</p>
             <p className="text-sm text-muted-foreground">Complete your profile to unlock</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Contact & Location */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base font-semibold">Contact Information</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-3">
+              <User className="h-4 w-4 text-muted-foreground shrink-0" />
+              <div>
+                <p className="text-xs text-muted-foreground">Contact Person</p>
+                <p className="text-sm font-medium">{institution.contact_person || "—"}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
+              <div>
+                <p className="text-xs text-muted-foreground">Phone</p>
+                <p className="text-sm font-medium">{institution.contact_phone || "—"}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
+              <div>
+                <p className="text-xs text-muted-foreground">Email</p>
+                <p className="text-sm font-medium">{institution.contact_email || "—"}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base font-semibold">Location</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-3">
+              <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
+              <div>
+                <p className="text-xs text-muted-foreground">County</p>
+                <p className="text-sm font-medium">{institution.county}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
+              <div>
+                <p className="text-xs text-muted-foreground">Sub-County</p>
+                <p className="text-sm font-medium">{institution.sub_county || "—"}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
+              <div>
+                <p className="text-xs text-muted-foreground">Coordinates</p>
+                <p className="text-sm font-medium">
+                  {institution.latitude && institution.longitude
+                    ? `${institution.latitude}, ${institution.longitude}`
+                    : "—"}
+                </p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
