@@ -332,6 +332,7 @@ export type Database = {
           contact_email: string | null
           contact_person: string | null
           contact_phone: string | null
+          cooking_time_minutes: number | null
           county: string
           created_at: string
           created_by: string | null
@@ -339,6 +340,7 @@ export type Database = {
           fuel_of_choice: string | null
           id: string
           institution_type: Database["public"]["Enums"]["institution_type"]
+          kitchen_photo_url: string | null
           latitude: number | null
           longitude: number | null
           meals_per_day: number | null
@@ -368,6 +370,7 @@ export type Database = {
           contact_email?: string | null
           contact_person?: string | null
           contact_phone?: string | null
+          cooking_time_minutes?: number | null
           county: string
           created_at?: string
           created_by?: string | null
@@ -375,6 +378,7 @@ export type Database = {
           fuel_of_choice?: string | null
           id?: string
           institution_type?: Database["public"]["Enums"]["institution_type"]
+          kitchen_photo_url?: string | null
           latitude?: number | null
           longitude?: number | null
           meals_per_day?: number | null
@@ -404,6 +408,7 @@ export type Database = {
           contact_email?: string | null
           contact_person?: string | null
           contact_phone?: string | null
+          cooking_time_minutes?: number | null
           county?: string
           created_at?: string
           created_by?: string | null
@@ -411,6 +416,7 @@ export type Database = {
           fuel_of_choice?: string | null
           id?: string
           institution_type?: Database["public"]["Enums"]["institution_type"]
+          kitchen_photo_url?: string | null
           latitude?: number | null
           longitude?: number | null
           meals_per_day?: number | null

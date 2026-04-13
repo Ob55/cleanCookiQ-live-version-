@@ -57,11 +57,9 @@ export default function InstitutionSetup() {
   const [mealsPerDay, setMealsPerDay] = useState("");
   const [fuelType, setFuelType] = useState("");
   const [consumption, setConsumption] = useState("");
-  const [steamTransition, setSteamTransition] = useState<boolean | null>(null);
-
   const unit = fuelType ? FUEL_UNITS[fuelType] : null;
 
-  const isValid = name.trim() && county && ownershipType && mealsPerDay && fuelType && consumption && steamTransition !== null;
+  const isValid = name.trim() && county && ownershipType && mealsPerDay && fuelType && consumption;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,7 +94,6 @@ export default function InstitutionSetup() {
         current_fuel: OWNERSHIP_MAP[fuelType] as any,
         consumption_per_term: parseFloat(consumption),
         consumption_unit: unit,
-        wishes_to_transition_steam: steamTransition,
         setup_completed: true,
         created_by: user.id,
       };
@@ -208,36 +205,8 @@ export default function InstitutionSetup() {
               </div>
             </div>
 
-            {/* Field 7 — Steam Transition */}
-            <div>
-              <Label>Do you wish to transition to steam cooking?</Label>
-              <div className="flex gap-3 mt-2">
-                <button
-                  type="button"
-                  onClick={() => setSteamTransition(true)}
-                  className={`flex-1 py-2.5 rounded-lg text-sm font-semibold border-2 transition-colors ${
-                    steamTransition === true
-                      ? "text-white border-transparent"
-                      : "border-[#00712D] text-[#00712D] bg-white hover:bg-[#00712D]/5"
-                  }`}
-                  style={steamTransition === true ? { backgroundColor: "#00712D" } : {}}
-                >
-                  Yes
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSteamTransition(false)}
-                  className={`flex-1 py-2.5 rounded-lg text-sm font-semibold border-2 transition-colors ${
-                    steamTransition === false
-                      ? "text-white border-transparent"
-                      : "border-[#00712D] text-[#00712D] bg-white hover:bg-[#0A400C]/5"
-                  }`}
-                  style={steamTransition === false ? { backgroundColor: "#0A400C" } : {}}
-                >
-                  No
-                </button>
-              </div>
-            </div>
+
+
 
             <Button type="submit" className="w-full min-h-[44px]" disabled={!isValid || loading}>
               {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
