@@ -227,6 +227,7 @@ export default function OpportunityManagement() {
                   <td className="p-3">
                     <Badge variant="secondary" className={statusColors[o.status] || ""}>{o.status}</Badge>
                   </td>
+                  <td className="p-3 text-sm text-muted-foreground">{(o as any).created_by_name || "—"}</td>
                   <td className="p-3 text-sm text-muted-foreground">
                     {o.deadline ? new Date(o.deadline).toLocaleDateString() : "—"}
                   </td>
@@ -243,7 +244,7 @@ export default function OpportunityManagement() {
                 </tr>
               ))}
               {!filtered?.length && (
-                <tr><td colSpan={6} className="p-8 text-center text-muted-foreground">No opportunities found</td></tr>
+                <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">No opportunities found</td></tr>
               )}
             </tbody>
           </table>
