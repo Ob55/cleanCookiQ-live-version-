@@ -152,6 +152,7 @@ export default function TransitionProductSelector({ institutionId, editable = tr
       price: sp.provider_products?.price,
       image_url: sp.provider_products?.image_url,
       provider: sp.provider_products?.providers?.name || "Unknown provider",
+      providerPhone: sp.provider_products?.providers?.contact_phone || null,
       quantity: sp.quantity || 1,
     })),
     ...selectedServices.map((ss: any) => ({
@@ -163,6 +164,7 @@ export default function TransitionProductSelector({ institutionId, editable = tr
       price: (ss.provider_services as any)?.price,
       image_url: null,
       provider: ss.provider_services?.providers?.name || "Unknown provider",
+      providerPhone: ss.provider_services?.providers?.contact_phone || null,
       quantity: ss.quantity || 1,
     })),
   ];
