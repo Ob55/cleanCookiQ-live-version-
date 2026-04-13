@@ -56,6 +56,7 @@ import SupplierProducts from "@/pages/supplier/SupplierProducts";
 import SupplierServices from "@/pages/supplier/SupplierServices";
 import SupplierDocuments from "@/pages/supplier/SupplierDocuments";
 import FunderDashboard from "@/pages/funder/FunderDashboard";
+import FunderInstitutionDetail from "@/pages/funder/FunderInstitutionDetail";
 
 import NotFound from "@/pages/NotFound";
 
@@ -126,6 +127,7 @@ const App = () => (
             {/* Funder pages (with sidebar) */}
             <Route element={<ProtectedRoute><FunderLayout /></ProtectedRoute>}>
               <Route path="/funder/dashboard" element={<FunderDashboard />} />
+              <Route path="/funder/institution/:id" element={<FunderInstitutionDetail />} />
             </Route>
 
             {/* Admin pages (protected) */}

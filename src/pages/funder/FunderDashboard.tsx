@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, MapPin, Flame, BarChart3, Droplets, Banknote } from "lucide-react";
+import { Loader2, MapPin, Flame, BarChart3, Droplets, Banknote, Link2, Unlink } from "lucide-react";
 import { toast } from "sonner";
 import { notifyAdmins } from "@/lib/notifications";
 
@@ -14,11 +13,21 @@ const FUEL_LABELS: Record<string, string> = {
   biogas: "Biogas", electric: "Electric (Induction)", other: "Biomass Pellets",
 };
 
+async function notifyInstitutionOwner(institutionId: string, title: string, body: string) {
+  const { data: inst } = await supabase
+    .from("institutions")
+    .select("created_by")
+    .eq("id", institutionId)
+    .maybeSingle();
+  if (inst?.created_by) {
+    await supabase.from("notifications").insert({ user_id: inst.created_by, title, body });
+  }
+}
+
 export default function FunderDashboard() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // Get funder profile
   const { data: funderProfile, isLoading: fpLoading } = useQuery({
     queryKey: ["funder-profile", user?.id],
     queryFn: async () => {
@@ -33,7 +42,6 @@ export default function FunderDashboard() {
     enabled: !!user,
   });
 
-  // Get institutions with transition_interest = yes or maybe
   const { data: institutions, isLoading: instLoading } = useQuery({
     queryKey: ["funder-institutions"],
     queryFn: async () => {
@@ -46,21 +54,19 @@ export default function FunderDashboard() {
     },
   });
 
-  // Get existing links
   const { data: myLinks } = useQuery({
     queryKey: ["funder-links", funderProfile?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("funder_institution_links")
-        .select("institution_id")
+        .select("id, institution_id")
         .eq("funder_id", funderProfile!.id);
       if (error) throw error;
-      return data?.map(l => l.institution_id) || [];
+      return data || [];
     },
     enabled: !!funderProfile?.id,
   });
 
-  // Get readiness scores
   const { data: scores } = useQuery({
     queryKey: ["readiness-scores"],
     queryFn: async () => {
@@ -81,12 +87,16 @@ export default function FunderDashboard() {
       });
       if (error) throw error;
 
-      // Find institution name
       const inst = institutions?.find(i => i.id === institutionId);
       if (inst) {
         await notifyAdmins(
           "Funder Linked to Institution",
           `${funderProfile.organisation_name} has expressed interest in funding ${inst.name} in ${inst.county}. Funding Type: ${funderProfile.funding_type}. Please review and create an opportunity for this institution.`
+        );
+        await notifyInstitutionOwner(
+          institutionId,
+          "A Funder Has Linked to Your Institution",
+          `${funderProfile.organisation_name} has linked to ${inst.name} and is interested in supporting your clean cooking transition. Log in to view details.`
         );
       }
     },
@@ -97,12 +107,44 @@ export default function FunderDashboard() {
     onError: (e: any) => toast.error(e.message),
   });
 
+  const unlinkMutation = useMutation({
+    mutationFn: async (institutionId: string) => {
+      if (!funderProfile) throw new Error("No funder profile");
+      const link = myLinks?.find(l => l.institution_id === institutionId);
+      if (!link) throw new Error("Link not found");
+
+      const { error } = await supabase
+        .from("funder_institution_links")
+        .delete()
+        .eq("id", link.id);
+      if (error) throw error;
+
+      const inst = institutions?.find(i => i.id === institutionId);
+      if (inst) {
+        await notifyAdmins(
+          "Funder Unlinked from Institution",
+          `${funderProfile.organisation_name} has unlinked from ${inst.name} in ${inst.county}. The institution no longer has a linked funder.`
+        );
+        await notifyInstitutionOwner(
+          institutionId,
+          "A Funder Has Unlinked from Your Institution",
+          `${funderProfile.organisation_name} has unlinked from ${inst.name}. You may receive interest from other funders in the future.`
+        );
+      }
+    },
+    onSuccess: () => {
+      toast.success("You have been unlinked from this institution.");
+      queryClient.invalidateQueries({ queryKey: ["funder-links"] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
   const getScore = (id: string) => {
     const s = scores?.find(s => s.institution_id === id);
     return s?.overall_score;
   };
 
-  const isLinked = (id: string) => myLinks?.includes(id);
+  const isLinked = (id: string) => myLinks?.some(l => l.institution_id === id);
 
   if (fpLoading || instLoading) {
     return (
@@ -140,9 +182,12 @@ export default function FunderDashboard() {
             const score = inst.assessment_score || getScore(inst.id);
             const linked = isLinked(inst.id);
             return (
-              <Card key={inst.id} className="flex flex-col">
+              <Card key={inst.id} className={`flex flex-col ${linked ? "ring-2 ring-primary/50" : ""}`}>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base">{inst.name}</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base">{inst.name}</CardTitle>
+                    {linked && <Badge className="bg-primary/20 text-primary text-xs">Linked</Badge>}
+                  </div>
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <MapPin className="h-3 w-3" /> {inst.county}
                   </div>
@@ -152,7 +197,7 @@ export default function FunderDashboard() {
                     <Flame className="h-4 w-4 text-primary" />
                     <span>{inst.current_fuel ? FUEL_LABELS[inst.current_fuel] || inst.current_fuel : "—"}</span>
                   </div>
-                  {score != null && (
+                  {score != null && score > 0 && (
                     <div className="flex items-center gap-2 text-sm">
                       <BarChart3 className="h-4 w-4 text-primary" />
                       <span>Score: {score}%</span>
@@ -170,7 +215,7 @@ export default function FunderDashboard() {
                   <div className="flex items-center gap-2 text-sm">
                     <Banknote className="h-4 w-4 text-primary" />
                     <Badge variant="secondary" className={
-                      inst.transition_interest === "yes" ? "bg-emerald-500/20 text-emerald-600" 
+                      inst.transition_interest === "yes" ? "bg-emerald-500/20 text-emerald-600"
                       : inst.transition_interest === "maybe" ? "bg-amber-500/20 text-amber-600"
                       : "bg-muted text-muted-foreground"
                     }>
@@ -178,13 +223,28 @@ export default function FunderDashboard() {
                     </Badge>
                   </div>
 
-                  <Button
-                    className="w-full mt-2"
-                    disabled={linked || linkMutation.isPending}
-                    onClick={() => linkMutation.mutate(inst.id)}
-                  >
-                    {linked ? "✓ Linked" : linkMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Fund This Institution"}
-                  </Button>
+                  {linked ? (
+                    <Button
+                      variant="outline"
+                      className="w-full mt-2 text-destructive border-destructive/30 hover:bg-destructive/10"
+                      disabled={unlinkMutation.isPending}
+                      onClick={() => unlinkMutation.mutate(inst.id)}
+                    >
+                      {unlinkMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : (
+                        <><Unlink className="h-4 w-4 mr-2" /> Unlink</>
+                      )}
+                    </Button>
+                  ) : (
+                    <Button
+                      className="w-full mt-2"
+                      disabled={linkMutation.isPending}
+                      onClick={() => linkMutation.mutate(inst.id)}
+                    >
+                      {linkMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : (
+                        <><Link2 className="h-4 w-4 mr-2" /> Fund This Institution</>
+                      )}
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             );
