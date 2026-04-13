@@ -44,13 +44,14 @@ export default function SupplierSetup() {
         .eq("user_id", user.id);
 
       // Create provider record
-      await supabase.from("providers").insert({
+      const { error: provErr } = await supabase.from("providers").insert({
         name: companyName.trim(),
         organisation_id: org.id,
         contact_email: contactEmail || null,
         contact_phone: contactPhone || null,
         contact_person: user.user_metadata?.full_name || null,
       });
+      if (provErr) throw provErr;
 
       await refreshProfile();
       toast.success("Company setup complete!");
