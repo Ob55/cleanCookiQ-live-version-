@@ -6,13 +6,38 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Pencil, Save, X, Loader2, Users, UserCheck, Clock, Camera } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
+import { Building2, Pencil, Save, X, Loader2, Users, UserCheck, Clock, Camera, Banknote, ChefHat, Landmark, CreditCard } from "lucide-react";
 import { toast } from "sonner";
+import { calculateAssessmentScore } from "@/lib/assessmentScoring";
 import TransitionNeedsSection from "@/components/institution/TransitionNeedsSection";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood", charcoal: "Charcoal", lpg: "LPG",
   biogas: "Biogas", electric: "Electric (Induction)", other: "Biomass Pellets",
+};
+
+const KITCHEN_CONDITION_LABELS: Record<string, string> = {
+  clean_ready: "Clean and ready",
+  minor_renovation: "Minor renovation needed",
+  major_renovation: "Major renovation needed",
+};
+
+const FINANCING_LABELS: Record<string, string> = {
+  loan: "Loan acceptable",
+  partial: "Partial grant + partial loan",
+  grant: "Full grant only",
+  not_sure: "Not sure",
+};
+
+const DECISION_MAKER_LABELS: Record<string, string> = {
+  head_teacher: "Head Teacher / Principal",
+  board_of_governors: "Board of Governors",
+  religious_body: "Religious Sponsoring Body",
+  pta: "Parent Teacher Association",
+  county_government: "County Government / Ministry",
 };
 
 interface InstitutionData {
@@ -31,6 +56,12 @@ interface InstitutionData {
   contact_person: string | null;
   contact_email: string | null;
   contact_phone: string | null;
+  monthly_fuel_spend: number | null;
+  has_dedicated_kitchen: boolean | null;
+  kitchen_condition: string | null;
+  financing_preference: string | null;
+  financial_decision_maker: string | null;
+  transition_needs: string | null;
 }
 
 export default function InstitutionProfile() {
@@ -46,6 +77,15 @@ export default function InstitutionProfile() {
   const [cookingTime, setCookingTime] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [contactPerson, setContactPerson] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [monthlyFuelSpend, setMonthlyFuelSpend] = useState("");
+  const [hasDedicatedKitchen, setHasDedicatedKitchen] = useState("");
+  const [kitchenCondition, setKitchenCondition] = useState("");
+  const [financingPreference, setFinancingPreference] = useState("");
+  const [financialDecisionMaker, setFinancialDecisionMaker] = useState("");
+  const [transitionNeeds, setTransitionNeeds] = useState("");
 
   useEffect(() => {
     if (!user) return;
@@ -58,14 +98,27 @@ export default function InstitutionProfile() {
       if (data) {
         const inst = data as unknown as InstitutionData;
         setInstitution(inst);
-        setNumStudents(inst.number_of_students?.toString() || "");
-        setNumStaff(inst.number_of_staff?.toString() || "");
-        setCookingTime((inst.cooking_time_minutes as number)?.toString() || "");
-        setPhotoPreview(inst.kitchen_photo_url || null);
+        populateFields(inst);
       }
       setLoading(false);
     })();
   }, [user]);
+
+  const populateFields = (inst: InstitutionData) => {
+    setNumStudents(inst.number_of_students?.toString() || "");
+    setNumStaff(inst.number_of_staff?.toString() || "");
+    setCookingTime((inst.cooking_time_minutes as number)?.toString() || "");
+    setPhotoPreview(inst.kitchen_photo_url || null);
+    setContactPerson(inst.contact_person || "");
+    setContactPhone(inst.contact_phone || "");
+    setContactEmail(inst.contact_email || "");
+    setMonthlyFuelSpend(inst.monthly_fuel_spend?.toString() || "");
+    setHasDedicatedKitchen(inst.has_dedicated_kitchen === true ? "yes" : inst.has_dedicated_kitchen === false ? "no" : "");
+    setKitchenCondition(inst.kitchen_condition || "");
+    setFinancingPreference(inst.financing_preference || "");
+    setFinancialDecisionMaker(inst.financial_decision_maker || "");
+    setTransitionNeeds(inst.transition_needs || "");
+  };
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -81,7 +134,6 @@ export default function InstitutionProfile() {
     try {
       let kitchenPhotoUrl = institution.kitchen_photo_url;
 
-      // Upload photo if changed
       if (photoFile) {
         const ext = photoFile.name.split(".").pop();
         const path = `kitchen-photos/${institution.id}.${ext}`;
@@ -96,29 +148,49 @@ export default function InstitutionProfile() {
         }
       }
 
-      const { error } = await supabase
-        .from("institutions")
-        .update({
-          number_of_students: numStudents ? parseInt(numStudents) : null,
-          number_of_staff: numStaff ? parseInt(numStaff) : null,
-          cooking_time_minutes: cookingTime ? parseInt(cookingTime) : null,
-          kitchen_photo_url: kitchenPhotoUrl,
-        })
-        .eq("id", institution.id);
+      const kitchenBool = hasDedicatedKitchen === "yes" ? true : hasDedicatedKitchen === "no" ? false : null;
 
-      if (error) throw error;
+      // Recalculate assessment score
+      const { score, category } = calculateAssessmentScore({
+        current_fuel: institution.current_fuel,
+        consumption_per_term: institution.consumption_per_term,
+        has_dedicated_kitchen: kitchenBool,
+        kitchen_condition: kitchenCondition || null,
+        financing_preference: financingPreference || null,
+        number_of_students: numStudents ? parseInt(numStudents) : null,
+        monthly_fuel_spend: monthlyFuelSpend ? parseFloat(monthlyFuelSpend) : null,
+        financial_decision_maker: financialDecisionMaker || null,
+      });
 
-      setInstitution(prev => prev ? {
-        ...prev,
+      const updateData = {
         number_of_students: numStudents ? parseInt(numStudents) : null,
         number_of_staff: numStaff ? parseInt(numStaff) : null,
         cooking_time_minutes: cookingTime ? parseInt(cookingTime) : null,
         kitchen_photo_url: kitchenPhotoUrl,
-      } : null);
+        contact_person: contactPerson || null,
+        contact_phone: contactPhone || null,
+        contact_email: contactEmail || null,
+        monthly_fuel_spend: monthlyFuelSpend ? parseFloat(monthlyFuelSpend) : null,
+        has_dedicated_kitchen: kitchenBool,
+        kitchen_condition: kitchenCondition || null,
+        financing_preference: financingPreference || null,
+        financial_decision_maker: financialDecisionMaker || null,
+        transition_needs: transitionNeeds || null,
+        assessment_score: score,
+        assessment_category: category,
+      };
 
+      const { error } = await supabase
+        .from("institutions")
+        .update(updateData)
+        .eq("id", institution.id);
+
+      if (error) throw error;
+
+      setInstitution(prev => prev ? { ...prev, ...updateData } : null);
       setPhotoFile(null);
       setEditing(false);
-      toast.success("Institution updated successfully!");
+      toast.success("Profile updated! Your readiness score has been recalculated.");
     } catch (err: any) {
       toast.error(err.message || "Failed to update");
     } finally {
@@ -127,13 +199,8 @@ export default function InstitutionProfile() {
   };
 
   const handleCancel = () => {
-    if (institution) {
-      setNumStudents(institution.number_of_students?.toString() || "");
-      setNumStaff(institution.number_of_staff?.toString() || "");
-      setCookingTime((institution.cooking_time_minutes as number)?.toString() || "");
-      setPhotoPreview(institution.kitchen_photo_url || null);
-      setPhotoFile(null);
-    }
+    if (institution) populateFields(institution);
+    setPhotoFile(null);
     setEditing(false);
   };
 
@@ -210,17 +277,51 @@ export default function InstitutionProfile() {
         </CardContent>
       </Card>
 
+      {/* Contact Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Contact Information</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div>
+              <Label className="text-sm text-muted-foreground">Contact Person</Label>
+              {editing ? (
+                <Input value={contactPerson} onChange={e => setContactPerson(e.target.value)} placeholder="e.g. Jane Wanjiku" className="mt-1" />
+              ) : (
+                <p className="text-sm font-medium mt-1">{institution.contact_person || "Not set"}</p>
+              )}
+            </div>
+            <div>
+              <Label className="text-sm text-muted-foreground">Phone</Label>
+              {editing ? (
+                <Input value={contactPhone} onChange={e => setContactPhone(e.target.value)} placeholder="e.g. 0712345678" className="mt-1" />
+              ) : (
+                <p className="text-sm font-medium mt-1">{institution.contact_phone || "Not set"}</p>
+              )}
+            </div>
+            <div>
+              <Label className="text-sm text-muted-foreground">Email</Label>
+              {editing ? (
+                <Input type="email" value={contactEmail} onChange={e => setContactEmail(e.target.value)} placeholder="e.g. info@school.ac.ke" className="mt-1" />
+              ) : (
+                <p className="text-sm font-medium mt-1">{institution.contact_email || "Not set"}</p>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Editable Details */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Additional Details</CardTitle>
+          <CardTitle className="text-lg">Operational Details</CardTitle>
           <CardDescription>
-            {editing ? "Update your institution's additional information" : "Extra information about your institution"}
+            {editing ? "Update your institution's information" : "Operational information about your institution"}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {/* Number of Students */}
             <div className="flex items-start gap-3">
               <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-1">
                 <Users className="h-5 w-5 text-primary" />
@@ -228,18 +329,13 @@ export default function InstitutionProfile() {
               <div className="flex-1">
                 <Label className="text-sm text-muted-foreground">Number of Students</Label>
                 {editing ? (
-                  <Input
-                    type="number" min="0" value={numStudents}
-                    onChange={e => setNumStudents(e.target.value)}
-                    placeholder="e.g. 500" className="mt-1"
-                  />
+                  <Input type="number" min="0" value={numStudents} onChange={e => setNumStudents(e.target.value)} placeholder="e.g. 500" className="mt-1" />
                 ) : (
                   <p className="text-lg font-semibold">{institution.number_of_students || "Not set"}</p>
                 )}
               </div>
             </div>
 
-            {/* Number of Staff */}
             <div className="flex items-start gap-3">
               <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-1">
                 <UserCheck className="h-5 w-5 text-primary" />
@@ -247,66 +343,193 @@ export default function InstitutionProfile() {
               <div className="flex-1">
                 <Label className="text-sm text-muted-foreground">Number of Staff</Label>
                 {editing ? (
-                  <Input
-                    type="number" min="0" value={numStaff}
-                    onChange={e => setNumStaff(e.target.value)}
-                    placeholder="e.g. 30" className="mt-1"
-                  />
+                  <Input type="number" min="0" value={numStaff} onChange={e => setNumStaff(e.target.value)} placeholder="e.g. 30" className="mt-1" />
                 ) : (
                   <p className="text-lg font-semibold">{institution.number_of_staff || "Not set"}</p>
                 )}
               </div>
             </div>
 
-            {/* Cooking Time */}
             <div className="flex items-start gap-3">
               <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-1">
                 <Clock className="h-5 w-5 text-primary" />
               </div>
               <div className="flex-1">
-                <Label className="text-sm text-muted-foreground">Time Spent Cooking (minutes per session)</Label>
+                <Label className="text-sm text-muted-foreground">Cooking Time (minutes/session)</Label>
                 {editing ? (
-                  <Input
-                    type="number" min="0" value={cookingTime}
-                    onChange={e => setCookingTime(e.target.value)}
-                    placeholder="e.g. 120" className="mt-1"
-                  />
+                  <Input type="number" min="0" value={cookingTime} onChange={e => setCookingTime(e.target.value)} placeholder="e.g. 120" className="mt-1" />
                 ) : (
-                  <p className="text-lg font-semibold">
-                    {institution.cooking_time_minutes ? `${institution.cooking_time_minutes} mins` : "Not set"}
-                  </p>
+                  <p className="text-lg font-semibold">{institution.cooking_time_minutes ? `${institution.cooking_time_minutes} mins` : "Not set"}</p>
                 )}
               </div>
             </div>
 
-            {/* Kitchen Photo */}
             <div className="flex items-start gap-3">
               <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-1">
-                <Camera className="h-5 w-5 text-primary" />
+                <Banknote className="h-5 w-5 text-primary" />
               </div>
               <div className="flex-1">
-                <Label className="text-sm text-muted-foreground">Kitchen Photo</Label>
+                <Label className="text-sm text-muted-foreground">Monthly Fuel Spend (KSh)</Label>
                 {editing ? (
-                  <div className="mt-1">
-                    <Input type="file" accept="image/*" onChange={handlePhotoChange} />
-                    {photoPreview && (
-                      <img src={photoPreview} alt="Kitchen preview" className="mt-2 rounded-lg max-h-40 object-cover" />
-                    )}
-                  </div>
+                  <Input type="number" min="0" value={monthlyFuelSpend} onChange={e => setMonthlyFuelSpend(e.target.value)} placeholder="e.g. 50000" className="mt-1" />
                 ) : (
-                  photoPreview ? (
-                    <img src={photoPreview} alt="Kitchen" className="mt-1 rounded-lg max-h-40 object-cover" />
-                  ) : (
-                    <p className="text-lg font-semibold text-muted-foreground">No photo uploaded</p>
-                  )
+                  <p className="text-lg font-semibold">{institution.monthly_fuel_spend ? `KSh ${institution.monthly_fuel_spend.toLocaleString()}` : "Not set"}</p>
                 )}
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* Kitchen & Assessment Details */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Kitchen & Readiness Assessment</CardTitle>
+          <CardDescription>
+            {editing ? "Update your kitchen and readiness details — your score will be recalculated on save" : "These details feed into your readiness score"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {/* Dedicated Kitchen */}
+            <div className="flex items-start gap-3">
+              <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-1">
+                <ChefHat className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <Label className="text-sm text-muted-foreground">Dedicated Kitchen</Label>
+                {editing ? (
+                  <RadioGroup value={hasDedicatedKitchen} onValueChange={setHasDedicatedKitchen} className="flex gap-4 mt-2">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="yes" id="dk-yes" />
+                      <Label htmlFor="dk-yes" className="font-normal">Yes</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="no" id="dk-no" />
+                      <Label htmlFor="dk-no" className="font-normal">No</Label>
+                    </div>
+                  </RadioGroup>
+                ) : (
+                  <p className="text-lg font-semibold">{institution.has_dedicated_kitchen === true ? "Yes" : institution.has_dedicated_kitchen === false ? "No" : "Not set"}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Kitchen Condition */}
+            <div className="flex items-start gap-3">
+              <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-1">
+                <Building2 className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <Label className="text-sm text-muted-foreground">Kitchen Condition</Label>
+                {editing ? (
+                  <Select value={kitchenCondition} onValueChange={setKitchenCondition}>
+                    <SelectTrigger className="mt-1"><SelectValue placeholder="Select condition" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="clean_ready">Clean and ready</SelectItem>
+                      <SelectItem value="minor_renovation">Minor renovation needed</SelectItem>
+                      <SelectItem value="major_renovation">Major renovation needed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p className="text-lg font-semibold">{institution.kitchen_condition ? KITCHEN_CONDITION_LABELS[institution.kitchen_condition] || institution.kitchen_condition : "Not set"}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Financing Preference */}
+            <div className="flex items-start gap-3">
+              <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-1">
+                <CreditCard className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <Label className="text-sm text-muted-foreground">Financing Preference</Label>
+                {editing ? (
+                  <Select value={financingPreference} onValueChange={setFinancingPreference}>
+                    <SelectTrigger className="mt-1"><SelectValue placeholder="Select preference" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="loan">Loan acceptable</SelectItem>
+                      <SelectItem value="partial">Partial grant + partial loan</SelectItem>
+                      <SelectItem value="grant">Full grant only</SelectItem>
+                      <SelectItem value="not_sure">Not sure</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p className="text-lg font-semibold">{institution.financing_preference ? FINANCING_LABELS[institution.financing_preference] || institution.financing_preference : "Not set"}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Financial Decision Maker */}
+            <div className="flex items-start gap-3">
+              <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-1">
+                <Landmark className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <Label className="text-sm text-muted-foreground">Financial Decision Maker</Label>
+                {editing ? (
+                  <Select value={financialDecisionMaker} onValueChange={setFinancialDecisionMaker}>
+                    <SelectTrigger className="mt-1"><SelectValue placeholder="Select decision maker" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="head_teacher">Head Teacher / Principal</SelectItem>
+                      <SelectItem value="board_of_governors">Board of Governors</SelectItem>
+                      <SelectItem value="religious_body">Religious Sponsoring Body</SelectItem>
+                      <SelectItem value="pta">Parent Teacher Association</SelectItem>
+                      <SelectItem value="county_government">County Government / Ministry</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p className="text-lg font-semibold">{institution.financial_decision_maker ? DECISION_MAKER_LABELS[institution.financial_decision_maker] || institution.financial_decision_maker : "Not set"}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Kitchen Photo */}
+          <div className="flex items-start gap-3">
+            <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-1">
+              <Camera className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1">
+              <Label className="text-sm text-muted-foreground">Kitchen Photo</Label>
+              {editing ? (
+                <div className="mt-1">
+                  <Input type="file" accept="image/*" onChange={handlePhotoChange} />
+                  {photoPreview && (
+                    <img src={photoPreview} alt="Kitchen preview" className="mt-2 rounded-lg max-h-40 object-cover" />
+                  )}
+                </div>
+              ) : (
+                photoPreview ? (
+                  <img src={photoPreview} alt="Kitchen" className="mt-1 rounded-lg max-h-40 object-cover" />
+                ) : (
+                  <p className="text-lg font-semibold text-muted-foreground">No photo uploaded</p>
+                )
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Transition Needs */}
-      <TransitionNeedsSection institutionId={institution.id} />
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">What We Need for Transitioning</CardTitle>
+          <CardDescription>Describe any equipment, installation, financing, or training needs</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {editing ? (
+            <Textarea
+              value={transitionNeeds}
+              onChange={e => setTransitionNeeds(e.target.value)}
+              placeholder="e.g. We need an industrial LPG stove system, installation support, and staff training on safe gas usage..."
+              rows={4}
+            />
+          ) : (
+            <p className="text-sm">{institution.transition_needs || "Not described yet. Click Edit to add your transition requirements."}</p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
