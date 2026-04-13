@@ -1,10 +1,11 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, LogOut, Menu, Bell, Building2 } from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, Building2 } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import NotificationBell from "@/components/NotificationBell";
 
 export default function FunderLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -150,9 +151,7 @@ export default function FunderLayout() {
           </button>
           <div className="flex-1" />
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-4 w-4" />
-            </Button>
+            <NotificationBell />
             <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
               <span className="text-xs font-bold text-primary-foreground">{initials}</span>
             </div>

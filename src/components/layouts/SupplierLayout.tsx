@@ -1,11 +1,12 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard, Package, Wrench, FileCheck, Menu, LogOut, Bell
+  LayoutDashboard, Package, Wrench, FileCheck, Menu, LogOut
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import NotificationBell from "@/components/NotificationBell";
 
 const supplierNav = [
   { label: "Dashboard", href: "/supplier/dashboard", icon: LayoutDashboard },
@@ -110,14 +111,7 @@ export default function SupplierLayout() {
           </button>
           <div className="flex-1" />
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="relative" onClick={() => navigate("/supplier/dashboard")}>
-              <Bell className="h-4 w-4" />
-              {needsCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-accent text-[10px] font-bold flex items-center justify-center text-accent-foreground">
-                  {needsCount > 9 ? "9+" : needsCount}
-                </span>
-              )}
-            </Button>
+            <NotificationBell />
             <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
               <span className="text-xs font-bold text-primary-foreground">{initials}</span>
             </div>

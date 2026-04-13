@@ -1,12 +1,13 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Building2, Users, ClipboardCheck, Settings,
-  BarChart3, FileText, Shield, TrendingUp, Factory, Menu, X, LogOut, Bell,
+  BarChart3, FileText, Shield, TrendingUp, Factory, Menu, X, LogOut,
   Briefcase, FolderKanban
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import NotificationBell from "@/components/NotificationBell";
 
 
 const adminNav = [
@@ -109,10 +110,7 @@ export default function AdminLayout() {
           </button>
           <div className="flex-1" />
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-4 w-4" />
-              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-accent" />
-            </Button>
+            <NotificationBell />
             <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
               <span className="text-xs font-bold text-primary-foreground">{initials}</span>
             </div>
