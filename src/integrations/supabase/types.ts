@@ -1177,6 +1177,8 @@ export type Database = {
         | "financing_partner"
         | "programme_manager"
         | "dmrv_verifier"
+        | "institution_admin"
+        | "institution_user"
       approval_status: "pending" | "approved" | "rejected"
       assessment_status: "draft" | "submitted" | "reviewed" | "approved"
       contract_status: "active" | "expiring_soon" | "expired" | "terminated"
@@ -1376,6 +1378,8 @@ export const Constants = {
         "financing_partner",
         "programme_manager",
         "dmrv_verifier",
+        "institution_admin",
+        "institution_user",
       ],
       approval_status: ["pending", "approved", "rejected"],
       assessment_status: ["draft", "submitted", "reviewed", "approved"],
