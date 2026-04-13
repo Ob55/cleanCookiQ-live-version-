@@ -14,8 +14,9 @@ import { useState } from "react";
 import {
   ArrowLeft, Building2, MapPin, Flame, Users, Loader2, UserCheck,
   Phone, Mail, Clock, Utensils, Leaf, DollarSign, Camera, FileText,
-  BarChart3, Gauge, Plus, Bell, Factory,
+  BarChart3, Gauge, Plus, Bell, Factory, ShoppingCart,
 } from "lucide-react";
+import TransitionProductSelector from "@/components/institution/TransitionProductSelector";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood", charcoal: "Charcoal", lpg: "LPG",
@@ -268,17 +269,21 @@ export default function InstitutionDetail() {
         </CardContent>
       </Card>
 
-      {/* Transition Needs */}
-      {inst.transition_needs && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2"><FileText className="h-4 w-4 text-muted-foreground" /> Transition Needs</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{inst.transition_needs}</p>
-          </CardContent>
-        </Card>
-      )}
+      {/* Transition Products & Needs */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2"><ShoppingCart className="h-4 w-4 text-primary" /> What They Need for Transitioning</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <TransitionProductSelector institutionId={inst.id} editable={false} />
+          {inst.transition_needs && (
+            <div>
+              <p className="text-sm font-medium text-muted-foreground mb-1">Additional Notes</p>
+              <p className="text-sm whitespace-pre-wrap">{inst.transition_needs}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Notes */}
       {inst.notes && (

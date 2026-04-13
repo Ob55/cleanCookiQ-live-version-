@@ -436,6 +436,45 @@ export type Database = {
           },
         ]
       }
+      institution_selected_products: {
+        Row: {
+          created_at: string
+          id: string
+          institution_id: string
+          product_id: string
+          quantity: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          institution_id: string
+          product_id: string
+          quantity?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          institution_id?: string
+          product_id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institution_selected_products_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "institution_selected_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "provider_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       institutions: {
         Row: {
           annual_savings_ksh: number | null

@@ -9,8 +9,9 @@ import { notifyInstitutionOwner } from "@/lib/notifications";
 import {
   Loader2, ArrowLeft, Flame, MapPin, Users, UtensilsCrossed,
   Calculator, TrendingDown, Leaf, Zap, Building2, Phone, Mail,
-  CheckCircle2, XCircle, Banknote, Send
+  CheckCircle2, XCircle, Banknote, Send, ShoppingCart
 } from "lucide-react";
+import TransitionProductSelector from "@/components/institution/TransitionProductSelector";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood", charcoal: "Charcoal", lpg: "LPG",
@@ -301,17 +302,24 @@ export default function FunderInstitutionDetail() {
         </Card>
       </div>
 
-      {/* Transition Needs */}
-      {inst.transition_needs && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">What They Need for Transitioning</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm">{inst.transition_needs}</p>
-          </CardContent>
-        </Card>
-      )}
+      {/* Transition Products & Needs */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <ShoppingCart className="h-5 w-5 text-primary" />
+            What They Need for Transitioning
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <TransitionProductSelector institutionId={inst.id} editable={false} />
+          {inst.transition_needs && (
+            <div>
+              <p className="text-sm font-medium text-muted-foreground mb-1">Additional Notes</p>
+              <p className="text-sm">{inst.transition_needs}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Contact & Location */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
