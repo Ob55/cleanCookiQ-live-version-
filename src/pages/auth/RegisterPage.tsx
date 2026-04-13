@@ -16,6 +16,13 @@ const orgTypes = [
   { value: "researcher", label: "Researcher", desc: "Academic or research institution", icon: FlaskConical },
 ];
 
+const fundingTypes = [
+  { value: "grant", label: "Grant" },
+  { value: "loan", label: "Loan" },
+  { value: "equity", label: "Equity" },
+  { value: "csr_donation", label: "CSR Donation" },
+];
+
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [orgType, setOrgType] = useState("");
@@ -25,15 +32,18 @@ export default function RegisterPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [fundingType, setFundingType] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const isSupplier = orgType === "supplier";
+  const isFunder = orgType === "funder";
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password.length < 8) { toast.error("Password must be at least 8 characters"); return; }
     if (isSupplier && !termsAccepted) { toast.error("You must accept the terms"); return; }
+    if (isFunder && !fundingType) { toast.error("Please select your funding type"); return; }
     setLoading(true);
 
     const roleMap: Record<string, string> = {
@@ -44,7 +54,7 @@ export default function RegisterPage() {
       researcher: "viewer",
     };
 
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -58,12 +68,27 @@ export default function RegisterPage() {
         },
       },
     });
-    setLoading(false);
+
     if (error) {
+      setLoading(false);
       toast.error(error.message);
-    } else {
-      navigate("/auth/verify-email");
+      return;
     }
+
+    // If funder, create funder_profiles record
+    if (isFunder && signUpData.user) {
+      await supabase.from("funder_profiles").insert({
+        user_id: signUpData.user.id,
+        organisation_name: orgName,
+        full_name: fullName,
+        funding_type: fundingType,
+        email,
+        phone,
+      });
+    }
+
+    setLoading(false);
+    navigate("/auth/verify-email");
   };
 
   return (
@@ -147,6 +172,24 @@ export default function RegisterPage() {
                 <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Create a strong password" className="mt-1" required />
               </div>
 
+              {isFunder && (
+                <div>
+                  <Label htmlFor="fundingType">Type of Funding You Offer *</Label>
+                  <select
+                    id="fundingType"
+                    value={fundingType}
+                    onChange={e => setFundingType(e.target.value)}
+                    className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    required
+                  >
+                    <option value="">Select funding type</option>
+                    {fundingTypes.map(ft => (
+                      <option key={ft.value} value={ft.value}>{ft.label}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               {isSupplier && (
                 <div className="p-4 rounded-lg border border-border bg-muted/30">
                   <p className="text-xs text-muted-foreground mb-3">
@@ -165,7 +208,7 @@ export default function RegisterPage() {
                 </div>
               )}
 
-              <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={loading || (isSupplier && !termsAccepted)}>
+              <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={loading || (isSupplier && !termsAccepted) || (isFunder && !fundingType)}>
                 {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                 Create Account
               </Button>

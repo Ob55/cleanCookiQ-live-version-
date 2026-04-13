@@ -80,12 +80,22 @@ export default function LoginPage() {
     }
 
     if (isSupplier) {
-      // Check if supplier has set up their company (has an organisation linked)
       if (profileData?.organisation_id) {
         navigate("/supplier/dashboard");
       } else {
         navigate("/supplier/setup");
       }
+      return;
+    }
+
+    // Funder routing
+    const isFunder =
+      roles.some((r: string) => r === "financing_partner") ||
+      profileOrgType === "funder" ||
+      metadataOrgType === "funder";
+
+    if (isFunder) {
+      navigate("/funder/dashboard");
       return;
     }
 

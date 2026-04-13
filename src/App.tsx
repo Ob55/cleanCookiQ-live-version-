@@ -10,6 +10,7 @@ import PublicLayout from "@/components/layouts/PublicLayout";
 import AdminLayout from "@/components/layouts/AdminLayout";
 import InstitutionLayout from "@/components/layouts/InstitutionLayout";
 import SupplierLayout from "@/components/layouts/SupplierLayout";
+import FunderLayout from "@/components/layouts/FunderLayout";
 
 import HomePage from "@/pages/HomePage";
 import MapPage from "@/pages/MapPage";
@@ -54,6 +55,7 @@ import SupplierDashboard from "@/pages/supplier/SupplierDashboard";
 import SupplierProducts from "@/pages/supplier/SupplierProducts";
 import SupplierServices from "@/pages/supplier/SupplierServices";
 import SupplierDocuments from "@/pages/supplier/SupplierDocuments";
+import FunderDashboard from "@/pages/funder/FunderDashboard";
 
 import NotFound from "@/pages/NotFound";
 
@@ -119,6 +121,11 @@ const App = () => (
               <Route path="/supplier/products" element={<SupplierProducts />} />
               <Route path="/supplier/services" element={<SupplierServices />} />
               <Route path="/supplier/documents" element={<SupplierDocuments />} />
+            </Route>
+
+            {/* Funder pages (with sidebar) */}
+            <Route element={<ProtectedRoute><FunderLayout /></ProtectedRoute>}>
+              <Route path="/funder/dashboard" element={<FunderDashboard />} />
             </Route>
 
             {/* Admin pages (protected) */}

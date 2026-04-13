@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Building2, Pencil, Save, X, Loader2, Users, UserCheck, Clock, Camera } from "lucide-react";
 import { toast } from "sonner";
+import TransitionNeedsSection from "@/components/institution/TransitionNeedsSection";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood", charcoal: "Charcoal", lpg: "LPG",
@@ -304,6 +305,8 @@ export default function InstitutionProfile() {
           </div>
         </CardContent>
       </Card>
+      {/* Transition Needs */}
+      <TransitionNeedsSection institutionId={institution.id} />
     </div>
   );
 }

@@ -323,6 +323,78 @@ export type Database = {
           },
         ]
       }
+      funder_institution_links: {
+        Row: {
+          funder_id: string
+          id: string
+          institution_id: string
+          linked_at: string
+          status: string
+        }
+        Insert: {
+          funder_id: string
+          id?: string
+          institution_id: string
+          linked_at?: string
+          status?: string
+        }
+        Update: {
+          funder_id?: string
+          id?: string
+          institution_id?: string
+          linked_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "funder_institution_links_funder_id_fkey"
+            columns: ["funder_id"]
+            isOneToOne: false
+            referencedRelation: "funder_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "funder_institution_links_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      funder_profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          funding_type: string
+          id: string
+          organisation_name: string
+          phone: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          funding_type: string
+          id?: string
+          organisation_name: string
+          phone?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          funding_type?: string
+          id?: string
+          organisation_name?: string
+          phone?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       institution_needs: {
         Row: {
           created_at: string
@@ -367,6 +439,8 @@ export type Database = {
       institutions: {
         Row: {
           annual_savings_ksh: number | null
+          assessment_category: string | null
+          assessment_score: number | null
           co2_reduction_tonnes_pa: number | null
           consumption_per_term: number | null
           consumption_unit: string | null
@@ -378,14 +452,19 @@ export type Database = {
           created_at: string
           created_by: string | null
           current_fuel: Database["public"]["Enums"]["fuel_type"] | null
+          financial_decision_maker: string | null
+          financing_preference: string | null
           fuel_of_choice: string | null
+          has_dedicated_kitchen: boolean | null
           id: string
           institution_type: Database["public"]["Enums"]["institution_type"]
+          kitchen_condition: string | null
           kitchen_photo_url: string | null
           latitude: number | null
           longitude: number | null
           meals_per_day: number | null
           meals_served_per_day: number | null
+          monthly_fuel_spend: number | null
           name: string
           notes: string | null
           number_of_staff: number | null
@@ -400,11 +479,15 @@ export type Database = {
           ta_resource_window_end: string | null
           ta_resource_window_start: string | null
           ta_type_needed: string[] | null
+          transition_interest: string | null
+          transition_needs: string | null
           updated_at: string
           wishes_to_transition_steam: boolean | null
         }
         Insert: {
           annual_savings_ksh?: number | null
+          assessment_category?: string | null
+          assessment_score?: number | null
           co2_reduction_tonnes_pa?: number | null
           consumption_per_term?: number | null
           consumption_unit?: string | null
@@ -416,14 +499,19 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           current_fuel?: Database["public"]["Enums"]["fuel_type"] | null
+          financial_decision_maker?: string | null
+          financing_preference?: string | null
           fuel_of_choice?: string | null
+          has_dedicated_kitchen?: boolean | null
           id?: string
           institution_type?: Database["public"]["Enums"]["institution_type"]
+          kitchen_condition?: string | null
           kitchen_photo_url?: string | null
           latitude?: number | null
           longitude?: number | null
           meals_per_day?: number | null
           meals_served_per_day?: number | null
+          monthly_fuel_spend?: number | null
           name: string
           notes?: string | null
           number_of_staff?: number | null
@@ -438,11 +526,15 @@ export type Database = {
           ta_resource_window_end?: string | null
           ta_resource_window_start?: string | null
           ta_type_needed?: string[] | null
+          transition_interest?: string | null
+          transition_needs?: string | null
           updated_at?: string
           wishes_to_transition_steam?: boolean | null
         }
         Update: {
           annual_savings_ksh?: number | null
+          assessment_category?: string | null
+          assessment_score?: number | null
           co2_reduction_tonnes_pa?: number | null
           consumption_per_term?: number | null
           consumption_unit?: string | null
@@ -454,14 +546,19 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           current_fuel?: Database["public"]["Enums"]["fuel_type"] | null
+          financial_decision_maker?: string | null
+          financing_preference?: string | null
           fuel_of_choice?: string | null
+          has_dedicated_kitchen?: boolean | null
           id?: string
           institution_type?: Database["public"]["Enums"]["institution_type"]
+          kitchen_condition?: string | null
           kitchen_photo_url?: string | null
           latitude?: number | null
           longitude?: number | null
           meals_per_day?: number | null
           meals_served_per_day?: number | null
+          monthly_fuel_spend?: number | null
           name?: string
           notes?: string | null
           number_of_staff?: number | null
@@ -476,6 +573,8 @@ export type Database = {
           ta_resource_window_end?: string | null
           ta_resource_window_start?: string | null
           ta_type_needed?: string[] | null
+          transition_interest?: string | null
+          transition_needs?: string | null
           updated_at?: string
           wishes_to_transition_steam?: boolean | null
         }
@@ -488,6 +587,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notifications: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          read: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       opex_contracts: {
         Row: {
@@ -549,6 +675,7 @@ export type Database = {
       opportunities: {
         Row: {
           created_at: string
+          created_by_name: string | null
           deadline: string | null
           description: string | null
           estimated_value: number | null
@@ -561,6 +688,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          created_by_name?: string | null
           deadline?: string | null
           description?: string | null
           estimated_value?: number | null
@@ -573,6 +701,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          created_by_name?: string | null
           deadline?: string | null
           description?: string | null
           estimated_value?: number | null

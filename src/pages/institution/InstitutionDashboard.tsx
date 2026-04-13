@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Flame, UtensilsCrossed, Droplets, BarChart3, Loader2, User, Phone, Mail, MapPin } from "lucide-react";
+import CookingAlchemySection from "@/components/institution/CookingAlchemySection";
+import TransitionInterest from "@/components/institution/TransitionInterest";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood", charcoal: "Charcoal", lpg: "LPG",
@@ -12,10 +14,12 @@ const FUEL_LABELS: Record<string, string> = {
 };
 
 interface Institution {
+  id: string;
   name: string;
   county: string;
   sub_county: string | null;
   ownership_type: string | null;
+  institution_type: string | null;
   meals_per_day: number | null;
   current_fuel: string | null;
   consumption_per_term: number | null;
@@ -32,6 +36,10 @@ interface Institution {
   co2_reduction_tonnes_pa: number | null;
   latitude: number | null;
   longitude: number | null;
+  monthly_fuel_spend: number | null;
+  transition_interest: string | null;
+  assessment_score: number | null;
+  assessment_category: string | null;
 }
 
 function computeCompletion(inst: Institution): number {
@@ -48,18 +56,28 @@ function computeCompletion(inst: Institution): number {
 export default function InstitutionDashboard() {
   const { user } = useAuth();
   const [institution, setInstitution] = useState<Institution | null>(null);
+  const [costModel, setCostModel] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
     (async () => {
-      // Find institution created by this user
       const { data } = await supabase
         .from("institutions")
         .select("*")
         .eq("created_by", user.id)
         .maybeSingle();
-      setInstitution(data as Institution | null);
+      const inst = data as any;
+      setInstitution(inst as Institution | null);
+
+      if (inst?.id) {
+        const { data: cm } = await supabase
+          .from("cost_models")
+          .select("capex, monthly_opex, projected_monthly_savings")
+          .eq("institution_id", inst.id)
+          .maybeSingle();
+        setCostModel(cm);
+      }
       setLoading(false);
     })();
   }, [user]);
@@ -77,6 +95,13 @@ export default function InstitutionDashboard() {
   }
 
   const completion = computeCompletion(institution);
+
+  const scoreCategoryColor: Record<string, string> = {
+    "Ready Now": "bg-emerald-500/20 text-emerald-600",
+    "Ready with Minor Actions": "bg-amber-500/20 text-amber-600",
+    "Needs Enabling Support": "bg-orange-500/20 text-orange-600",
+    "Longer-Term Opportunity": "bg-muted text-muted-foreground",
+  };
 
   return (
     <div className="space-y-6">
@@ -154,8 +179,19 @@ export default function InstitutionDashboard() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Readiness Score</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold text-muted-foreground">Pending Assessment</p>
-            <p className="text-sm text-muted-foreground">Complete your profile to unlock</p>
+            {institution.assessment_score && institution.assessment_score > 0 ? (
+              <div>
+                <p className="text-lg font-semibold">{institution.assessment_score}%</p>
+                <Badge variant="secondary" className={scoreCategoryColor[institution.assessment_category || ""] || ""}>
+                  {institution.assessment_category}
+                </Badge>
+              </div>
+            ) : (
+              <div>
+                <p className="text-lg font-semibold text-muted-foreground">Pending Assessment</p>
+                <p className="text-sm text-muted-foreground">Complete your profile to unlock</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -213,6 +249,22 @@ export default function InstitutionDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Cooking Alchemy Section */}
+      <CookingAlchemySection institution={institution} costModel={costModel} />
+
+      {/* Transition Interest */}
+      <TransitionInterest
+        institutionId={institution.id}
+        institutionName={institution.name}
+        county={institution.county}
+        institutionType={institution.institution_type}
+        currentFuel={institution.current_fuel}
+        monthlySpend={institution.monthly_fuel_spend}
+        studentsCount={institution.number_of_students}
+        currentInterest={institution.transition_interest}
+        onUpdate={(val) => setInstitution(prev => prev ? { ...prev, transition_interest: val } : null)}
+      />
     </div>
   );
 }

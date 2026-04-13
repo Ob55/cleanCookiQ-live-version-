@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,8 +11,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { FileText, Plus, Loader2, Search, DollarSign, Calendar } from "lucide-react";
 import { useState } from "react";
+import { notifyInstitutionOwner, notifyFunders } from "@/lib/notifications";
 
 export default function OpportunityManagement() {
+  const { profile } = useAuth();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
@@ -44,6 +47,7 @@ export default function OpportunityManagement() {
 
   const createOpp = useMutation({
     mutationFn: async () => {
+      const createdByName = profile?.full_name || "Admin";
       const { error } = await supabase.from("opportunities").insert({
         title: form.title,
         description: form.description,
@@ -51,8 +55,25 @@ export default function OpportunityManagement() {
         estimated_value: form.estimated_value ? Number(form.estimated_value) : null,
         institution_id: form.institution_id,
         deadline: form.deadline ? new Date(form.deadline).toISOString() : null,
-      });
+        created_by_name: createdByName,
+      } as any);
       if (error) throw error;
+
+      // Notify institution
+      const inst = institutions?.find(i => i.id === form.institution_id);
+      if (inst) {
+        await notifyInstitutionOwner(
+          form.institution_id,
+          "A New Opportunity Has Been Created For You",
+          `A new opportunity has been created for ${inst.name}. Opportunity: ${form.title}. Details: ${form.description || "N/A"}. Created by: ${createdByName}. Please log in to review this opportunity.`
+        );
+      }
+
+      // Notify funders
+      await notifyFunders(
+        "New Funding Opportunity Available",
+        "A new opportunity has been created on CleanCookIQ. An institution is ready for clean cooking transition and requires funding support. Log in to view the details and express your interest."
+      );
     },
     onSuccess: () => {
       toast.success("Opportunity created");
@@ -103,6 +124,10 @@ export default function OpportunityManagement() {
           <DialogContent className="max-w-lg">
             <DialogHeader><DialogTitle>Create New Opportunity</DialogTitle></DialogHeader>
             <div className="space-y-3">
+              <div>
+                <Label>Created By</Label>
+                <Input value={profile?.full_name || "Admin"} disabled className="mt-1 bg-muted" />
+              </div>
               <div><Label>Title *</Label><Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} className="mt-1" /></div>
               <div><Label>Description</Label><Textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} className="mt-1" /></div>
               <div>
@@ -176,6 +201,7 @@ export default function OpportunityManagement() {
                 <th className="text-left text-xs font-medium text-muted-foreground p-3">Institution</th>
                 <th className="text-left text-xs font-medium text-muted-foreground p-3">Value</th>
                 <th className="text-left text-xs font-medium text-muted-foreground p-3">Status</th>
+                <th className="text-left text-xs font-medium text-muted-foreground p-3">Created By</th>
                 <th className="text-left text-xs font-medium text-muted-foreground p-3">Deadline</th>
                 <th className="text-left text-xs font-medium text-muted-foreground p-3">Actions</th>
               </tr>
@@ -201,6 +227,7 @@ export default function OpportunityManagement() {
                   <td className="p-3">
                     <Badge variant="secondary" className={statusColors[o.status] || ""}>{o.status}</Badge>
                   </td>
+                  <td className="p-3 text-sm text-muted-foreground">{(o as any).created_by_name || "—"}</td>
                   <td className="p-3 text-sm text-muted-foreground">
                     {o.deadline ? new Date(o.deadline).toLocaleDateString() : "—"}
                   </td>
@@ -217,7 +244,7 @@ export default function OpportunityManagement() {
                 </tr>
               ))}
               {!filtered?.length && (
-                <tr><td colSpan={6} className="p-8 text-center text-muted-foreground">No opportunities found</td></tr>
+                <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">No opportunities found</td></tr>
               )}
             </tbody>
           </table>
