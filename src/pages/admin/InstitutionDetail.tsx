@@ -73,6 +73,20 @@ export default function InstitutionDetail() {
     enabled: !!id,
   });
 
+  const { data: linkedFunder } = useQuery({
+    queryKey: ["linked-funder", id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("funder_institution_links")
+        .select("*, funder_profiles(full_name, organisation_name, phone)")
+        .eq("institution_id", id!)
+        .eq("status", "active")
+        .limit(1);
+      return data?.[0] ?? null;
+    },
+    enabled: !!id,
+  });
+
   const { data: needs } = useQuery({
     queryKey: ["institution_needs", id],
     queryFn: async () => {
@@ -146,6 +160,21 @@ export default function InstitutionDetail() {
         <StatCard icon={<UserCheck className="h-5 w-5 text-primary" />} label="Staff" value={inst.number_of_staff || 0} />
         <StatCard icon={<Clock className="h-5 w-5 text-primary" />} label="Cooking Time" value={inst.cooking_time_minutes ? `${(inst.cooking_time_minutes / 60).toFixed(1)} hrs` : "—"} />
       </div>
+
+      {/* Linked Funder */}
+      <Card>
+        <CardContent className="p-4 flex items-center gap-3">
+          <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+            <DollarSign className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Linked Funder / Financing Partner</p>
+            <p className="text-sm font-semibold">
+              {linkedFunder ? (linkedFunder as any).funder_profiles?.organisation_name || (linkedFunder as any).funder_profiles?.full_name || "Linked" : "N/A"}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Energy & Fuel */}

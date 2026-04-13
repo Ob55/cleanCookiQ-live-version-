@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, Plus, X, Loader2, ShoppingCart, Package, Wrench } from "lucide-react";
+import { Search, Plus, X, Loader2, ShoppingCart, Package, Wrench, Phone } from "lucide-react";
 import { toast } from "sonner";
 
 interface Props {
@@ -23,7 +23,7 @@ export default function TransitionProductSelector({ institutionId, editable = tr
     queryFn: async () => {
       const { data, error } = await supabase
         .from("institution_selected_products")
-        .select("*, provider_products(*, providers(name))")
+        .select("*, provider_products(*, providers(name, contact_phone))")
         .eq("institution_id", institutionId);
       if (error) throw error;
       return (data ?? []).map((sp: any) => ({ ...sp, type: "product" as const }));
@@ -37,7 +37,7 @@ export default function TransitionProductSelector({ institutionId, editable = tr
     queryFn: async () => {
       const { data, error } = await supabase
         .from("institution_selected_services" as any)
-        .select("*, provider_services(*, providers(name))")
+        .select("*, provider_services(*, providers(name, contact_phone))")
         .eq("institution_id", institutionId);
       if (error) throw error;
       return ((data as any[]) ?? []).map((ss: any) => ({ ...ss, type: "service" as const }));
@@ -152,6 +152,7 @@ export default function TransitionProductSelector({ institutionId, editable = tr
       price: sp.provider_products?.price,
       image_url: sp.provider_products?.image_url,
       provider: sp.provider_products?.providers?.name || "Unknown provider",
+      providerPhone: sp.provider_products?.providers?.contact_phone || null,
       quantity: sp.quantity || 1,
     })),
     ...selectedServices.map((ss: any) => ({
@@ -163,6 +164,7 @@ export default function TransitionProductSelector({ institutionId, editable = tr
       price: (ss.provider_services as any)?.price,
       image_url: null,
       provider: ss.provider_services?.providers?.name || "Unknown provider",
+      providerPhone: ss.provider_services?.providers?.contact_phone || null,
       quantity: ss.quantity || 1,
     })),
   ];
@@ -195,6 +197,9 @@ export default function TransitionProductSelector({ institutionId, editable = tr
                       <Badge variant="outline" className="text-[10px] px-1.5 py-0">{item.type === "product" ? "Product" : "Service"}</Badge>
                     </div>
                     <p className="text-xs text-muted-foreground">{item.provider}</p>
+                    {item.providerPhone && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1"><Phone className="h-3 w-3" />{item.providerPhone}</p>
+                    )}
                   </div>
                   {editable && (
                     <Button
