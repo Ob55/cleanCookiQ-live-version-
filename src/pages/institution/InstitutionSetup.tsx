@@ -52,6 +52,7 @@ export default function InstitutionSetup() {
   const [mealsPerDay, setMealsPerDay] = useState("");
   const [fuelType, setFuelType] = useState("");
   const [consumption, setConsumption] = useState("");
+  const [cookingTimeHours, setCookingTimeHours] = useState("");
   const [contactPerson, setContactPerson] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [contactEmail, setContactEmail] = useState("");
@@ -115,6 +116,7 @@ export default function InstitutionSetup() {
         current_fuel: fuelType as any,
         consumption_per_term: parseFloat(consumption),
         consumption_unit: unit,
+        cooking_time_minutes: cookingTimeHours ? Math.round(parseFloat(cookingTimeHours) * 60) : null,
         contact_person: contactPerson || null,
         contact_phone: contactPhone || null,
         contact_email: contactEmail || null,
@@ -255,6 +257,12 @@ export default function InstitutionSetup() {
             <div>
               <Label htmlFor="monthly-spend">Monthly Fuel Spend (KSh)</Label>
               <Input id="monthly-spend" type="number" min="0" value={monthlyFuelSpend} onChange={e => setMonthlyFuelSpend(e.target.value)} placeholder="e.g. 50000" className="mt-1" />
+            </div>
+
+            {/* Field 9 — Cooking Time */}
+            <div>
+              <Label htmlFor="cooking-time">Cooking Time Per Session (Hours)</Label>
+              <Input id="cooking-time" type="number" step="0.5" min="0" value={cookingTimeHours} onChange={e => setCookingTimeHours(e.target.value)} placeholder="e.g. 2" className="mt-1" />
             </div>
 
             {/* Assessment Fields */}

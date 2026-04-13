@@ -22,6 +22,27 @@ const FUEL_LABELS: Record<string, string> = {
   biogas: "Biogas", electric: "Electric (Induction)", other: "Other",
 };
 
+const KITCHEN_CONDITION_LABELS: Record<string, string> = {
+  clean_ready: "Clean and ready",
+  minor_renovation: "Minor renovation needed",
+  major_renovation: "Major renovation needed",
+};
+
+const FINANCING_LABELS: Record<string, string> = {
+  loan: "Loan acceptable",
+  partial: "Partial grant + partial loan",
+  grant: "Full grant only",
+  not_sure: "Not sure",
+};
+
+const DECISION_MAKER_LABELS: Record<string, string> = {
+  head_teacher: "Head Teacher / Principal",
+  board_of_governors: "Board of Governors",
+  religious_body: "Religious Sponsoring Body",
+  pta: "Parent Teacher Association",
+  county_government: "County Government / Ministry",
+};
+
 export default function InstitutionDetail() {
   const { id } = useParams<{ id: string }>();
 
@@ -122,7 +143,7 @@ export default function InstitutionDetail() {
         <StatCard icon={<Utensils className="h-5 w-5 text-primary" />} label="Meals/Day" value={inst.meals_per_day || inst.meals_served_per_day || 0} />
         <StatCard icon={<Users className="h-5 w-5 text-primary" />} label="Students" value={inst.number_of_students || 0} />
         <StatCard icon={<UserCheck className="h-5 w-5 text-primary" />} label="Staff" value={inst.number_of_staff || 0} />
-        <StatCard icon={<Clock className="h-5 w-5 text-primary" />} label="Cooking Time" value={inst.cooking_time_minutes ? `${inst.cooking_time_minutes} min` : "—"} />
+        <StatCard icon={<Clock className="h-5 w-5 text-primary" />} label="Cooking Time" value={inst.cooking_time_minutes ? `${(inst.cooking_time_minutes / 60).toFixed(1)} hrs` : "—"} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -148,9 +169,28 @@ export default function InstitutionDetail() {
           </CardHeader>
           <CardContent>
             <dl className="space-y-3 text-sm">
+              <DetailRow label="Monthly Fuel Spend" value={inst.monthly_fuel_spend ? `KSh ${Number(inst.monthly_fuel_spend).toLocaleString()}` : "—"} />
               <DetailRow label="Annual Savings" value={inst.annual_savings_ksh ? `KSh ${Number(inst.annual_savings_ksh).toLocaleString()}` : "—"} />
               <DetailRow label="CO₂ Reduction" value={inst.co2_reduction_tonnes_pa ? `${Number(inst.co2_reduction_tonnes_pa).toLocaleString()} t/yr` : "—"} />
               <DetailRow label="Ownership Type" value={inst.ownership_type || "—"} capitalize />
+              <DetailRow label="Financing Preference" value={inst.financing_preference ? FINANCING_LABELS[inst.financing_preference] || inst.financing_preference : "—"} />
+              <DetailRow label="Financial Decision Maker" value={inst.financial_decision_maker ? DECISION_MAKER_LABELS[inst.financial_decision_maker] || inst.financial_decision_maker : "—"} />
+            </dl>
+          </CardContent>
+        </Card>
+
+        {/* Kitchen & Assessment */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2"><Gauge className="h-4 w-4 text-primary" /> Kitchen & Assessment</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <dl className="space-y-3 text-sm">
+              <DetailRow label="Dedicated Kitchen" value={inst.has_dedicated_kitchen === true ? "Yes" : inst.has_dedicated_kitchen === false ? "No" : "Not set"} />
+              <DetailRow label="Kitchen Condition" value={inst.kitchen_condition ? KITCHEN_CONDITION_LABELS[inst.kitchen_condition] || inst.kitchen_condition : "Not set"} />
+              <DetailRow label="Assessment Score" value={inst.assessment_score ? `${inst.assessment_score}%` : "Not scored"} />
+              <DetailRow label="Assessment Category" value={inst.assessment_category || "Not categorized"} />
+              <DetailRow label="Transition Interest" value={inst.transition_interest || "Not set"} capitalize />
             </dl>
           </CardContent>
         </Card>
@@ -227,6 +267,18 @@ export default function InstitutionDetail() {
           )}
         </CardContent>
       </Card>
+
+      {/* Transition Needs */}
+      {inst.transition_needs && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2"><FileText className="h-4 w-4 text-muted-foreground" /> Transition Needs</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{inst.transition_needs}</p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Notes */}
       {inst.notes && (

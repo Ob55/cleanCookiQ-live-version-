@@ -74,7 +74,7 @@ export default function InstitutionProfile() {
   // Editable fields
   const [numStudents, setNumStudents] = useState("");
   const [numStaff, setNumStaff] = useState("");
-  const [cookingTime, setCookingTime] = useState("");
+  const [cookingTimeHours, setCookingTimeHours] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [contactPerson, setContactPerson] = useState("");
@@ -107,7 +107,7 @@ export default function InstitutionProfile() {
   const populateFields = (inst: InstitutionData) => {
     setNumStudents(inst.number_of_students?.toString() || "");
     setNumStaff(inst.number_of_staff?.toString() || "");
-    setCookingTime((inst.cooking_time_minutes as number)?.toString() || "");
+    setCookingTimeHours(inst.cooking_time_minutes ? (inst.cooking_time_minutes / 60).toString() : "");
     setPhotoPreview(inst.kitchen_photo_url || null);
     setContactPerson(inst.contact_person || "");
     setContactPhone(inst.contact_phone || "");
@@ -165,7 +165,7 @@ export default function InstitutionProfile() {
       const updateData = {
         number_of_students: numStudents ? parseInt(numStudents) : null,
         number_of_staff: numStaff ? parseInt(numStaff) : null,
-        cooking_time_minutes: cookingTime ? parseInt(cookingTime) : null,
+        cooking_time_minutes: cookingTimeHours ? Math.round(parseFloat(cookingTimeHours) * 60) : null,
         kitchen_photo_url: kitchenPhotoUrl,
         contact_person: contactPerson || null,
         contact_phone: contactPhone || null,
@@ -355,11 +355,11 @@ export default function InstitutionProfile() {
                 <Clock className="h-5 w-5 text-primary" />
               </div>
               <div className="flex-1">
-                <Label className="text-sm text-muted-foreground">Cooking Time (minutes/session)</Label>
+                <Label className="text-sm text-muted-foreground">Cooking Time (hours/session)</Label>
                 {editing ? (
-                  <Input type="number" min="0" value={cookingTime} onChange={e => setCookingTime(e.target.value)} placeholder="e.g. 120" className="mt-1" />
+                  <Input type="number" step="0.5" min="0" value={cookingTimeHours} onChange={e => setCookingTimeHours(e.target.value)} placeholder="e.g. 2" className="mt-1" />
                 ) : (
-                  <p className="text-lg font-semibold">{institution.cooking_time_minutes ? `${institution.cooking_time_minutes} mins` : "Not set"}</p>
+                  <p className="text-lg font-semibold">{institution.cooking_time_minutes ? `${(institution.cooking_time_minutes / 60).toFixed(1)} hrs` : "Not set"}</p>
                 )}
               </div>
             </div>
