@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, Plus, X, Loader2, ShoppingCart, Package, Wrench } from "lucide-react";
+import { Search, Plus, X, Loader2, ShoppingCart, Package, Wrench, Phone } from "lucide-react";
 import { toast } from "sonner";
 
 interface Props {
