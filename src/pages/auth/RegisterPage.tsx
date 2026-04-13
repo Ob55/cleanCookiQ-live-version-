@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { Building2, Factory, Banknote, FlaskConical, Landmark, GraduationCap, Briefcase, FolderKanban, Shield, ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
+import { Building2, Factory, Banknote, FlaskConical, Landmark, ArrowLeft, Loader2, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const orgTypes = [
   { value: "institution", label: "Institution", desc: "School, hospital, prison, factory", icon: Building2 },
@@ -15,31 +16,33 @@ const orgTypes = [
   { value: "researcher", label: "Researcher", desc: "Academic or research institution", icon: FlaskConical },
 ];
 
-const roleTypes = [
-  { value: "ta_provider", label: "TA Provider", desc: "Provide technical assistance to institutions", icon: GraduationCap, forOrg: "supplier" },
-  { value: "financing_partner", label: "Financing Partner", desc: "Review and fund grant/debt applications", icon: Banknote, forOrg: "funder" },
-  { value: "programme_manager", label: "Programme Manager", desc: "Manage multi-institution programmes", icon: FolderKanban, forOrg: null },
-  { value: "dmrv_verifier", label: "dMRV Verifier", desc: "Submit and verify monitoring records", icon: Shield, forOrg: null },
-];
-
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [orgType, setOrgType] = useState("");
-  const [selectedRole, setSelectedRole] = useState("");
   const [orgName, setOrgName] = useState("");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const isSupplier = orgType === "supplier";
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password.length < 8) { toast.error("Password must be at least 8 characters"); return; }
+    if (isSupplier && !termsAccepted) { toast.error("You must accept the terms"); return; }
     setLoading(true);
 
-    const requestedRole = selectedRole || (orgType === "institution" ? "institution_admin" : undefined);
+    const roleMap: Record<string, string> = {
+      institution: "institution_admin",
+      supplier: "ta_provider",
+      funder: "financing_partner",
+      csr: "viewer",
+      researcher: "viewer",
+    };
 
     const { error } = await supabase.auth.signUp({
       email,
@@ -51,7 +54,7 @@ export default function RegisterPage() {
           org_type: orgType,
           org_name: orgName,
           phone,
-          requested_role: requestedRole,
+          requested_role: roleMap[orgType] || "viewer",
         },
       },
     });
@@ -62,8 +65,6 @@ export default function RegisterPage() {
       navigate("/auth/verify-email");
     }
   };
-
-  const availableRoles = roleTypes.filter(r => !r.forOrg || r.forOrg === orgType);
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4">
@@ -79,7 +80,7 @@ export default function RegisterPage() {
           </Link>
           <h1 className="text-2xl font-display font-bold">Create your account</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {step === 1 ? "Select your organisation type" : step === 2 ? "Select your role (optional)" : "Enter your details"}
+            {step === 1 ? "Select your organisation type" : "Enter your details"}
           </p>
         </div>
 
@@ -89,7 +90,7 @@ export default function RegisterPage() {
               {orgTypes.map((org) => (
                 <button
                   key={org.value}
-                  onClick={() => setOrgType(org.value)}
+                  onClick={() => { setOrgType(org.value); setStep(2); }}
                   className={`w-full flex items-center gap-4 p-4 rounded-lg border transition-colors text-left ${
                     orgType === org.value ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"
                   }`}
@@ -105,47 +106,29 @@ export default function RegisterPage() {
                   </div>
                 </button>
               ))}
-              <Button className="w-full mt-4 bg-primary text-primary-foreground" disabled={!orgType} onClick={() => setStep(2)}>
-                Continue <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          ) : step === 2 ? (
-            <div className="space-y-3">
-              <button type="button" onClick={() => setStep(1)} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mb-2">
-                <ArrowLeft className="h-3 w-3" /> Back
-              </button>
-              <p className="text-sm text-muted-foreground mb-3">Select a specialised role if applicable, or skip to continue.</p>
-              {availableRoles.map((role) => (
-                <button
-                  key={role.value}
-                  onClick={() => setSelectedRole(selectedRole === role.value ? "" : role.value)}
-                  className={`w-full flex items-center gap-4 p-4 rounded-lg border transition-colors text-left ${
-                    selectedRole === role.value ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"
-                  }`}
-                >
-                  <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${
-                    selectedRole === role.value ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-                  }`}>
-                    <role.icon className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm">{role.label}</p>
-                    <p className="text-xs text-muted-foreground">{role.desc}</p>
-                  </div>
-                </button>
-              ))}
-              <Button className="w-full mt-4 bg-primary text-primary-foreground" onClick={() => setStep(3)}>
-                {selectedRole ? "Continue" : "Skip & Continue"} <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
             </div>
           ) : (
             <form className="space-y-4" onSubmit={handleRegister}>
-              <button type="button" onClick={() => setStep(2)} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mb-2">
+              <button type="button" onClick={() => setStep(1)} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mb-2">
                 <ArrowLeft className="h-3 w-3" /> Back
               </button>
+
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50 mb-2">
+                {(() => {
+                  const org = orgTypes.find(o => o.value === orgType);
+                  if (!org) return null;
+                  return (
+                    <>
+                      <org.icon className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-medium">{org.label}</span>
+                    </>
+                  );
+                })()}
+              </div>
+
               <div>
-                <Label htmlFor="orgName">Organisation Name</Label>
-                <Input id="orgName" value={orgName} onChange={e => setOrgName(e.target.value)} placeholder="e.g. Nairobi Primary School" className="mt-1" required />
+                <Label htmlFor="orgName">{isSupplier ? "Company Name" : "Organisation Name"}</Label>
+                <Input id="orgName" value={orgName} onChange={e => setOrgName(e.target.value)} placeholder={isSupplier ? "e.g. Clean Energy Solutions Ltd" : "e.g. Nairobi Primary School"} className="mt-1" required />
               </div>
               <div>
                 <Label htmlFor="fullName">Full Name</Label>
@@ -156,14 +139,33 @@ export default function RegisterPage() {
                 <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@organisation.co.ke" className="mt-1" required />
               </div>
               <div>
-                <Label htmlFor="phone">Phone (optional)</Label>
+                <Label htmlFor="phone">Phone</Label>
                 <Input id="phone" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+254 7XX XXX XXX" className="mt-1" />
               </div>
               <div>
                 <Label htmlFor="password">Password</Label>
                 <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Create a strong password" className="mt-1" required />
               </div>
-              <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={loading}>
+
+              {isSupplier && (
+                <div className="p-4 rounded-lg border border-border bg-muted/30">
+                  <p className="text-xs text-muted-foreground mb-3">
+                    By registering as a Supplier/Provider, you agree to CleanCookIQ's terms of service, including compliance with quality standards, timely delivery of products and services, and adherence to our partner code of conduct. You acknowledge that your profile and product listings will be visible to institutions and administrators on the platform.
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="terms"
+                      checked={termsAccepted}
+                      onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+                    />
+                    <label htmlFor="terms" className="text-sm font-medium cursor-pointer">
+                      I accept the terms and conditions
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={loading || (isSupplier && !termsAccepted)}>
                 {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                 Create Account
               </Button>
