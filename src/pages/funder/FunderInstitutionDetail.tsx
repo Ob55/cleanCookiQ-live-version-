@@ -49,6 +49,19 @@ export default function FunderInstitutionDetail() {
     enabled: !!id,
   });
 
+  const requestMutation = useMutation({
+    mutationFn: async ({ institutionId, institutionName, fields }: { institutionId: string; institutionName: string; fields: string[] }) => {
+      const fieldList = fields.join(", ");
+      await notifyInstitutionOwner(
+        institutionId,
+        "Please Complete Your Profile",
+        `A financing partner is interested in supporting ${institutionName} but needs more information. Please log in and fill in the following missing details: ${fieldList}. Complete your profile to unlock funding opportunities.`
+      );
+    },
+    onSuccess: () => toast.success("Request sent! The institution will be notified to fill in missing details."),
+    onError: () => toast.error("Failed to send request."),
+  });
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
