@@ -125,6 +125,7 @@ export default function InstitutionSetup() {
         kitchen_condition: kitchenCondition || null,
         financing_preference: financingPreference || null,
         financial_decision_maker: financialDecisionMaker || null,
+        transition_needs: transitionNeeds || null,
         assessment_score: score,
         assessment_category: category,
         setup_completed: true,
