@@ -53,10 +53,14 @@ export default function InstitutionSetup() {
 
   const [name, setName] = useState("");
   const [county, setCounty] = useState("");
+  const [subCounty, setSubCounty] = useState("");
   const [ownershipType, setOwnershipType] = useState("");
   const [mealsPerDay, setMealsPerDay] = useState("");
   const [fuelType, setFuelType] = useState("");
   const [consumption, setConsumption] = useState("");
+  const [contactPerson, setContactPerson] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
   const unit = fuelType ? FUEL_UNITS[fuelType] : null;
 
   const isValid = name.trim() && county && ownershipType && mealsPerDay && fuelType && consumption;
@@ -89,11 +93,15 @@ export default function InstitutionSetup() {
       const institutionData = {
         name: name.trim(),
         county,
+        sub_county: subCounty || null,
         ownership_type: ownershipType,
         meals_per_day: parseInt(mealsPerDay),
         current_fuel: OWNERSHIP_MAP[fuelType] as any,
         consumption_per_term: parseFloat(consumption),
         consumption_unit: unit,
+        contact_person: contactPerson || null,
+        contact_phone: contactPhone || null,
+        contact_email: contactEmail || null,
         setup_completed: true,
         created_by: user.id,
       };
@@ -202,6 +210,34 @@ export default function InstitutionSetup() {
                 <span className="text-sm text-muted-foreground whitespace-nowrap">
                   {unit ? `(${unit})` : "(select fuel type first)"}
                 </span>
+              </div>
+            </div>
+
+            {/* Contact Information */}
+            <div className="pt-2 border-t">
+              <p className="text-sm font-semibold text-muted-foreground mb-3">Contact Information</p>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="contact-person">Contact Person</Label>
+                  <Input id="contact-person" value={contactPerson} onChange={e => setContactPerson(e.target.value)} placeholder="e.g. Jane Wanjiku" className="mt-1" />
+                </div>
+                <div>
+                  <Label htmlFor="contact-phone">Phone</Label>
+                  <Input id="contact-phone" value={contactPhone} onChange={e => setContactPhone(e.target.value)} placeholder="e.g. 0712345678" className="mt-1" />
+                </div>
+                <div>
+                  <Label htmlFor="contact-email">Email</Label>
+                  <Input id="contact-email" type="email" value={contactEmail} onChange={e => setContactEmail(e.target.value)} placeholder="e.g. info@school.ac.ke" className="mt-1" />
+                </div>
+              </div>
+            </div>
+
+            {/* Location */}
+            <div className="pt-2 border-t">
+              <p className="text-sm font-semibold text-muted-foreground mb-3">Location</p>
+              <div>
+                <Label htmlFor="sub-county">Sub-County</Label>
+                <Input id="sub-county" value={subCounty} onChange={e => setSubCounty(e.target.value)} placeholder="e.g. Isiolo Central" className="mt-1" />
               </div>
             </div>
 

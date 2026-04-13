@@ -210,17 +210,6 @@ export default function InstitutionDashboard() {
                 <p className="text-sm font-medium">{institution.sub_county || "—"}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
-              <div>
-                <p className="text-xs text-muted-foreground">Coordinates</p>
-                <p className="text-sm font-medium">
-                  {institution.latitude && institution.longitude
-                    ? `${institution.latitude}, ${institution.longitude}`
-                    : "—"}
-                </p>
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>
