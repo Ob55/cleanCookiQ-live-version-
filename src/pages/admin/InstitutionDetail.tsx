@@ -73,6 +73,20 @@ export default function InstitutionDetail() {
     enabled: !!id,
   });
 
+  const { data: linkedFunder } = useQuery({
+    queryKey: ["linked-funder", id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("funder_institution_links")
+        .select("*, funder_profiles(full_name, organisation_name, phone)")
+        .eq("institution_id", id!)
+        .eq("status", "active")
+        .limit(1);
+      return data?.[0] ?? null;
+    },
+    enabled: !!id,
+  });
+
   const { data: needs } = useQuery({
     queryKey: ["institution_needs", id],
     queryFn: async () => {
