@@ -259,6 +259,12 @@ export default function InstitutionSetup() {
               <Input id="monthly-spend" type="number" min="0" value={monthlyFuelSpend} onChange={e => setMonthlyFuelSpend(e.target.value)} placeholder="e.g. 50000" className="mt-1" />
             </div>
 
+            {/* Field 9 — Cooking Time */}
+            <div>
+              <Label htmlFor="cooking-time">Cooking Time Per Session (Hours)</Label>
+              <Input id="cooking-time" type="number" step="0.5" min="0" value={cookingTimeHours} onChange={e => setCookingTimeHours(e.target.value)} placeholder="e.g. 2" className="mt-1" />
+            </div>
+
             {/* Assessment Fields */}
             <div className="pt-2 border-t">
               <p className="text-sm font-semibold text-muted-foreground mb-3">Readiness Assessment</p>
