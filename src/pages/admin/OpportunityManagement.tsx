@@ -76,8 +76,6 @@ export default function OpportunityManagement() {
         "A new opportunity has been created on CleanCookIQ. An institution is ready for clean cooking transition and requires funding support. Log in to view the details and express your interest."
       );
     },
-      if (error) throw error;
-    },
     onSuccess: () => {
       toast.success("Opportunity created");
       setShowAdd(false);
