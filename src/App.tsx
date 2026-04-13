@@ -83,6 +83,18 @@ const App = () => (
               <ProtectedRoute><FinancingPage /></ProtectedRoute>
             } />
 
+            {/* Institution pages (protected) */}
+            <Route path="/institution/setup" element={
+              <ProtectedRoute><InstitutionSetup /></ProtectedRoute>
+            } />
+            <Route element={<ProtectedRoute><InstitutionLayout /></ProtectedRoute>}>
+              <Route path="/institution/dashboard" element={<InstitutionDashboard />} />
+              <Route path="/institution/profile" element={<InstitutionPlaceholder />} />
+              <Route path="/institution/pathway" element={<InstitutionPlaceholder />} />
+              <Route path="/institution/documents" element={<InstitutionPlaceholder />} />
+              <Route path="/institution/support" element={<InstitutionPlaceholder />} />
+            </Route>
+
             {/* Admin pages (protected) */}
             <Route element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
               <Route path="/admin/pipeline" element={<PipelineDashboard />} />
