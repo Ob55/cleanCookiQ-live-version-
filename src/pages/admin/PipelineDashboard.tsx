@@ -23,20 +23,29 @@ export default function PipelineDashboard() {
   const stageCounts: Record<string, number> = {};
   institutions?.forEach(i => { stageCounts[i.pipeline_stage] = (stageCounts[i.pipeline_stage] || 0) + 1; });
 
+  // Count institutions that have been assessed (have a score > 0 OR are in assessed+ stages)
+  const assessedStages = new Set(["assessed", "scored", "matched", "least_cost_path_assigned", "provider_matched", "negotiation", "financed", "contracted", "in_delivery", "installed", "monitoring", "monitored_dmrv"]);
+  const assessedCount = institutions?.filter(i => (i.assessment_score && Number(i.assessment_score) > 0) || assessedStages.has(i.pipeline_stage)).length ?? 0;
+
   const stages = [
     { stage: "Identified", key: "identified" },
-    { stage: "Assessed", key: "assessed" },
-    { stage: "Matched", key: "matched" },
-    { stage: "Negotiation", key: "negotiation" },
-    { stage: "Contracted", key: "contracted" },
+    { stage: "Contacted", key: "contacted" },
+    { stage: "Assessed / Scored", keys: ["assessed", "scored"] },
+    { stage: "Matched", keys: ["matched", "least_cost_path_assigned", "provider_matched"] },
+    { stage: "Negotiation / Financed", keys: ["negotiation", "financed"] },
+    { stage: "Contracted / Delivery", keys: ["contracted", "in_delivery"] },
     { stage: "Installed", key: "installed" },
-    { stage: "Monitoring", key: "monitoring" },
-  ].map(s => ({ ...s, count: stageCounts[s.key] || 0, pct: total ? Math.round(((stageCounts[s.key] || 0) / total) * 100) : 0 }));
+    { stage: "Monitoring", keys: ["monitoring", "monitored_dmrv"] },
+  ].map(s => {
+    const keys = (s as any).keys || [(s as any).key];
+    const count = keys.reduce((sum: number, k: string) => sum + (stageCounts[k] || 0), 0);
+    return { stage: s.stage, count, pct: total ? Math.round((count / total) * 100) : 0 };
+  });
 
   const kpis = [
     { label: "Total Institutions", value: total.toLocaleString(), icon: Building2 },
-    { label: "Assessed", value: (stageCounts["assessed"] || 0).toString(), icon: BarChart3 },
-    { label: "In Delivery", value: ((stageCounts["contracted"] || 0) + (stageCounts["installed"] || 0)).toString(), icon: TrendingUp },
+    { label: "Assessed", value: assessedCount.toString(), icon: BarChart3 },
+    { label: "In Delivery", value: ((stageCounts["contracted"] || 0) + (stageCounts["installed"] || 0) + (stageCounts["in_delivery"] || 0)).toString(), icon: TrendingUp },
     { label: "Providers", value: (providers?.length ?? 0).toString(), icon: Factory },
   ];
 

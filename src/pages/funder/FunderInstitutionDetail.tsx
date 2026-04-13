@@ -1,13 +1,15 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { notifyInstitutionOwner } from "@/lib/notifications";
 import {
   Loader2, ArrowLeft, Flame, MapPin, Users, UtensilsCrossed,
   Calculator, TrendingDown, Leaf, Zap, Building2, Phone, Mail,
-  CheckCircle2, XCircle, Banknote
+  CheckCircle2, XCircle, Banknote, Send
 } from "lucide-react";
 
 const FUEL_LABELS: Record<string, string> = {
@@ -45,6 +47,19 @@ export default function FunderInstitutionDetail() {
       return data;
     },
     enabled: !!id,
+  });
+
+  const requestMutation = useMutation({
+    mutationFn: async ({ institutionId, institutionName, fields }: { institutionId: string; institutionName: string; fields: string[] }) => {
+      const fieldList = fields.join(", ");
+      await notifyInstitutionOwner(
+        institutionId,
+        "Please Complete Your Profile",
+        `A financing partner is interested in supporting ${institutionName} but needs more information. Please log in and fill in the following missing details: ${fieldList}. Complete your profile to unlock funding opportunities.`
+      );
+    },
+    onSuccess: () => toast.success("Request sent! The institution will be notified to fill in missing details."),
+    onError: () => toast.error("Failed to send request."),
   });
 
   if (isLoading) {
@@ -239,11 +254,23 @@ export default function FunderInstitutionDetail() {
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg flex items-center gap-2 text-destructive">
               <XCircle className="h-5 w-5" />
               What's Missing ({missingItems.length})
             </CardTitle>
+            {missingItems.length > 0 && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-1.5"
+                disabled={requestMutation.isPending}
+                onClick={() => requestMutation.mutate({ institutionId: inst.id, institutionName: inst.name, fields: missingItems.map(m => m.label) })}
+              >
+                {requestMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                Request All Details
+              </Button>
+            )}
           </CardHeader>
           <CardContent className="space-y-2">
             {missingItems.length === 0 ? (
@@ -251,8 +278,22 @@ export default function FunderInstitutionDetail() {
             ) : (
               missingItems.map(item => (
                 <div key={item.label} className="flex items-center justify-between py-2 px-3 rounded-lg bg-destructive/5 border border-destructive/10">
-                  <span className="text-sm font-medium">{item.label}</span>
-                  <span className="text-sm text-muted-foreground">{item.value}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">{item.label}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">{item.value}</span>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 px-2 text-xs"
+                      disabled={requestMutation.isPending}
+                      onClick={() => requestMutation.mutate({ institutionId: inst.id, institutionName: inst.name, fields: [item.label] })}
+                    >
+                      <Send className="h-3 w-3 mr-1" />
+                      Request
+                    </Button>
+                  </div>
                 </div>
               ))
             )}
