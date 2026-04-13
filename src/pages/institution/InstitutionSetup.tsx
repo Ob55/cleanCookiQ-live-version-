@@ -52,6 +52,7 @@ export default function InstitutionSetup() {
   const [mealsPerDay, setMealsPerDay] = useState("");
   const [fuelType, setFuelType] = useState("");
   const [consumption, setConsumption] = useState("");
+  const [cookingTimeHours, setCookingTimeHours] = useState("");
   const [contactPerson, setContactPerson] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [contactEmail, setContactEmail] = useState("");
@@ -115,6 +116,7 @@ export default function InstitutionSetup() {
         current_fuel: fuelType as any,
         consumption_per_term: parseFloat(consumption),
         consumption_unit: unit,
+        cooking_time_minutes: cookingTimeHours ? Math.round(parseFloat(cookingTimeHours) * 60) : null,
         contact_person: contactPerson || null,
         contact_phone: contactPhone || null,
         contact_email: contactEmail || null,
