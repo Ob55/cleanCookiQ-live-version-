@@ -1,9 +1,18 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Building2, MapPin, Flame, Users, Loader2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  ArrowLeft, Building2, MapPin, Flame, Users, Loader2, UserCheck,
+  Phone, Mail, Clock, Utensils, Leaf, DollarSign, Camera, FileText,
+  BarChart3, Gauge,
+} from "lucide-react";
+
+const FUEL_LABELS: Record<string, string> = {
+  firewood: "Firewood", charcoal: "Charcoal", lpg: "LPG",
+  biogas: "Biogas", electric: "Electric (Induction)", other: "Other",
+};
 
 export default function InstitutionDetail() {
   const { id } = useParams<{ id: string }>();
@@ -38,46 +47,117 @@ export default function InstitutionDetail() {
     { label: "Social", value: Number(scores.social_score) },
   ] : [];
 
+  const inst = institution;
+
   return (
     <div className="space-y-6">
       <Link to="/admin/institutions" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" /> Back to institutions
       </Link>
 
+      {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-4">
           <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center">
             <Building2 className="h-7 w-7 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-display font-bold">{institution.name}</h1>
+            <h1 className="text-2xl font-display font-bold">{inst.name}</h1>
             <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
-              <span className="capitalize">{institution.institution_type}</span>
+              <span className="capitalize">{inst.institution_type}</span>
               <span>•</span>
-              <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{institution.county}{institution.sub_county ? `, ${institution.sub_county}` : ""}</span>
+              <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{inst.county}{inst.sub_county ? `, ${inst.sub_county}` : ""}</span>
             </div>
           </div>
         </div>
-        <Badge variant="secondary" className="capitalize">{institution.pipeline_stage}</Badge>
+        <Badge variant="secondary" className="capitalize text-sm px-3 py-1">{inst.pipeline_stage.replace(/_/g, " ")}</Badge>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Info card */}
-        <div className="bg-card border border-border rounded-xl p-6 shadow-card">
-          <h2 className="font-display font-bold mb-4">Details</h2>
-          <dl className="space-y-3 text-sm">
-            <div className="flex justify-between"><dt className="text-muted-foreground">Meals/Day</dt><dd className="font-medium">{institution.meals_per_day}</dd></div>
-            <div className="flex justify-between"><dt className="text-muted-foreground">Current Fuel</dt><dd className="font-medium capitalize">{institution.current_fuel}</dd></div>
-            <div className="flex justify-between"><dt className="text-muted-foreground">Students</dt><dd className="font-medium">{institution.number_of_students}</dd></div>
-            <div className="flex justify-between"><dt className="text-muted-foreground">Staff</dt><dd className="font-medium">{institution.number_of_staff}</dd></div>
-            {institution.contact_person && <div className="flex justify-between"><dt className="text-muted-foreground">Contact</dt><dd className="font-medium">{institution.contact_person}</dd></div>}
-            {institution.contact_phone && <div className="flex justify-between"><dt className="text-muted-foreground">Phone</dt><dd className="font-medium">{institution.contact_phone}</dd></div>}
-          </dl>
-        </div>
+      {/* Summary stat cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <StatCard icon={<Utensils className="h-5 w-5 text-primary" />} label="Meals/Day" value={inst.meals_per_day || inst.meals_served_per_day || 0} />
+        <StatCard icon={<Users className="h-5 w-5 text-primary" />} label="Students" value={inst.number_of_students || 0} />
+        <StatCard icon={<UserCheck className="h-5 w-5 text-primary" />} label="Staff" value={inst.number_of_staff || 0} />
+        <StatCard icon={<Clock className="h-5 w-5 text-primary" />} label="Cooking Time" value={inst.cooking_time_minutes ? `${inst.cooking_time_minutes} min` : "—"} />
+      </div>
 
-        {/* Readiness score */}
-        <div className="bg-card border border-border rounded-xl p-6 shadow-card md:col-span-2">
-          <h2 className="font-display font-bold mb-4">Readiness Score</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Energy & Fuel */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2"><Flame className="h-4 w-4 text-orange-500" /> Energy & Fuel</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <dl className="space-y-3 text-sm">
+              <DetailRow label="Current Fuel" value={inst.current_fuel ? FUEL_LABELS[inst.current_fuel] || inst.current_fuel : "—"} />
+              <DetailRow label="Fuel of Choice" value={inst.fuel_of_choice || "—"} />
+              <DetailRow label="Consumption/Term" value={inst.consumption_per_term ? `${inst.consumption_per_term} ${inst.consumption_unit || ""}` : "—"} />
+              <DetailRow label="Recommended Solution" value={inst.recommended_solution || "—"} />
+            </dl>
+          </CardContent>
+        </Card>
+
+        {/* Financial Impact */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2"><DollarSign className="h-4 w-4 text-emerald-500" /> Financial & Environmental</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <dl className="space-y-3 text-sm">
+              <DetailRow label="Annual Savings" value={inst.annual_savings_ksh ? `KSh ${Number(inst.annual_savings_ksh).toLocaleString()}` : "—"} />
+              <DetailRow label="CO₂ Reduction" value={inst.co2_reduction_tonnes_pa ? `${Number(inst.co2_reduction_tonnes_pa).toLocaleString()} t/yr` : "—"} />
+              <DetailRow label="Ownership Type" value={inst.ownership_type || "—"} capitalize />
+            </dl>
+          </CardContent>
+        </Card>
+
+        {/* Contact Info */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2"><Phone className="h-4 w-4 text-blue-500" /> Contact Information</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <dl className="space-y-3 text-sm">
+              <DetailRow label="Contact Person" value={inst.contact_person || "—"} />
+              <DetailRow label="Phone" value={inst.contact_phone || "—"} />
+              <DetailRow label="Email" value={inst.contact_email || "—"} />
+            </dl>
+          </CardContent>
+        </Card>
+
+        {/* Location */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4 text-red-500" /> Location</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <dl className="space-y-3 text-sm">
+              <DetailRow label="County" value={inst.county} />
+              <DetailRow label="Sub-County" value={inst.sub_county || "—"} />
+              <DetailRow label="Coordinates" value={inst.latitude && inst.longitude ? `${inst.latitude}, ${inst.longitude}` : "—"} />
+            </dl>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Kitchen Photo */}
+      {inst.kitchen_photo_url && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2"><Camera className="h-4 w-4 text-purple-500" /> Kitchen Photo</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <img src={inst.kitchen_photo_url} alt="Kitchen" className="rounded-lg max-h-64 object-cover" />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Readiness Score */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2"><Gauge className="h-4 w-4 text-primary" /> Readiness Score</CardTitle>
+        </CardHeader>
+        <CardContent>
           {scores ? (
             <div>
               <div className="flex items-center gap-4 mb-6">
@@ -99,17 +179,45 @@ export default function InstitutionDetail() {
               </div>
             </div>
           ) : (
-            <p className="text-muted-foreground text-sm">No assessment scored yet. Complete an assessment to generate a readiness score.</p>
+            <p className="text-muted-foreground text-sm">No assessment scored yet.</p>
           )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      {institution.notes && (
-        <div className="bg-card border border-border rounded-xl p-6 shadow-card">
-          <h2 className="font-display font-bold mb-2">Notes</h2>
-          <p className="text-sm text-muted-foreground">{institution.notes}</p>
-        </div>
+      {/* Notes */}
+      {inst.notes && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2"><FileText className="h-4 w-4 text-muted-foreground" /> Notes</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{inst.notes}</p>
+          </CardContent>
+        </Card>
       )}
+    </div>
+  );
+}
+
+function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | number }) {
+  return (
+    <Card>
+      <CardContent className="p-4 flex items-center gap-3">
+        <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">{icon}</div>
+        <div>
+          <p className="text-xs text-muted-foreground">{label}</p>
+          <p className="text-lg font-bold">{typeof value === "number" ? value.toLocaleString() : value}</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function DetailRow({ label, value, capitalize }: { label: string; value: string; capitalize?: boolean }) {
+  return (
+    <div className="flex justify-between">
+      <dt className="text-muted-foreground">{label}</dt>
+      <dd className={`font-medium ${capitalize ? "capitalize" : ""}`}>{value}</dd>
     </div>
   );
 }
