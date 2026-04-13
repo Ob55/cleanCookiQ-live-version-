@@ -327,6 +327,8 @@ export type Database = {
         Row: {
           annual_savings_ksh: number | null
           co2_reduction_tonnes_pa: number | null
+          consumption_per_term: number | null
+          consumption_unit: string | null
           contact_email: string | null
           contact_person: string | null
           contact_phone: string | null
@@ -346,18 +348,23 @@ export type Database = {
           number_of_staff: number | null
           number_of_students: number | null
           organisation_id: string | null
+          ownership_type: string | null
           pipeline_stage: Database["public"]["Enums"]["pipeline_stage"]
           recommended_solution: string | null
+          setup_completed: boolean | null
           sub_county: string | null
           ta_required: boolean | null
           ta_resource_window_end: string | null
           ta_resource_window_start: string | null
           ta_type_needed: string[] | null
           updated_at: string
+          wishes_to_transition_steam: boolean | null
         }
         Insert: {
           annual_savings_ksh?: number | null
           co2_reduction_tonnes_pa?: number | null
+          consumption_per_term?: number | null
+          consumption_unit?: string | null
           contact_email?: string | null
           contact_person?: string | null
           contact_phone?: string | null
@@ -377,18 +384,23 @@ export type Database = {
           number_of_staff?: number | null
           number_of_students?: number | null
           organisation_id?: string | null
+          ownership_type?: string | null
           pipeline_stage?: Database["public"]["Enums"]["pipeline_stage"]
           recommended_solution?: string | null
+          setup_completed?: boolean | null
           sub_county?: string | null
           ta_required?: boolean | null
           ta_resource_window_end?: string | null
           ta_resource_window_start?: string | null
           ta_type_needed?: string[] | null
           updated_at?: string
+          wishes_to_transition_steam?: boolean | null
         }
         Update: {
           annual_savings_ksh?: number | null
           co2_reduction_tonnes_pa?: number | null
+          consumption_per_term?: number | null
+          consumption_unit?: string | null
           contact_email?: string | null
           contact_person?: string | null
           contact_phone?: string | null
@@ -408,14 +420,17 @@ export type Database = {
           number_of_staff?: number | null
           number_of_students?: number | null
           organisation_id?: string | null
+          ownership_type?: string | null
           pipeline_stage?: Database["public"]["Enums"]["pipeline_stage"]
           recommended_solution?: string | null
+          setup_completed?: boolean | null
           sub_county?: string | null
           ta_required?: boolean | null
           ta_resource_window_end?: string | null
           ta_resource_window_start?: string | null
           ta_type_needed?: string[] | null
           updated_at?: string
+          wishes_to_transition_steam?: boolean | null
         }
         Relationships: [
           {
