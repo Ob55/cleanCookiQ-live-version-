@@ -14,6 +14,7 @@ interface Service {
   id: string;
   name: string;
   details: string | null;
+  price: number | null;
 }
 
 export default function SupplierServices() {
@@ -23,7 +24,7 @@ export default function SupplierServices() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ name: "", details: "" });
+  const [form, setForm] = useState({ name: "", details: "", price: "" });
 
   useEffect(() => {
     if (!profile?.organisation_id) return;
@@ -32,7 +33,7 @@ export default function SupplierServices() {
       if (prov) {
         setProviderId(prov.id);
         const { data } = await supabase.from("provider_services").select("*").eq("provider_id", prov.id).order("created_at", { ascending: false });
-        setServices(data ?? []);
+        setServices((data as any) ?? []);
       }
       setLoading(false);
     };
@@ -46,12 +47,13 @@ export default function SupplierServices() {
       provider_id: providerId,
       name: form.name.trim(),
       details: form.details || null,
+      price: form.price ? parseFloat(form.price) : null,
       created_by: user.id,
-    }).select().single();
+    } as any).select().single();
     setSaving(false);
     if (error) { toast.error(error.message); return; }
-    setServices(prev => [data, ...prev]);
-    setForm({ name: "", details: "" });
+    setServices(prev => [(data as any), ...prev]);
+    setForm({ name: "", details: "", price: "" });
     setDialogOpen(false);
     toast.success("Service added!");
   };
@@ -86,6 +88,10 @@ export default function SupplierServices() {
                 <Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Stove Installation" className="mt-1" />
               </div>
               <div>
+                <Label>Price (KSh)</Label>
+                <Input type="number" min="0" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} placeholder="e.g. 15000" className="mt-1" />
+              </div>
+              <div>
                 <Label>Details</Label>
                 <Textarea value={form.details} onChange={e => setForm({ ...form, details: e.target.value })} placeholder="Describe the service..." className="mt-1" rows={4} />
               </div>
@@ -116,6 +122,9 @@ export default function SupplierServices() {
                     </div>
                     <div>
                       <h3 className="font-semibold">{service.name}</h3>
+                      {service.price != null && (
+                        <p className="text-sm font-bold text-primary mt-0.5">KSh {Number(service.price).toLocaleString()}</p>
+                      )}
                       {service.details && (
                         <p className="text-sm text-muted-foreground mt-1">{service.details}</p>
                       )}
