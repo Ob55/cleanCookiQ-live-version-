@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { calculateAssessmentScore } from "@/lib/assessmentScoring";
 
 const COUNTIES = [
   "Baringo","Bomet","Bungoma","Busia","Elgeyo-Marakwet","Embu","Garissa","Homa Bay",
@@ -37,15 +39,6 @@ const FUEL_UNITS: Record<string, string> = {
   other: "kg",
 };
 
-const OWNERSHIP_MAP: Record<string, string> = {
-  firewood: "firewood",
-  charcoal: "charcoal",
-  lpg: "lpg",
-  biogas: "biogas",
-  electric: "electric",
-  other: "other",
-};
-
 export default function InstitutionSetup() {
   const navigate = useNavigate();
   const { user, refreshProfile } = useAuth();
@@ -61,6 +54,15 @@ export default function InstitutionSetup() {
   const [contactPerson, setContactPerson] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [contactEmail, setContactEmail] = useState("");
+
+  // Assessment scoring fields
+  const [numberOfStudents, setNumberOfStudents] = useState("");
+  const [monthlyFuelSpend, setMonthlyFuelSpend] = useState("");
+  const [hasDedicatedKitchen, setHasDedicatedKitchen] = useState("");
+  const [kitchenCondition, setKitchenCondition] = useState("");
+  const [financingPreference, setFinancingPreference] = useState("");
+  const [financialDecisionMaker, setFinancialDecisionMaker] = useState("");
+
   const unit = fuelType ? FUEL_UNITS[fuelType] : null;
 
   const isValid = name.trim() && county && ownershipType && mealsPerDay && fuelType && consumption;
@@ -71,14 +73,12 @@ export default function InstitutionSetup() {
     setLoading(true);
 
     try {
-      // Find institution linked to user's profile
       const { data: profile } = await supabase
         .from("profiles")
         .select("organisation_id")
         .eq("user_id", user.id)
         .single();
 
-      // Check if user already has an institution via organisation
       let institutionId: string | null = null;
 
       if (profile?.organisation_id) {
@@ -90,18 +90,40 @@ export default function InstitutionSetup() {
         institutionId = existing?.id ?? null;
       }
 
+      // Calculate assessment score
+      const kitchenBool = hasDedicatedKitchen === "yes" ? true : hasDedicatedKitchen === "no" ? false : null;
+      const scoringInput = {
+        current_fuel: fuelType || null,
+        consumption_per_term: consumption ? parseFloat(consumption) : null,
+        has_dedicated_kitchen: kitchenBool,
+        kitchen_condition: kitchenCondition || null,
+        financing_preference: financingPreference || null,
+        number_of_students: numberOfStudents ? parseInt(numberOfStudents) : null,
+        monthly_fuel_spend: monthlyFuelSpend ? parseFloat(monthlyFuelSpend) : null,
+        financial_decision_maker: financialDecisionMaker || null,
+      };
+      const { score, category } = calculateAssessmentScore(scoringInput);
+
       const institutionData = {
         name: name.trim(),
         county,
         sub_county: subCounty || null,
         ownership_type: ownershipType,
         meals_per_day: parseInt(mealsPerDay),
-        current_fuel: OWNERSHIP_MAP[fuelType] as any,
+        current_fuel: fuelType as any,
         consumption_per_term: parseFloat(consumption),
         consumption_unit: unit,
         contact_person: contactPerson || null,
         contact_phone: contactPhone || null,
         contact_email: contactEmail || null,
+        number_of_students: numberOfStudents ? parseInt(numberOfStudents) : null,
+        monthly_fuel_spend: monthlyFuelSpend ? parseFloat(monthlyFuelSpend) : null,
+        has_dedicated_kitchen: kitchenBool,
+        kitchen_condition: kitchenCondition || null,
+        financing_preference: financingPreference || null,
+        financial_decision_maker: financialDecisionMaker || null,
+        assessment_score: score,
+        assessment_category: category,
         setup_completed: true,
         created_by: user.id,
       };
@@ -169,7 +191,13 @@ export default function InstitutionSetup() {
               </Select>
             </div>
 
-            {/* Field 4 — Meals Per Day */}
+            {/* Field 4 — Number of Students */}
+            <div>
+              <Label htmlFor="num-students">Number of Students / Residents Fed Daily</Label>
+              <Input id="num-students" type="number" min="0" value={numberOfStudents} onChange={e => setNumberOfStudents(e.target.value)} placeholder="e.g. 500" className="mt-1" />
+            </div>
+
+            {/* Field 5 — Meals Per Day */}
             <div>
               <Label>Meals Served Per Day</Label>
               <Select value={mealsPerDay} onValueChange={setMealsPerDay}>
@@ -182,7 +210,7 @@ export default function InstitutionSetup() {
               </Select>
             </div>
 
-            {/* Field 5 — Current Fuel */}
+            {/* Field 6 — Current Fuel */}
             <div>
               <Label>Current Fuel Used for Cooking</Label>
               <Select value={fuelType} onValueChange={setFuelType}>
@@ -193,7 +221,7 @@ export default function InstitutionSetup() {
               </Select>
             </div>
 
-            {/* Field 6 — Consumption Per Term */}
+            {/* Field 7 — Consumption Per Term */}
             <div>
               <Label>Consumption Per Term</Label>
               <div className="flex items-center gap-2 mt-1">
@@ -210,6 +238,78 @@ export default function InstitutionSetup() {
                 <span className="text-sm text-muted-foreground whitespace-nowrap">
                   {unit ? `(${unit})` : "(select fuel type first)"}
                 </span>
+              </div>
+            </div>
+
+            {/* Field 8 — Monthly Fuel Spend */}
+            <div>
+              <Label htmlFor="monthly-spend">Monthly Fuel Spend (KSh)</Label>
+              <Input id="monthly-spend" type="number" min="0" value={monthlyFuelSpend} onChange={e => setMonthlyFuelSpend(e.target.value)} placeholder="e.g. 50000" className="mt-1" />
+            </div>
+
+            {/* Assessment Fields */}
+            <div className="pt-2 border-t">
+              <p className="text-sm font-semibold text-muted-foreground mb-3">Readiness Assessment</p>
+
+              {/* Dedicated Kitchen */}
+              <div className="space-y-4">
+                <div>
+                  <Label>Do you have a dedicated kitchen?</Label>
+                  <RadioGroup value={hasDedicatedKitchen} onValueChange={setHasDedicatedKitchen} className="flex gap-4 mt-2">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="yes" id="kitchen-yes" />
+                      <Label htmlFor="kitchen-yes" className="font-normal">Yes</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="no" id="kitchen-no" />
+                      <Label htmlFor="kitchen-no" className="font-normal">No</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                {/* Kitchen Condition */}
+                {hasDedicatedKitchen === "yes" && (
+                  <div>
+                    <Label>Kitchen Condition</Label>
+                    <Select value={kitchenCondition} onValueChange={setKitchenCondition}>
+                      <SelectTrigger className="mt-1"><SelectValue placeholder="Select condition" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="clean_ready">Clean and ready</SelectItem>
+                        <SelectItem value="minor_renovation">Minor renovation needed</SelectItem>
+                        <SelectItem value="major_renovation">Major renovation needed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {/* Financing Preference */}
+                <div>
+                  <Label>Financing Preference</Label>
+                  <Select value={financingPreference} onValueChange={setFinancingPreference}>
+                    <SelectTrigger className="mt-1"><SelectValue placeholder="Select preference" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="loan">Loan acceptable</SelectItem>
+                      <SelectItem value="partial">Partial grant + partial loan</SelectItem>
+                      <SelectItem value="grant">Full grant only</SelectItem>
+                      <SelectItem value="not_sure">Not sure</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Financial Decision Maker */}
+                <div>
+                  <Label>Who makes the financial decisions?</Label>
+                  <Select value={financialDecisionMaker} onValueChange={setFinancialDecisionMaker}>
+                    <SelectTrigger className="mt-1"><SelectValue placeholder="Select decision maker" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="head_teacher">Head Teacher / Principal</SelectItem>
+                      <SelectItem value="board_of_governors">Board of Governors</SelectItem>
+                      <SelectItem value="religious_body">Religious Sponsoring Body</SelectItem>
+                      <SelectItem value="pta">Parent Teacher Association</SelectItem>
+                      <SelectItem value="county_government">County Government / Ministry</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
 
@@ -240,9 +340,6 @@ export default function InstitutionSetup() {
                 <Input id="sub-county" value={subCounty} onChange={e => setSubCounty(e.target.value)} placeholder="e.g. Isiolo Central" className="mt-1" />
               </div>
             </div>
-
-
-
 
             <Button type="submit" className="w-full min-h-[44px]" disabled={!isValid || loading}>
               {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
