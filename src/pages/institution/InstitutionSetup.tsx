@@ -119,6 +119,7 @@ export default function InstitutionSetup() {
         contact_phone: contactPhone || null,
         contact_email: contactEmail || null,
         number_of_students: numberOfStudents ? parseInt(numberOfStudents) : null,
+        number_of_staff: numberOfStaff ? parseInt(numberOfStaff) : null,
         monthly_fuel_spend: monthlyFuelSpend ? parseFloat(monthlyFuelSpend) : null,
         has_dedicated_kitchen: kitchenBool,
         kitchen_condition: kitchenCondition || null,
