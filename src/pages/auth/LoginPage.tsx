@@ -58,6 +58,12 @@ export default function LoginPage() {
     setLoading(false);
     toast.success("Logged in successfully");
 
+    // Admin roles take priority — always route to admin dashboard
+    if (isAdmin) {
+      navigate("/admin/pipeline");
+      return;
+    }
+
     if (isInstitutionUser) {
       const { data: inst } = await supabase
         .from("institutions")
@@ -66,11 +72,6 @@ export default function LoginPage() {
         .maybeSingle();
 
       navigate(inst?.setup_completed ? "/institution/dashboard" : "/institution/setup");
-      return;
-    }
-
-    if (isAdmin) {
-      navigate("/admin/pipeline");
       return;
     }
 
