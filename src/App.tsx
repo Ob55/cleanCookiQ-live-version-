@@ -29,6 +29,7 @@ import InstitutionManagement from "@/pages/admin/InstitutionManagement";
 import InstitutionDetail from "@/pages/admin/InstitutionDetail";
 import UserManagement from "@/pages/admin/UserManagement";
 import ProviderManagement from "@/pages/admin/ProviderManagement";
+import ProviderDetail from "@/pages/admin/ProviderDetail";
 import AssessmentQueue from "@/pages/admin/AssessmentQueue";
 import OpportunityManagement from "@/pages/admin/OpportunityManagement";
 import BDDashboard from "@/pages/admin/BDDashboard";
@@ -126,6 +127,7 @@ const App = () => (
               <Route path="/admin/institutions" element={<InstitutionManagement />} />
               <Route path="/admin/institutions/:id" element={<InstitutionDetail />} />
               <Route path="/admin/providers" element={<ProviderManagement />} />
+              <Route path="/admin/providers/:id" element={<ProviderDetail />} />
               <Route path="/admin/assessments" element={<AssessmentQueue />} />
               <Route path="/admin/opportunities" element={<OpportunityManagement />} />
               <Route path="/admin/bd" element={<BDDashboard />} />
