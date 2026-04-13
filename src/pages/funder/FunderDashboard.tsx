@@ -169,8 +169,12 @@ export default function FunderDashboard() {
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Banknote className="h-4 w-4 text-primary" />
-                    <Badge variant="secondary" className={inst.transition_interest === "yes" ? "bg-emerald-500/20 text-emerald-600" : "bg-amber-500/20 text-amber-600"}>
-                      Interest: {inst.transition_interest?.toUpperCase()}
+                    <Badge variant="secondary" className={
+                      inst.transition_interest === "yes" ? "bg-emerald-500/20 text-emerald-600" 
+                      : inst.transition_interest === "maybe" ? "bg-amber-500/20 text-amber-600"
+                      : "bg-muted text-muted-foreground"
+                    }>
+                      Interest: {inst.transition_interest ? inst.transition_interest.toUpperCase() : "NOT SET"}
                     </Badge>
                   </div>
 
