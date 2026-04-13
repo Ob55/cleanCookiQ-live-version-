@@ -10,7 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 const institutionNav = [
   { label: "Dashboard", href: "/institution/dashboard", icon: LayoutDashboard },
   { label: "My Institution", href: "/institution/profile", icon: Building2 },
-  { label: "My Pathway", href: "/institution/pathway", icon: Route },
+  { label: "Cooking Alchemy", href: "/institution/alchemy", icon: Route },
   { label: "Documents", href: "/institution/documents", icon: FileText },
   { label: "Support", href: "/institution/support", icon: LifeBuoy },
 ];

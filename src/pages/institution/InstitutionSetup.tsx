@@ -57,11 +57,9 @@ export default function InstitutionSetup() {
   const [mealsPerDay, setMealsPerDay] = useState("");
   const [fuelType, setFuelType] = useState("");
   const [consumption, setConsumption] = useState("");
-  const [steamTransition, setSteamTransition] = useState<boolean | null>(null);
-
   const unit = fuelType ? FUEL_UNITS[fuelType] : null;
 
-  const isValid = name.trim() && county && ownershipType && mealsPerDay && fuelType && consumption && steamTransition !== null;
+  const isValid = name.trim() && county && ownershipType && mealsPerDay && fuelType && consumption;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
