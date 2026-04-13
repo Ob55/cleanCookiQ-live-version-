@@ -1130,6 +1130,7 @@ export type Database = {
           details: string | null
           id: string
           name: string
+          price: number | null
           provider_id: string
           updated_at: string
         }
@@ -1139,6 +1140,7 @@ export type Database = {
           details?: string | null
           id?: string
           name: string
+          price?: number | null
           provider_id: string
           updated_at?: string
         }
@@ -1148,6 +1150,7 @@ export type Database = {
           details?: string | null
           id?: string
           name?: string
+          price?: number | null
           provider_id?: string
           updated_at?: string
         }
