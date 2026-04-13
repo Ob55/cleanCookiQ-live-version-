@@ -1,0 +1,1 @@
+ALTER TABLE public.provider_services ADD COLUMN price NUMERIC NULL;
