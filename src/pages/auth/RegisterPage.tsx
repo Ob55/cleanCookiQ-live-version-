@@ -12,8 +12,6 @@ const orgTypes = [
   { value: "institution", label: "Institution", desc: "School, hospital, prison, factory", icon: Building2 },
   { value: "supplier", label: "Supplier / Provider", desc: "Equipment, installation, maintenance", icon: Factory },
   { value: "funder", label: "Funder / Financing Partner", desc: "Finance partner or investor", icon: Banknote },
-  { value: "csr", label: "CSR Partner", desc: "Corporate social responsibility", icon: Landmark },
-  { value: "researcher", label: "Researcher", desc: "Academic or research institution", icon: FlaskConical },
 ];
 
 const fundingTypes = [
