@@ -184,6 +184,51 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* How It Works */}
+      <section className="py-20 lg:py-28 bg-background">
+        <div className="container">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">How CleanCookIQ Works</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              A structured pipeline that takes institutions from registration to monitored clean kitchens.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+            {[
+              {
+                step: "01", title: "Register", icon: UserPlus,
+                desc: "Institutions register cooking data — fuel type, population, budget, location.",
+              },
+              {
+                step: "02", title: "Assess & Score", icon: ClipboardCheck,
+                desc: "7-dimension readiness engine scores each institution and computes the least-cost pathway.",
+              },
+              {
+                step: "03", title: "Match & Finance", icon: Handshake,
+                desc: "Verified providers matched to ready institutions. Funders connect to bankable opportunities.",
+              },
+              {
+                step: "04", title: "Deploy", icon: Rocket,
+                desc: "Equipment installed and commissioned. Milestones tracked in real-time through the platform.",
+              },
+              {
+                step: "05", title: "Monitor & Verify", icon: Activity,
+                desc: "Post-installation performance monitored. Data feeds carbon credit verification and impact reports.",
+              },
+            ].map((item) => (
+              <div key={item.step} className="flex flex-col items-center text-center">
+                <div className="h-14 w-14 rounded-full bg-primary flex items-center justify-center mb-4">
+                  <item.icon className="h-6 w-6 text-primary-foreground" />
+                </div>
+                <span className="text-xs font-bold text-primary tracking-wider uppercase mb-1">Step {item.step}</span>
+                <h3 className="font-display font-bold text-lg mb-2">{item.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-20 bg-gradient-hero text-primary-foreground">
         <div className="container text-center">
