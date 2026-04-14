@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { MapPin, BarChart3, Users, TrendingUp, Leaf, Building2, ArrowRight, Flame, Factory, Banknote, Briefcase, FolderKanban, GraduationCap } from "lucide-react";
+import FuelOptionsSection from "@/components/institution/FuelOptionsSection";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const stats = [
@@ -145,6 +146,13 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Fuel Options */}
+      <section className="py-20 lg:py-28 bg-background">
+        <div className="container">
+          <FuelOptionsSection />
         </div>
       </section>
 
