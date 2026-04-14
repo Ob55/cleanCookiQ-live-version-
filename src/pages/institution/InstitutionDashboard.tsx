@@ -253,8 +253,6 @@ export default function InstitutionDashboard() {
       {/* Cooking Alchemy Section */}
       <CookingAlchemySection institution={institution} costModel={costModel} />
 
-      {/* Fuel Options */}
-      <FuelOptionsSection />
 
       {/* Transition Interest */}
       <TransitionInterest
