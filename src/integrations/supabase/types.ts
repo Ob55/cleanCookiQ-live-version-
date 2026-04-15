@@ -1432,39 +1432,51 @@ export type Database = {
       }
       support_tickets: {
         Row: {
+          admin_reply: string | null
           assigned_to_provider_id: string | null
           created_at: string
           description: string | null
           id: string
           priority: Database["public"]["Enums"]["ticket_priority"]
-          project_id: string
+          project_id: string | null
           raised_by: string | null
+          raised_by_email: string | null
+          raised_by_name: string | null
+          raised_by_role: string | null
           resolved_at: string | null
           status: Database["public"]["Enums"]["ticket_status"]
           title: string
           updated_at: string
         }
         Insert: {
+          admin_reply?: string | null
           assigned_to_provider_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
           priority?: Database["public"]["Enums"]["ticket_priority"]
-          project_id: string
+          project_id?: string | null
           raised_by?: string | null
+          raised_by_email?: string | null
+          raised_by_name?: string | null
+          raised_by_role?: string | null
           resolved_at?: string | null
           status?: Database["public"]["Enums"]["ticket_status"]
           title: string
           updated_at?: string
         }
         Update: {
+          admin_reply?: string | null
           assigned_to_provider_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
           priority?: Database["public"]["Enums"]["ticket_priority"]
-          project_id?: string
+          project_id?: string | null
           raised_by?: string | null
+          raised_by_email?: string | null
+          raised_by_name?: string | null
+          raised_by_role?: string | null
           resolved_at?: string | null
           status?: Database["public"]["Enums"]["ticket_status"]
           title?: string
