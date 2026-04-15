@@ -34,11 +34,9 @@ import ProviderDetail from "@/pages/admin/ProviderDetail";
 import AssessmentQueue from "@/pages/admin/AssessmentQueue";
 import OpportunityManagement from "@/pages/admin/OpportunityManagement";
 import BDDashboard from "@/pages/admin/BDDashboard";
-import ScoringConfig from "@/pages/admin/ScoringConfig";
 import CostConfig from "@/pages/admin/CostConfig";
-import AuditLog from "@/pages/admin/AuditLog";
 import PortfolioManagement from "@/pages/admin/PortfolioManagement";
-import ProgramManagement from "@/pages/admin/ProgramManagement";
+import AdminTickets from "@/pages/admin/AdminTickets";
 
 import TADashboard from "@/pages/ta/TADashboard";
 import FinancingPage from "@/pages/FinancingPage";
@@ -57,6 +55,8 @@ import SupplierServices from "@/pages/supplier/SupplierServices";
 import SupplierDocuments from "@/pages/supplier/SupplierDocuments";
 import FunderDashboard from "@/pages/funder/FunderDashboard";
 import FunderInstitutionDetail from "@/pages/funder/FunderInstitutionDetail";
+
+import TicketsPage from "@/pages/shared/TicketsPage";
 
 import NotFound from "@/pages/NotFound";
 
@@ -109,6 +109,7 @@ const App = () => (
               <Route path="/institution/alchemy" element={<CookingAlchemy />} />
               <Route path="/institution/documents" element={<InstitutionDocuments />} />
               <Route path="/institution/support" element={<InstitutionSupport />} />
+              <Route path="/institution/tickets" element={<TicketsPage />} />
             </Route>
 
             {/* Supplier Setup (no sidebar) */}
@@ -122,12 +123,14 @@ const App = () => (
               <Route path="/supplier/products" element={<SupplierProducts />} />
               <Route path="/supplier/services" element={<SupplierServices />} />
               <Route path="/supplier/documents" element={<SupplierDocuments />} />
+              <Route path="/supplier/tickets" element={<TicketsPage />} />
             </Route>
 
             {/* Funder pages (with sidebar) */}
             <Route element={<ProtectedRoute><FunderLayout /></ProtectedRoute>}>
               <Route path="/funder/dashboard" element={<FunderDashboard />} />
               <Route path="/funder/institution/:id" element={<FunderInstitutionDetail />} />
+              <Route path="/funder/tickets" element={<TicketsPage />} />
             </Route>
 
             {/* Admin pages (protected) */}
@@ -141,11 +144,9 @@ const App = () => (
               <Route path="/admin/opportunities" element={<OpportunityManagement />} />
               <Route path="/admin/bd" element={<BDDashboard />} />
               <Route path="/admin/portfolio" element={<PortfolioManagement />} />
-              <Route path="/admin/programs" element={<ProgramManagement />} />
+              <Route path="/admin/tickets" element={<AdminTickets />} />
               <Route path="/admin/users" element={<UserManagement />} />
-              <Route path="/admin/scoring/config" element={<ScoringConfig />} />
               <Route path="/admin/engine/costs" element={<CostConfig />} />
-              <Route path="/admin/audit" element={<AuditLog />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
