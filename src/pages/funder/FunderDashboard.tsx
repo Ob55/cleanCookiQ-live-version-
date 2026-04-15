@@ -115,6 +115,7 @@ export default function FunderDashboard() {
     onSuccess: () => {
       toast.success("You have been linked to this institution!");
       queryClient.invalidateQueries({ queryKey: ["funder-links"] });
+      queryClient.invalidateQueries({ queryKey: ["all-funder-links"] });
     },
     onError: (e: any) => toast.error(e.message),
   });
@@ -147,6 +148,7 @@ export default function FunderDashboard() {
     onSuccess: () => {
       toast.success("You have been unlinked from this institution.");
       queryClient.invalidateQueries({ queryKey: ["funder-links"] });
+      queryClient.invalidateQueries({ queryKey: ["all-funder-links"] });
     },
     onError: (e: any) => toast.error(e.message),
   });
