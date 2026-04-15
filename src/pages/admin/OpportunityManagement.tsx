@@ -47,7 +47,7 @@ export default function OpportunityManagement() {
 
   const createOpp = useMutation({
     mutationFn: async () => {
-      const createdByName = profile?.full_name || "Admin";
+      const createdByName = "IGNIS";
       const { error } = await supabase.from("opportunities").insert({
         title: form.title,
         description: form.description,
@@ -125,8 +125,8 @@ export default function OpportunityManagement() {
             <DialogHeader><DialogTitle>Create New Opportunity</DialogTitle></DialogHeader>
             <div className="space-y-3">
               <div>
-                <Label>Created By</Label>
-                <Input value={profile?.full_name || "Admin"} disabled className="mt-1 bg-muted" />
+              <Label>Created By</Label>
+                <Input value="IGNIS" disabled className="mt-1 bg-muted" />
               </div>
               <div><Label>Title *</Label><Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} className="mt-1" /></div>
               <div><Label>Description</Label><Textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} className="mt-1" /></div>
