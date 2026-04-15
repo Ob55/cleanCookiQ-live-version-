@@ -90,7 +90,7 @@ export default function CookingAlchemy() {
     return (
       <div className="space-y-6">
         <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-          <FlaskConical className="h-6 w-6 text-primary" /> Cooking Alchemy
+          <FlaskConical className="h-6 w-6 text-primary" /> Cooking Counting
         </h1>
         <Card>
           <CardContent className="py-12 text-center">
@@ -124,7 +124,7 @@ export default function CookingAlchemy() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-          <FlaskConical className="h-6 w-6 text-primary" /> Cooking Alchemy
+          <FlaskConical className="h-6 w-6 text-primary" /> Cooking Counting
         </h1>
         <p className="text-muted-foreground mt-1">See how much you could save by transitioning to clean cooking</p>
       </div>

@@ -19,7 +19,9 @@ const adminNav = [
   { label: "Opportunities", href: "/admin/opportunities", icon: FileText },
   { label: "BD Dashboard", href: "/admin/bd", icon: BarChart3 },
   { label: "Portfolio", href: "/admin/portfolio", icon: Briefcase },
+  { label: "Portfolio Aggregation", href: "/admin/portfolio-aggregation", icon: BarChart3 },
   { label: "Tickets", href: "/admin/tickets", icon: Ticket },
+  { label: "Subscribers", href: "/admin/subscribers", icon: Users },
   { label: "Users", href: "/admin/users", icon: Users },
 ];
 

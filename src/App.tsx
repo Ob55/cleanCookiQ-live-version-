@@ -35,7 +35,11 @@ import AssessmentQueue from "@/pages/admin/AssessmentQueue";
 import OpportunityManagement from "@/pages/admin/OpportunityManagement";
 import BDDashboard from "@/pages/admin/BDDashboard";
 import PortfolioManagement from "@/pages/admin/PortfolioManagement";
+import PortfolioAggregation from "@/pages/admin/PortfolioAggregation";
 import AdminTickets from "@/pages/admin/AdminTickets";
+import Subscribers from "@/pages/admin/Subscribers";
+
+import MarketingAnalysis from "@/pages/MarketingAnalysis";
 
 import TADashboard from "@/pages/ta/TADashboard";
 import FinancingPage from "@/pages/FinancingPage";
@@ -58,6 +62,8 @@ import FunderDashboard from "@/pages/funder/FunderDashboard";
 import FunderInstitutionDetail from "@/pages/funder/FunderInstitutionDetail";
 import FunderDocuments from "@/pages/funder/FunderDocuments";
 
+import TicketsPage from "@/pages/shared/TicketsPage";
+
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -76,6 +82,7 @@ const App = () => (
               <Route path="/map" element={<MapPage />} />
               <Route path="/intelligence" element={<IntelligencePage />} />
               <Route path="/providers" element={<ProvidersPage />} />
+              <Route path="/marketing" element={<MarketingAnalysis />} />
               <Route path="/about" element={<AboutPage />} />
             </Route>
 
@@ -123,6 +130,7 @@ const App = () => (
               <Route path="/supplier/services" element={<SupplierServices />} />
               <Route path="/supplier/documents" element={<SupplierDocuments />} />
               <Route path="/supplier/opportunities" element={<SupplierOpportunities />} />
+              <Route path="/supplier/support" element={<TicketsPage />} />
             </Route>
 
             {/* Funder pages (with sidebar) */}
@@ -130,6 +138,7 @@ const App = () => (
               <Route path="/funder/dashboard" element={<FunderDashboard />} />
               <Route path="/funder/institution/:id" element={<FunderInstitutionDetail />} />
               <Route path="/funder/documents" element={<FunderDocuments />} />
+              <Route path="/funder/support" element={<TicketsPage />} />
             </Route>
 
             {/* Admin pages (protected) */}
@@ -143,7 +152,9 @@ const App = () => (
               <Route path="/admin/opportunities" element={<OpportunityManagement />} />
               <Route path="/admin/bd" element={<BDDashboard />} />
               <Route path="/admin/portfolio" element={<PortfolioManagement />} />
+              <Route path="/admin/portfolio-aggregation" element={<PortfolioAggregation />} />
               <Route path="/admin/tickets" element={<AdminTickets />} />
+              <Route path="/admin/subscribers" element={<Subscribers />} />
               <Route path="/admin/users" element={<UserManagement />} />
             </Route>
 

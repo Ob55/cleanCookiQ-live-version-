@@ -71,7 +71,7 @@ export default function CookingAlchemySection({ institution, costModel }: Props)
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
           <Flame className="h-5 w-5 text-primary" />
-          Cooking Alchemy — Transition Assessment
+          Cooking Counting — Transition Assessment
         </CardTitle>
       </CardHeader>
       <CardContent>

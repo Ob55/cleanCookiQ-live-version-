@@ -7,7 +7,6 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Flame, UtensilsCrossed, Droplets, BarChart3, Loader2, User, Phone, Mail, MapPin } from "lucide-react";
 import CookingAlchemySection from "@/components/institution/CookingAlchemySection";
-import TransitionInterest from "@/components/institution/TransitionInterest";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood", charcoal: "Charcoal", lpg: "LPG",
@@ -273,22 +272,8 @@ export default function InstitutionDashboard() {
         </Card>
       </div>
 
-      {/* Cooking Alchemy Section */}
+      {/* Cooking Counting Section */}
       <CookingAlchemySection institution={institution} costModel={costModel} />
-
-
-      {/* Transition Interest */}
-      <TransitionInterest
-        institutionId={institution.id}
-        institutionName={institution.name}
-        county={institution.county}
-        institutionType={institution.institution_type}
-        currentFuel={institution.current_fuel}
-        monthlySpend={institution.monthly_fuel_spend}
-        studentsCount={institution.number_of_students}
-        currentInterest={institution.transition_interest}
-        onUpdate={(val) => setInstitution(prev => prev ? { ...prev, transition_interest: val } : null)}
-      />
     </div>
   );
 }
