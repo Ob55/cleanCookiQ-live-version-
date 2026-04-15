@@ -62,11 +62,31 @@ export default function InstitutionDashboard() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data } = await supabase
+      // Try created_by first
+      let { data } = await supabase
         .from("institutions")
         .select("*")
         .eq("created_by", user.id)
+        .limit(1)
         .maybeSingle();
+
+      // Fallback: try via profile organisation_id
+      if (!data) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("organisation_id")
+          .eq("user_id", user.id)
+          .single();
+        if (profile?.organisation_id) {
+          const { data: orgInst } = await supabase
+            .from("institutions")
+            .select("*")
+            .eq("organisation_id", profile.organisation_id)
+            .limit(1)
+            .maybeSingle();
+          data = orgInst;
+        }
+      }
       const inst = data as any;
       setInstitution(inst as Institution | null);
 

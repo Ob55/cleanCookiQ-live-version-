@@ -50,11 +50,29 @@ export default function CookingAlchemy() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data } = await supabase
+      let { data } = await supabase
         .from("institutions")
         .select("name, current_fuel, consumption_per_term, consumption_unit, meals_per_day, cooking_time_minutes")
         .eq("created_by", user.id)
+        .limit(1)
         .maybeSingle();
+
+      if (!data) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("organisation_id")
+          .eq("user_id", user.id)
+          .single();
+        if (profile?.organisation_id) {
+          const { data: orgInst } = await supabase
+            .from("institutions")
+            .select("name, current_fuel, consumption_per_term, consumption_unit, meals_per_day, cooking_time_minutes")
+            .eq("organisation_id", profile.organisation_id)
+            .limit(1)
+            .maybeSingle();
+          data = orgInst;
+        }
+      }
       setInstitution(data as InstitutionData | null);
       setLoading(false);
     })();
