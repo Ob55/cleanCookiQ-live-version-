@@ -13,7 +13,6 @@ import { Building2, Pencil, Save, X, Loader2, Users, UserCheck, Clock, Camera, B
 import { toast } from "sonner";
 import { calculateAssessmentScore } from "@/lib/assessmentScoring";
 import TransitionNeedsSection from "@/components/institution/TransitionNeedsSection";
-import TransitionProductSelector from "@/components/institution/TransitionProductSelector";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood", charcoal: "Charcoal", lpg: "LPG",
@@ -530,35 +529,6 @@ export default function InstitutionProfile() {
         </CardContent>
       </Card>
 
-      {/* Transition Needs */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">What We Need for Transitioning</CardTitle>
-          <CardDescription>Select products and services from providers to build your transition plan</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <TransitionProductSelector institutionId={institution.id} editable={true} />
-          {editing ? (
-            <div>
-              <Label className="text-sm text-muted-foreground">Additional Notes</Label>
-              <Textarea
-                value={transitionNeeds}
-                onChange={e => setTransitionNeeds(e.target.value)}
-                placeholder="e.g. We also need staff training on safe gas usage..."
-                rows={3}
-                className="mt-1"
-              />
-            </div>
-          ) : (
-            institution.transition_needs && (
-              <div>
-                <p className="text-sm text-muted-foreground font-medium mb-1">Additional Notes</p>
-                <p className="text-sm">{institution.transition_needs}</p>
-              </div>
-            )
-          )}
-        </CardContent>
-      </Card>
     </div>
   );
 }
