@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, LogOut, Menu, Building2 } from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, Building2, Ticket } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -84,6 +84,25 @@ export default function FunderLayout() {
             >
               <LayoutDashboard className="h-4 w-4 shrink-0" />
               Dashboard
+            </Link>
+          );
+        })()}
+
+        {/* Tickets Link */}
+        {(() => {
+          const isActive = location.pathname === "/funder/tickets";
+          return (
+            <Link
+              to="/funder/tickets"
+              onClick={() => setSidebarOpen(false)}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                isActive
+                  ? "bg-sidebar-accent text-sidebar-primary"
+                  : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+              }`}
+            >
+              <Ticket className="h-4 w-4 shrink-0" />
+              Tickets
             </Link>
           );
         })()}
