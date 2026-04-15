@@ -49,7 +49,7 @@ import InstitutionDashboard from "@/pages/institution/InstitutionDashboard";
 import InstitutionProfile from "@/pages/institution/InstitutionProfile";
 import CookingAlchemy from "@/pages/institution/CookingAlchemy";
 import InstitutionDocuments from "@/pages/institution/InstitutionDocuments";
-import InstitutionSupport from "@/pages/institution/InstitutionSupport";
+
 
 import SupplierSetup from "@/pages/supplier/SupplierSetup";
 import SupplierDashboard from "@/pages/supplier/SupplierDashboard";
