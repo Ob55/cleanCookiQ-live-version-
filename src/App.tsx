@@ -49,7 +49,7 @@ import InstitutionDashboard from "@/pages/institution/InstitutionDashboard";
 import InstitutionProfile from "@/pages/institution/InstitutionProfile";
 import CookingAlchemy from "@/pages/institution/CookingAlchemy";
 import InstitutionDocuments from "@/pages/institution/InstitutionDocuments";
-import InstitutionSupport from "@/pages/institution/InstitutionSupport";
+
 
 import SupplierSetup from "@/pages/supplier/SupplierSetup";
 import SupplierDashboard from "@/pages/supplier/SupplierDashboard";
@@ -115,7 +115,7 @@ const App = () => (
               <Route path="/institution/profile" element={<InstitutionProfile />} />
               <Route path="/institution/alchemy" element={<CookingAlchemy />} />
               <Route path="/institution/documents" element={<InstitutionDocuments />} />
-              <Route path="/institution/support" element={<InstitutionSupport />} />
+              <Route path="/institution/support" element={<TicketsPage />} />
             </Route>
 
             {/* Supplier Setup (no sidebar) */}
