@@ -12,15 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { calculateAssessmentScore } from "@/lib/assessmentScoring";
-
-const COUNTIES = [
-  "Baringo","Bomet","Bungoma","Busia","Elgeyo-Marakwet","Embu","Garissa","Homa Bay",
-  "Isiolo","Kajiado","Kakamega","Kericho","Kiambu","Kilifi","Kirinyaga","Kisii","Kisumu",
-  "Kitui","Kwale","Laikipia","Lamu","Machakos","Makueni","Mandera","Marsabit","Meru",
-  "Migori","Mombasa","Murang'a","Nairobi","Nakuru","Nandi","Narok","Nyamira","Nyandarua",
-  "Nyeri","Samburu","Siaya","Taita-Taveta","Tana River","Tharaka-Nithi","Trans Nzoia",
-  "Turkana","Uasin Gishu","Vihiga","Wajir","West Pokot"
-];
+import CountyCombobox from "@/components/CountyCombobox";
 
 const FUEL_TYPES = [
   { value: "firewood", label: "Firewood" },
@@ -176,12 +168,7 @@ export default function InstitutionSetup() {
             {/* Field 2 — County */}
             <div>
               <Label>County</Label>
-              <Select value={county} onValueChange={setCounty}>
-                <SelectTrigger className="mt-1"><SelectValue placeholder="Select county" /></SelectTrigger>
-                <SelectContent>
-                  {COUNTIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                </SelectContent>
-              </Select>
+              <CountyCombobox value={county} onValueChange={setCounty} />
             </div>
 
             {/* Field 3 — Institution Type */}

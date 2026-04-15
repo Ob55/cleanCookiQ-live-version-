@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -55,6 +56,7 @@ function computeCompletion(inst: Institution): number {
 
 export default function InstitutionDashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [institution, setInstitution] = useState<Institution | null>(null);
   const [costModel, setCostModel] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -62,11 +64,31 @@ export default function InstitutionDashboard() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data } = await supabase
+      // Try created_by first
+      let { data } = await supabase
         .from("institutions")
         .select("*")
         .eq("created_by", user.id)
+        .limit(1)
         .maybeSingle();
+
+      // Fallback: try via profile organisation_id
+      if (!data) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("organisation_id")
+          .eq("user_id", user.id)
+          .single();
+        if (profile?.organisation_id) {
+          const { data: orgInst } = await supabase
+            .from("institutions")
+            .select("*")
+            .eq("organisation_id", profile.organisation_id)
+            .limit(1)
+            .maybeSingle();
+          data = orgInst;
+        }
+      }
       const inst = data as any;
       setInstitution(inst as Institution | null);
 
@@ -91,7 +113,8 @@ export default function InstitutionDashboard() {
   }
 
   if (!institution) {
-    return <p className="text-muted-foreground">No institution found. Please complete setup first.</p>;
+    navigate("/institution/setup", { replace: true });
+    return null;
   }
 
   const completion = computeCompletion(institution);
