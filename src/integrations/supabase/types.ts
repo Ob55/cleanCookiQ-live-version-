@@ -395,6 +395,41 @@ export type Database = {
         }
         Relationships: []
       }
+      institution_documents: {
+        Row: {
+          created_at: string
+          file_url: string | null
+          id: string
+          institution_id: string
+          title: string
+          uploaded_by: string
+        }
+        Insert: {
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          institution_id: string
+          title: string
+          uploaded_by: string
+        }
+        Update: {
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          institution_id?: string
+          title?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institution_documents_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       institution_needs: {
         Row: {
           created_at: string
@@ -752,6 +787,9 @@ export type Database = {
       }
       opportunities: {
         Row: {
+          awarded_provider_contact: string | null
+          awarded_provider_id: string | null
+          awarded_provider_name: string | null
           created_at: string
           created_by_name: string | null
           deadline: string | null
@@ -765,6 +803,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          awarded_provider_contact?: string | null
+          awarded_provider_id?: string | null
+          awarded_provider_name?: string | null
           created_at?: string
           created_by_name?: string | null
           deadline?: string | null
@@ -778,6 +819,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          awarded_provider_contact?: string | null
+          awarded_provider_id?: string | null
+          awarded_provider_name?: string | null
           created_at?: string
           created_by_name?: string | null
           deadline?: string | null
@@ -791,6 +835,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "opportunities_awarded_provider_id_fkey"
+            columns: ["awarded_provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "opportunities_institution_id_fkey"
             columns: ["institution_id"]
