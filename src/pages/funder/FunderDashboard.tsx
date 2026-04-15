@@ -28,7 +28,7 @@ async function notifyInstitutionOwner(institutionId: string, title: string, body
 
 export default function FunderDashboard() {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
+  const [searchTerm, setSearchTerm] = useState("");
 
   const { data: funderProfile, isLoading: fpLoading } = useQuery({
     queryKey: ["funder-profile", user?.id],
@@ -185,7 +185,6 @@ export default function FunderDashboard() {
     "Longer-Term Opportunity": "bg-muted text-muted-foreground",
   };
 
-  const [searchTerm, setSearchTerm] = useState("");
 
   const filteredInstitutions = institutions
     ?.filter((inst: any) => !isLinkedByAnother(inst.id))
