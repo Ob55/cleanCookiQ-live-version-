@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard, Building2, FlaskConical, FileText, LifeBuoy, Menu, LogOut
+  LayoutDashboard, Building2, FlaskConical, FileText, LifeBuoy, Menu, LogOut, Ticket
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -12,9 +12,9 @@ import ignisLogo from "@/assets/ignis-logo.png";
 const institutionNav = [
   { label: "Dashboard", href: "/institution/dashboard", icon: LayoutDashboard },
   { label: "My Institution", href: "/institution/profile", icon: Building2 },
-  { label: "Cooking Alchemy", href: "/institution/alchemy", icon: FlaskConical },
+  { label: "Cooking Counting", href: "/institution/alchemy", icon: FlaskConical },
   { label: "Documents", href: "/institution/documents", icon: FileText },
-  { label: "Support", href: "/institution/support", icon: LifeBuoy },
+  { label: "Tickets", href: "/institution/support", icon: Ticket },
 ];
 
 export default function InstitutionLayout() {
