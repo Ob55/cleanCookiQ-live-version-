@@ -24,7 +24,7 @@ export default function VerifyEmailPage() {
         </div>
         <h1 className="text-2xl font-display font-bold mb-2">Check your email</h1>
         <p className="text-muted-foreground mb-6">
-          We've sent a verification link to your email address. Click the link to verify your account.
+          We've sent a verification link to your email address. Click the link to verify your account and you'll be taken straight to your dashboard.
         </p>
         <div className="bg-card border border-border rounded-xl p-6 shadow-card mb-6">
           <p className="text-sm text-muted-foreground">
