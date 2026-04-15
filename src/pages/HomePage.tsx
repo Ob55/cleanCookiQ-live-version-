@@ -247,19 +247,10 @@ export default function HomePage() {
           <p className="text-primary-foreground/80 max-w-xl mx-auto mb-8">
             Whether you're an institution, provider, funder, or researcher — there's a place for you on CleanCookIQ.
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex justify-center">
             <Link to="/auth/register">
               <Button size="lg" className="bg-accent text-accent-foreground hover:bg-amber-light font-semibold">
                 Create an Account
-              </Button>
-            </Link>
-            <Link to="/auth/login">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
-              >
-                Admin Login
               </Button>
             </Link>
           </div>
