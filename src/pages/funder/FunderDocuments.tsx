@@ -29,9 +29,6 @@ export default function FunderDocuments() {
   useEffect(() => {
     if (!user) return;
     const load = async () => {
-      // Funders use institution_documents with a special institution_id = their user_id
-      // Actually, let's use provider_documents approach - store in a generic way
-      // For simplicity, use institution_documents with uploaded_by filter
       const { data } = await supabase
         .from("institution_documents")
         .select("*")
@@ -53,11 +50,19 @@ export default function FunderDocuments() {
     if (upErr) { toast.error("Upload failed"); setSaving(false); return; }
     const { data: urlData } = supabase.storage.from("institution-assets").getPublicUrl(path);
 
-    // We need an institution_id - use a placeholder approach
-    // Actually funder docs don't belong to an institution. Let me use provider_documents table approach instead.
-    // For now, let's skip institution_id requirement by using a different approach
+    const { data, error } = await supabase.from("institution_documents").insert({
+      title: title.trim(),
+      file_url: urlData.publicUrl,
+      uploaded_by: user.id,
+    } as any).select().single();
+
     setSaving(false);
-    toast.error("Funder document storage coming soon");
+    if (error) { toast.error(error.message); return; }
+    setDocs(prev => [data, ...prev]);
+    setTitle("");
+    setFile(null);
+    setDialogOpen(false);
+    toast.success("Document uploaded!");
   };
 
   if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
