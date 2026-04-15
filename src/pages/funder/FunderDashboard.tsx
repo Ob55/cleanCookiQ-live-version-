@@ -157,6 +157,10 @@ export default function FunderDashboard() {
   };
 
   const isLinked = (id: string) => myLinks?.some(l => l.institution_id === id);
+  const isLinkedByAnother = (id: string) => {
+    if (!allLinks || !funderProfile) return false;
+    return allLinks.some(l => l.institution_id === id && l.funder_id !== funderProfile.id);
+  };
 
   if (fpLoading || instLoading) {
     return (
