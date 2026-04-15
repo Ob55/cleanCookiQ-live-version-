@@ -125,7 +125,7 @@ export default function LoginPage() {
             </span>
           </Link>
           <h1 className="text-2xl font-display font-bold">Welcome back</h1>
-          <p className="text-sm text-muted-foreground mt-1">Log in to your Project Compass account</p>
+          <p className="text-sm text-muted-foreground mt-1">Log in to your CleanCookIQ account</p>
         </div>
 
         <div className="bg-card border border-border rounded-xl p-6 shadow-card">
