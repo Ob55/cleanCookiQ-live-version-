@@ -5,10 +5,17 @@ import { Loader2 } from "lucide-react";
 interface Props {
   children: React.ReactNode;
   requireAdmin?: boolean;
+  allowedRoles?: string[];
+  allowedOrgTypes?: string[];
 }
 
-export default function ProtectedRoute({ children, requireAdmin = false }: Props) {
-  const { user, loading, isAdmin } = useAuth();
+export default function ProtectedRoute({
+  children,
+  requireAdmin = false,
+  allowedRoles,
+  allowedOrgTypes,
+}: Props) {
+  const { user, loading, isAdmin, roles, profile } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -24,6 +31,13 @@ export default function ProtectedRoute({ children, requireAdmin = false }: Props
   }
 
   if (requireAdmin && !isAdmin) {
+    return <Navigate to="/" replace />;
+  }
+
+  const hasAllowedRole = !allowedRoles?.length || roles.some((role) => allowedRoles.includes(role));
+  const hasAllowedOrgType = !allowedOrgTypes?.length || (!!profile?.org_type && allowedOrgTypes.includes(profile.org_type));
+
+  if (!requireAdmin && (!hasAllowedRole || !hasAllowedOrgType)) {
     return <Navigate to="/" replace />;
   }
 

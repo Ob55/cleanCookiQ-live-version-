@@ -3,12 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import ignisLogo from "@/assets/ignis-logo.png";
+import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
 
 const navLinks = [
   { label: "Map", href: "/map" },
   { label: "Intelligence", href: "/intelligence" },
-  { label: "Providers", href: "/providers" },
   { label: "Marketing Analysis", href: "/marketing" },
   { label: "About", href: "/about" },
 ];
@@ -29,10 +28,8 @@ export default function PublicLayout() {
       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-lg">
         <div className="container flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <img src={ignisLogo} alt="Ignis Logo" className="h-8 w-8 rounded-lg object-contain" />
-            <span className="font-display font-bold text-lg text-foreground">
-              CleanCook<span className="text-accent">IQ</span>
-            </span>
+            <img src={cleancookIqLogo} alt="cleancookIQ logo" className="h-8 w-8 rounded-lg object-contain" />
+            <span className="font-display font-bold text-lg text-foreground">cleancookIQ</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
@@ -102,8 +99,8 @@ export default function PublicLayout() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <img src={ignisLogo} alt="Ignis Logo" className="h-8 w-8 rounded-lg object-contain" />
-                <span className="font-display font-bold text-lg">CleanCook<span className="text-accent">IQ</span></span>
+                <img src={cleancookIqLogo} alt="cleancookIQ logo" className="h-8 w-8 rounded-lg object-contain" />
+                <span className="font-display font-bold text-lg">cleancookIQ</span>
               </div>
               <p className="text-sm text-primary-foreground/60">Orchestrating Kenya's transition to clean institutional cooking.</p>
             </div>
@@ -118,7 +115,7 @@ export default function PublicLayout() {
             <div>
               <h4 className="font-display font-semibold mb-3 text-sm text-primary-foreground">Company</h4>
               <div className="space-y-2">
-                <Link to="/about" className="block text-sm text-primary-foreground/60 hover:text-accent">About Ignis</Link>
+                <Link to="/about" className="block text-sm text-primary-foreground/60 hover:text-accent">About cleancookIQ</Link>
               </div>
             </div>
             <div>
@@ -130,7 +127,7 @@ export default function PublicLayout() {
             </div>
           </div>
           <div className="mt-8 pt-6 border-t border-primary-foreground/20 text-center text-xs text-primary-foreground/60">
-            © {new Date().getFullYear()} Ignis / CleanCookIQ. All rights reserved.
+            © {new Date().getFullYear()} cleancookIQ. All rights reserved.
           </div>
         </div>
       </footer>

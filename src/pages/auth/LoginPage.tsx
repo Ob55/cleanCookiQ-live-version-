@@ -6,7 +6,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Eye, EyeOff } from "lucide-react";
-import ignisLogo from "@/assets/ignis-logo.png";
+import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -119,13 +119,11 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <img src={ignisLogo} alt="CleanCookIQ" className="h-12 w-auto" />
-            <span className="font-display font-bold text-xl">
-              CleanCook<span className="text-accent">IQ</span>
-            </span>
+            <img src={cleancookIqLogo} alt="cleancookIQ" className="h-12 w-auto" />
+            <span className="font-display font-bold text-xl">cleancookIQ</span>
           </Link>
           <h1 className="text-2xl font-display font-bold">Welcome back</h1>
-          <p className="text-sm text-muted-foreground mt-1">Log in to your CleanCookIQ account</p>
+          <p className="text-sm text-muted-foreground mt-1">Log in to your cleancookIQ account</p>
         </div>
 
         <div className="bg-card border border-border rounded-xl p-6 shadow-card">

@@ -47,6 +47,15 @@ const institutionTypeLabels: Record<string, string> = {
   other: "Other",
 };
 
+function escapeHtml(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
 export default function MapPage() {
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMap = useRef<L.Map | null>(null);
@@ -112,15 +121,15 @@ export default function MapPage() {
 
         marker.bindPopup(`
           <div style="font-family: system-ui; min-width: 220px; line-height: 1.6;">
-            <strong style="font-size: 14px;">${inst.name}</strong><br/>
-            <span style="text-transform: capitalize; color: ${color}; font-size: 12px;">● ${inst.institution_type}</span>
-            <span style="color: #999; font-size: 11px;"> · ${inst.pipeline_stage.replace(/_/g, ' ')}</span><br/>
-            <small style="color: #666;">${inst.county}${inst.sub_county ? ', ' + inst.sub_county : ''}</small>
+            <strong style="font-size: 14px;">${escapeHtml(inst.name)}</strong><br/>
+            <span style="text-transform: capitalize; color: ${color}; font-size: 12px;">● ${escapeHtml(inst.institution_type)}</span>
+            <span style="color: #999; font-size: 11px;"> · ${escapeHtml(inst.pipeline_stage.replace(/_/g, " "))}</span><br/>
+            <small style="color: #666;">${escapeHtml(`${inst.county}${inst.sub_county ? `, ${inst.sub_county}` : ""}`)}</small>
             <hr style="margin: 6px 0; border: none; border-top: 1px solid #eee;"/>
             <div style="font-size: 12px;">
-              <div><strong>Fuel:</strong> ${fuelOfChoice}</div>
+              <div><strong>Fuel:</strong> ${escapeHtml(String(fuelOfChoice))}</div>
               <div><strong>Meals:</strong> ${Number(mealsServed).toLocaleString()}/day</div>
-              <div><strong>Solution:</strong> ${recommendedSolution}</div>
+              <div><strong>Solution:</strong> ${escapeHtml(String(recommendedSolution))}</div>
               <div><strong>Savings:</strong> KSh ${Number(annualSavings).toLocaleString()}/yr</div>
               <div><strong>CO₂ Cut:</strong> ${Number(co2Reduction).toLocaleString()} t/yr</div>
             </div>

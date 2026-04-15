@@ -96,21 +96,31 @@ const App = () => (
 
             {/* TA Dashboard */}
             <Route path="/ta/dashboard" element={
-              <ProtectedRoute><TADashboard /></ProtectedRoute>
+              <ProtectedRoute allowedRoles={["ta_provider"]} allowedOrgTypes={["supplier"]}>
+                <TADashboard />
+              </ProtectedRoute>
             } />
 
             {/* Financing */}
             <Route path="/financing" element={
-              <ProtectedRoute><FinancingPage /></ProtectedRoute>
+              <ProtectedRoute allowedRoles={["financing_partner"]} allowedOrgTypes={["funder"]}>
+                <FinancingPage />
+              </ProtectedRoute>
             } />
 
             {/* Institution Setup (no sidebar) */}
             <Route path="/institution/setup" element={
-              <ProtectedRoute><InstitutionSetup /></ProtectedRoute>
+              <ProtectedRoute allowedRoles={["institution_admin", "institution_user"]} allowedOrgTypes={["institution"]}>
+                <InstitutionSetup />
+              </ProtectedRoute>
             } />
 
             {/* Institution pages (with sidebar) */}
-            <Route element={<ProtectedRoute><InstitutionLayout /></ProtectedRoute>}>
+            <Route element={
+              <ProtectedRoute allowedRoles={["institution_admin", "institution_user"]} allowedOrgTypes={["institution"]}>
+                <InstitutionLayout />
+              </ProtectedRoute>
+            }>
               <Route path="/institution/dashboard" element={<InstitutionDashboard />} />
               <Route path="/institution/profile" element={<InstitutionProfile />} />
               <Route path="/institution/alchemy" element={<CookingAlchemy />} />
@@ -120,11 +130,17 @@ const App = () => (
 
             {/* Supplier Setup (no sidebar) */}
             <Route path="/supplier/setup" element={
-              <ProtectedRoute><SupplierSetup /></ProtectedRoute>
+              <ProtectedRoute allowedRoles={["ta_provider"]} allowedOrgTypes={["supplier"]}>
+                <SupplierSetup />
+              </ProtectedRoute>
             } />
 
             {/* Supplier pages (with sidebar) */}
-            <Route element={<ProtectedRoute><SupplierLayout /></ProtectedRoute>}>
+            <Route element={
+              <ProtectedRoute allowedRoles={["ta_provider"]} allowedOrgTypes={["supplier"]}>
+                <SupplierLayout />
+              </ProtectedRoute>
+            }>
               <Route path="/supplier/dashboard" element={<SupplierDashboard />} />
               <Route path="/supplier/products" element={<SupplierProducts />} />
               <Route path="/supplier/services" element={<SupplierServices />} />
@@ -134,7 +150,11 @@ const App = () => (
             </Route>
 
             {/* Funder pages (with sidebar) */}
-            <Route element={<ProtectedRoute><FunderLayout /></ProtectedRoute>}>
+            <Route element={
+              <ProtectedRoute allowedRoles={["financing_partner"]} allowedOrgTypes={["funder"]}>
+                <FunderLayout />
+              </ProtectedRoute>
+            }>
               <Route path="/funder/dashboard" element={<FunderDashboard />} />
               <Route path="/funder/institution/:id" element={<FunderInstitutionDetail />} />
               <Route path="/funder/documents" element={<FunderDocuments />} />
@@ -142,7 +162,7 @@ const App = () => (
             </Route>
 
             {/* Admin pages (protected) */}
-            <Route element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+            <Route element={<ProtectedRoute requireAdmin><AdminLayout /></ProtectedRoute>}>
               <Route path="/admin/pipeline" element={<PipelineDashboard />} />
               <Route path="/admin/institutions" element={<InstitutionManagement />} />
               <Route path="/admin/institutions/:id" element={<InstitutionDetail />} />

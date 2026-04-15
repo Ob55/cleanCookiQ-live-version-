@@ -5,9 +5,9 @@ export default function AboutPage() {
     <div>
       <section className="py-20 bg-gradient-hero text-primary-foreground">
         <div className="container text-center">
-          <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">About CleanCookIQ</h1>
+          <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">About cleancookIQ</h1>
           <p className="text-primary-foreground/80 max-w-2xl mx-auto text-lg">
-            Built by Ignis to orchestrate Kenya's transition from polluting cooking fuels to clean alternatives at national scale.
+            Built to orchestrate Kenya's transition from polluting cooking fuels to clean alternatives at national scale.
           </p>
         </div>
       </section>
