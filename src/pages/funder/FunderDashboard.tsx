@@ -42,6 +42,18 @@ export default function FunderDashboard() {
     enabled: !!user,
   });
 
+  // Fetch ALL links (not just mine) to hide already-linked institutions
+  const { data: allLinks } = useQuery({
+    queryKey: ["all-funder-links"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("funder_institution_links")
+        .select("institution_id, funder_id");
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
   const { data: institutions, isLoading: instLoading } = useQuery({
     queryKey: ["funder-institutions"],
     queryFn: async () => {
