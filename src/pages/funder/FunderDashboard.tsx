@@ -194,11 +194,16 @@ export default function FunderDashboard() {
         <p className="text-muted-foreground">No institutions are currently seeking transition support.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {institutions.map((inst: any) => {
+          {institutions
+            .filter((inst: any) => !isLinkedByAnother(inst.id))
+            .map((inst: any) => {
             const score = inst.assessment_score || getScore(inst.id);
             const linked = isLinked(inst.id);
+            const isReady = inst.transition_interest === "yes";
             return (
-              <Card key={inst.id} className={`flex flex-col ${linked ? "ring-2 ring-primary/50" : ""}`}>
+              <Card key={inst.id} className={`flex flex-col transition-all ${
+                linked ? "ring-2 ring-primary/50" : ""
+              } ${isReady ? "ring-2 ring-emerald-400/60 shadow-lg shadow-emerald-500/20" : ""}`}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base">{inst.name}</CardTitle>
@@ -226,7 +231,7 @@ export default function FunderDashboard() {
                   )}
                   <div className="flex items-center gap-2 text-sm">
                     <Droplets className="h-4 w-4 text-primary" />
-                    <span>Steam: {inst.wishes_to_transition_steam ? "Yes" : "No"}</span>
+                    <span>Steam: {inst.transition_interest === "yes" ? (inst.wishes_to_transition_steam ? "Yes" : "No") : "Pending"}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Banknote className="h-4 w-4 text-primary" />
