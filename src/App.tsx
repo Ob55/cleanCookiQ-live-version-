@@ -50,6 +50,7 @@ const PortfolioManagement = lazy(() => import("@/pages/admin/PortfolioManagement
 const PortfolioAggregation = lazy(() => import("@/pages/admin/PortfolioAggregation"));
 const AdminTickets = lazy(() => import("@/pages/admin/AdminTickets"));
 const Subscribers = lazy(() => import("@/pages/admin/Subscribers"));
+const InstitutionImport = lazy(() => import("@/pages/admin/InstitutionImport"));
 
 // Lazy loaded role pages
 const TADashboard = lazy(() => import("@/pages/ta/TADashboard"));
@@ -191,6 +192,7 @@ const App = () => (
               <Route element={<ProtectedRoute requireAdmin><AdminLayout /></ProtectedRoute>}>
                 <Route path="/admin/pipeline" element={<PipelineDashboard />} />
                 <Route path="/admin/institutions" element={<InstitutionManagement />} />
+                <Route path="/admin/institutions/import" element={<InstitutionImport />} />
                 <Route path="/admin/institutions/:id" element={<InstitutionDetail />} />
                 <Route path="/admin/providers" element={<ProviderManagement />} />
                 <Route path="/admin/providers/:id" element={<ProviderDetail />} />

@@ -554,6 +554,7 @@ export type Database = {
           annual_savings_ksh: number | null
           assessment_category: string | null
           assessment_score: number | null
+          avg_meal_cost_ksh: number | null
           co2_reduction_tonnes_pa: number | null
           consumption_per_term: number | null
           consumption_unit: string | null
@@ -568,11 +569,15 @@ export type Database = {
           financial_decision_maker: string | null
           financing_preference: string | null
           fuel_of_choice: string | null
+          fuel_sourcing: string | null
+          grid_connected: boolean | null
           has_dedicated_kitchen: boolean | null
           id: string
           institution_type: Database["public"]["Enums"]["institution_type"]
           kitchen_condition: string | null
           kitchen_photo_url: string | null
+          kobo_submission_id: number | null
+          kobo_submission_uuid: string | null
           latitude: number | null
           longitude: number | null
           meals_per_day: number | null
@@ -583,9 +588,11 @@ export type Database = {
           number_of_staff: number | null
           number_of_students: number | null
           organisation_id: string | null
+          outages_per_month: string | null
           ownership_type: string | null
           pipeline_stage: Database["public"]["Enums"]["pipeline_stage"]
           recommended_solution: string | null
+          school_type: string | null
           setup_completed: boolean | null
           sub_county: string | null
           ta_required: boolean | null
@@ -602,6 +609,7 @@ export type Database = {
           annual_savings_ksh?: number | null
           assessment_category?: string | null
           assessment_score?: number | null
+          avg_meal_cost_ksh?: number | null
           co2_reduction_tonnes_pa?: number | null
           consumption_per_term?: number | null
           consumption_unit?: string | null
@@ -616,11 +624,15 @@ export type Database = {
           financial_decision_maker?: string | null
           financing_preference?: string | null
           fuel_of_choice?: string | null
+          fuel_sourcing?: string | null
+          grid_connected?: boolean | null
           has_dedicated_kitchen?: boolean | null
           id?: string
           institution_type?: Database["public"]["Enums"]["institution_type"]
           kitchen_condition?: string | null
           kitchen_photo_url?: string | null
+          kobo_submission_id?: number | null
+          kobo_submission_uuid?: string | null
           latitude?: number | null
           longitude?: number | null
           meals_per_day?: number | null
@@ -631,9 +643,11 @@ export type Database = {
           number_of_staff?: number | null
           number_of_students?: number | null
           organisation_id?: string | null
+          outages_per_month?: string | null
           ownership_type?: string | null
           pipeline_stage?: Database["public"]["Enums"]["pipeline_stage"]
           recommended_solution?: string | null
+          school_type?: string | null
           setup_completed?: boolean | null
           sub_county?: string | null
           ta_required?: boolean | null
@@ -650,6 +664,7 @@ export type Database = {
           annual_savings_ksh?: number | null
           assessment_category?: string | null
           assessment_score?: number | null
+          avg_meal_cost_ksh?: number | null
           co2_reduction_tonnes_pa?: number | null
           consumption_per_term?: number | null
           consumption_unit?: string | null
@@ -664,11 +679,15 @@ export type Database = {
           financial_decision_maker?: string | null
           financing_preference?: string | null
           fuel_of_choice?: string | null
+          fuel_sourcing?: string | null
+          grid_connected?: boolean | null
           has_dedicated_kitchen?: boolean | null
           id?: string
           institution_type?: Database["public"]["Enums"]["institution_type"]
           kitchen_condition?: string | null
           kitchen_photo_url?: string | null
+          kobo_submission_id?: number | null
+          kobo_submission_uuid?: string | null
           latitude?: number | null
           longitude?: number | null
           meals_per_day?: number | null
@@ -679,9 +698,11 @@ export type Database = {
           number_of_staff?: number | null
           number_of_students?: number | null
           organisation_id?: string | null
+          outages_per_month?: string | null
           ownership_type?: string | null
           pipeline_stage?: Database["public"]["Enums"]["pipeline_stage"]
           recommended_solution?: string | null
+          school_type?: string | null
           setup_completed?: boolean | null
           sub_county?: string | null
           ta_required?: boolean | null
@@ -1749,6 +1770,7 @@ export type Database = {
         | "factory"
         | "hotel"
         | "restaurant"
+        | "faith_based"
         | "other"
       org_type: "institution" | "supplier" | "funder" | "csr" | "researcher"
       pipeline_stage:
@@ -1947,6 +1969,7 @@ export const Constants = {
         "factory",
         "hotel",
         "restaurant",
+        "faith_based",
         "other",
       ],
       org_type: ["institution", "supplier", "funder", "csr", "researcher"],
