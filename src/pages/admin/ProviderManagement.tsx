@@ -10,8 +10,10 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { Factory, Check, X, Loader2, Plus, Search, Star, Eye, FileText } from "lucide-react";
+import { Factory, Check, X, Loader2, Plus, Search, Star, Eye, FileText, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 const categoryLabels: Record<string, string> = {
   equipment_provider: "Equipment Provider",
@@ -39,6 +41,35 @@ export default function ProviderManagement() {
     name: "", contact_person: "", contact_email: "", contact_phone: "",
     website: "", services: [] as string[], technology_types: [] as string[],
     counties_served: [] as string[], provider_category: "" as string,
+  });
+  const [editing, setEditing] = useState<any | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
+
+  const updateProvider = useMutation({
+    mutationFn: async (payload: any) => {
+      if (!editing) throw new Error("Nothing to update");
+      const { error } = await supabase.from("providers").update(payload).eq("id", editing.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Provider updated");
+      queryClient.invalidateQueries({ queryKey: ["admin-providers"] });
+      setEditing(null);
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const deleteProvider = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("providers").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Provider deleted");
+      queryClient.invalidateQueries({ queryKey: ["admin-providers"] });
+      setDeleteTarget(null);
+    },
+    onError: (e: any) => toast.error(e.message || "Delete failed"),
   });
 
   const { data: providers, isLoading } = useQuery({
@@ -292,6 +323,12 @@ export default function ProviderManagement() {
                           <X className="h-4 w-4 text-destructive" />
                         </Button>
                       )}
+                      <Button size="sm" variant="ghost" title="Edit provider" onClick={() => setEditing(p)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" title="Delete provider" onClick={() => setDeleteTarget(p)} className="text-destructive hover:text-destructive">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   </td>
                 </tr>
@@ -303,6 +340,105 @@ export default function ProviderManagement() {
           </table>
         </div>
       )}
+
+      {/* Edit provider dialog */}
+      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Provider</DialogTitle>
+          </DialogHeader>
+          {editing && (
+            <div className="space-y-3">
+              <div>
+                <Label>Provider Name</Label>
+                <Input value={editing.name ?? ""} onChange={e => setEditing({ ...editing, name: e.target.value })} />
+              </div>
+              <div>
+                <Label>Contact Person</Label>
+                <Input value={editing.contact_person ?? ""} onChange={e => setEditing({ ...editing, contact_person: e.target.value })} />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Email</Label>
+                  <Input type="email" value={editing.contact_email ?? ""} onChange={e => setEditing({ ...editing, contact_email: e.target.value })} />
+                </div>
+                <div>
+                  <Label>Phone</Label>
+                  <Input value={editing.contact_phone ?? ""} onChange={e => setEditing({ ...editing, contact_phone: e.target.value })} />
+                </div>
+              </div>
+              <div>
+                <Label>Website</Label>
+                <Input value={editing.website ?? ""} onChange={e => setEditing({ ...editing, website: e.target.value })} />
+              </div>
+              <div>
+                <Label>Category</Label>
+                <Select value={editing.provider_category ?? ""} onValueChange={v => setEditing({ ...editing, provider_category: v })}>
+                  <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(categoryLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Technologies (comma-separated)</Label>
+                <Textarea
+                  rows={2}
+                  value={(editing.technology_types ?? []).join(", ")}
+                  onChange={e => setEditing({ ...editing, technology_types: e.target.value.split(",").map((s: string) => s.trim()).filter(Boolean) })}
+                />
+              </div>
+              <div>
+                <Label>Counties Served (comma-separated)</Label>
+                <Textarea
+                  rows={2}
+                  value={(editing.counties_served ?? []).join(", ")}
+                  onChange={e => setEditing({ ...editing, counties_served: e.target.value.split(",").map((s: string) => s.trim()).filter(Boolean) })}
+                />
+              </div>
+              <Button
+                className="w-full bg-primary text-primary-foreground"
+                disabled={updateProvider.isPending}
+                onClick={() => updateProvider.mutate({
+                  name: editing.name,
+                  contact_person: editing.contact_person,
+                  contact_email: editing.contact_email,
+                  contact_phone: editing.contact_phone,
+                  website: editing.website,
+                  provider_category: editing.provider_category || null,
+                  technology_types: editing.technology_types?.length ? editing.technology_types : null,
+                  counties_served: editing.counties_served?.length ? editing.counties_served : null,
+                })}
+              >
+                {updateProvider.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                Save Changes
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirm */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete "{deleteTarget?.name}"?</AlertDialogTitle>
+            <AlertDialogDescription>
+              All products, services, and documents attached to this provider will be removed permanently. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => deleteTarget && deleteProvider.mutate(deleteTarget.id)}
+              disabled={deleteProvider.isPending}
+            >
+              {deleteProvider.isPending ? "Deleting…" : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

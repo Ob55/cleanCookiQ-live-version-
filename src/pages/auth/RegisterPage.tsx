@@ -57,7 +57,7 @@ export default function RegisterPage() {
       email,
       password,
       options: {
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: `${import.meta.env.VITE_APP_URL || window.location.origin}/auth/login`,
         data: {
           full_name: fullName,
           org_type: orgType,
@@ -70,7 +70,13 @@ export default function RegisterPage() {
 
     if (error) {
       setLoading(false);
-      toast.error(error.message);
+      if (error.message?.toLowerCase().includes("sending confirmation email")) {
+        // User was created but Supabase couldn't send the verification email — navigate anyway
+        toast.warning("Account created! The confirmation email is delayed — check your inbox in a few minutes or contact info@ignis-innovation.com.");
+        navigate("/auth/verify-email");
+      } else {
+        toast.error(error.message);
+      }
       return;
     }
 

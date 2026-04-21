@@ -594,6 +594,7 @@ export type Database = {
           ta_type_needed: string[] | null
           transition_interest: string | null
           transition_needs: string | null
+          transition_target_fuel: string | null
           updated_at: string
           wishes_to_transition_steam: boolean | null
         }
@@ -641,6 +642,7 @@ export type Database = {
           ta_type_needed?: string[] | null
           transition_interest?: string | null
           transition_needs?: string | null
+          transition_target_fuel?: string | null
           updated_at?: string
           wishes_to_transition_steam?: boolean | null
         }
@@ -688,6 +690,7 @@ export type Database = {
           ta_type_needed?: string[] | null
           transition_interest?: string | null
           transition_needs?: string | null
+          transition_target_fuel?: string | null
           updated_at?: string
           wishes_to_transition_steam?: boolean | null
         }
@@ -871,6 +874,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      portfolios: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          institution_ids: string[]
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          institution_ids?: string[]
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          institution_ids?: string[]
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       organisations: {
         Row: {

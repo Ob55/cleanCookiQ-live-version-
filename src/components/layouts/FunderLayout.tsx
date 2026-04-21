@@ -1,10 +1,7 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, LogOut, Menu, Building2, FileText, Ticket } from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, FileText, Ticket } from "lucide-react";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import NotificationBell from "@/components/NotificationBell";
 import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
 
@@ -12,39 +9,7 @@ export default function FunderLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { signOut, profile, user } = useAuth();
-
-  const { data: funderProfile } = useQuery({
-    queryKey: ["funder-profile-nav", user?.id],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("funder_profiles")
-        .select("id")
-        .eq("user_id", user!.id)
-        .maybeSingle();
-      return data;
-    },
-    enabled: !!user,
-  });
-
-  const { data: linkedInstitutions } = useQuery({
-    queryKey: ["funder-linked-nav", funderProfile?.id],
-    queryFn: async () => {
-      const { data: links } = await supabase
-        .from("funder_institution_links")
-        .select("institution_id")
-        .eq("funder_id", funderProfile!.id);
-      if (!links?.length) return [];
-      const ids = links.map(l => l.institution_id);
-      const { data: insts } = await supabase
-        .from("institutions")
-        .select("id, name")
-        .in("id", ids)
-        .order("name");
-      return insts || [];
-    },
-    enabled: !!funderProfile?.id,
-  });
+  const { signOut, profile } = useAuth();
 
   const handleSignOut = async () => {
     await signOut();
@@ -123,33 +88,6 @@ export default function FunderLayout() {
           );
         })()}
 
-        {/* Linked Institutions */}
-        {linkedInstitutions && linkedInstitutions.length > 0 && (
-          <div className="pt-3">
-            <p className="px-3 text-xs font-semibold text-sidebar-foreground/40 uppercase tracking-wider mb-2">
-              My Institutions
-            </p>
-            {linkedInstitutions.map((inst: any) => {
-              const href = `/funder/institution/${inst.id}`;
-              const isActive = location.pathname === href;
-              return (
-                <Link
-                  key={inst.id}
-                  to={href}
-                  onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    isActive
-                      ? "bg-sidebar-accent text-sidebar-primary"
-                      : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
-                  }`}
-                >
-                  <Building2 className="h-4 w-4 shrink-0" />
-                  <span className="truncate">{inst.name}</span>
-                </Link>
-              );
-            })}
-          </div>
-        )}
       </nav>
 
       <div className="p-3 border-t border-sidebar-border">

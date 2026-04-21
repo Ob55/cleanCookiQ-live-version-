@@ -17,6 +17,7 @@ import {
   BarChart3, Gauge, Plus, Bell, Factory, ShoppingCart,
 } from "lucide-react";
 import TransitionProductSelector from "@/components/institution/TransitionProductSelector";
+import { TRANSITION_TARGET_LABELS } from "@/components/institution/TransitionTarget";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood", charcoal: "Charcoal", lpg: "LPG",
@@ -234,6 +235,10 @@ export default function InstitutionDetail() {
               <DetailRow label="Assessment Score" value={inst.assessment_score ? `${inst.assessment_score}%` : "Not scored"} />
               <DetailRow label="Assessment Category" value={inst.assessment_category || "Not categorized"} />
               <DetailRow label="Transition Interest" value={inst.transition_interest || "Not set"} capitalize />
+              <DetailRow
+                label="Preferred Transition Method"
+                value={inst.transition_target_fuel ? (TRANSITION_TARGET_LABELS[inst.transition_target_fuel] || inst.transition_target_fuel) : "Not selected yet"}
+              />
             </dl>
           </CardContent>
         </Card>

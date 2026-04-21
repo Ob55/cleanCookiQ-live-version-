@@ -31,6 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [roles, setRoles] = useState<string[]>([]);
+  // loading covers both initial auth check AND profile/roles fetch
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = async (userId: string) => {
@@ -57,34 +58,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, sess) => {
-        setSession(sess);
-        setUser(sess?.user ?? null);
-        if (sess?.user) {
-          setTimeout(() => {
-            fetchProfile(sess.user.id);
-            fetchRoles(sess.user.id);
-          }, 0);
-        } else {
-          setProfile(null);
-          setRoles([]);
-        }
-        setLoading(false);
-      }
-    );
+    let initialized = false;
 
-    supabase.auth.getSession().then(({ data: { session: sess } }) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, sess) => {
+      // Redirect to reset-password page when user clicks a recovery link
+      if (event === "PASSWORD_RECOVERY") {
+        if (!window.location.pathname.includes("/auth/reset-password")) {
+          window.location.replace("/auth/reset-password" + window.location.hash);
+        }
+        return;
+      }
+
       setSession(sess);
       setUser(sess?.user ?? null);
       if (sess?.user) {
-        fetchProfile(sess.user.id);
-        fetchRoles(sess.user.id);
+        setLoading(true);
+        Promise.all([fetchProfile(sess.user.id), fetchRoles(sess.user.id)]).then(() => {
+          setLoading(false);
+        });
+      } else {
+        setProfile(null);
+        setRoles([]);
+        if (initialized) setLoading(false);
       }
-      setLoading(false);
+    });
+
+    // Initial session bootstrap
+    supabase.auth.getSession().then(async ({ data: { session: sess } }) => {
+      // onAuthStateChange already fired for this session — let it handle things
+      if (!sess) {
+        setLoading(false);
+      }
+      initialized = true;
     });
 
     return () => subscription.unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const signOut = async () => {
@@ -95,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setRoles([]);
   };
 
-  const isAdmin = roles.includes("admin");
+  const isAdmin = roles.some(r => ["admin", "manager", "field_agent"].includes(r));
   const isApproved = profile?.approval_status === "approved";
 
   return (

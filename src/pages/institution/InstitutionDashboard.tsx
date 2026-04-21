@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Flame, UtensilsCrossed, Droplets, BarChart3, Loader2, User, Phone, Mail, MapPin } from "lucide-react";
+import TransitionTarget from "@/components/institution/TransitionTarget";
 
 
 const FUEL_LABELS: Record<string, string> = {
@@ -38,6 +39,7 @@ interface Institution {
   longitude: number | null;
   monthly_fuel_spend: number | null;
   transition_interest: string | null;
+  transition_target_fuel: string | null;
   assessment_score: number | null;
   assessment_category: string | null;
 }
@@ -70,7 +72,7 @@ export default function InstitutionDashboard() {
         .limit(1)
         .maybeSingle();
 
-      // Fallback: try via profile organisation_id
+      // Fallback: try via profile organisation_id (profile.organisation_id stores the institution's primary key)
       if (!data) {
         const { data: profile } = await supabase
           .from("profiles")
@@ -81,8 +83,7 @@ export default function InstitutionDashboard() {
           const { data: orgInst } = await supabase
             .from("institutions")
             .select("*")
-            .eq("organisation_id", profile.organisation_id)
-            .limit(1)
+            .eq("id", profile.organisation_id)
             .maybeSingle();
           data = orgInst;
         }
@@ -208,6 +209,15 @@ export default function InstitutionDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Transition target */}
+      <TransitionTarget
+        institutionId={institution.id}
+        institutionName={institution.name}
+        county={institution.county}
+        currentTarget={institution.transition_target_fuel}
+        onUpdate={(value) => setInstitution((prev) => prev ? { ...prev, transition_target_fuel: value } : prev)}
+      />
 
       {/* Contact & Location */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

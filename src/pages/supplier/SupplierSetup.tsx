@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { sendEmail, emailSupplierWelcome } from "@/lib/emailService";
 
 export default function SupplierSetup() {
   const navigate = useNavigate();
@@ -54,8 +55,22 @@ export default function SupplierSetup() {
       if (provErr) throw provErr;
 
       await refreshProfile();
+
+      // Send welcome email
+      const recipientEmail = contactEmail || user.email;
+      if (recipientEmail) {
+        await sendEmail({
+          to: recipientEmail,
+          subject: "Welcome to CleanCook IQ as a Supplier",
+          html: emailSupplierWelcome(
+            user.user_metadata?.full_name || "",
+            companyName.trim(),
+          ),
+        });
+      }
+
       toast.success("Company setup complete!");
-      navigate("/supplier/dashboard");
+      setTimeout(() => navigate("/supplier/dashboard"), 100);
     } catch (err: any) {
       toast.error(err.message || "Failed to save");
     } finally {

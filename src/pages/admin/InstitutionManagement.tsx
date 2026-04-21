@@ -8,8 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Building2, Plus, Search, Filter, MapPin, Loader2, Eye } from "lucide-react";
+import { Building2, Plus, Search, Filter, MapPin, Loader2, Eye, Pencil, Trash2, Target } from "lucide-react";
 import { Link } from "react-router-dom";
+import { TRANSITION_TARGET_LABELS } from "@/components/institution/TransitionTarget";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 const counties = ["Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret", "Nyeri", "Machakos", "Kiambu", "Uasin Gishu", "Kakamega", "Bungoma", "Kilifi", "Garissa", "Turkana", "Marsabit"];
 const institutionTypes = ["school", "hospital", "prison", "factory", "hotel", "restaurant", "other"];
@@ -32,7 +34,22 @@ export default function InstitutionManagement() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [stageFilter, setStageFilter] = useState("all");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editing, setEditing] = useState<any | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
   const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("institutions").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Institution deleted");
+      queryClient.invalidateQueries({ queryKey: ["institutions"] });
+      setDeleteTarget(null);
+    },
+    onError: (err: any) => toast.error(err.message || "Failed to delete"),
+  });
 
   const { data: institutions, isLoading } = useQuery({
     queryKey: ["institutions", countyFilter, typeFilter, stageFilter],
@@ -123,7 +140,8 @@ export default function InstitutionManagement() {
                   <th className="text-left text-xs font-medium text-muted-foreground p-3">Stage</th>
                   <th className="text-left text-xs font-medium text-muted-foreground p-3">Meals/Day</th>
                   <th className="text-left text-xs font-medium text-muted-foreground p-3">Fuel</th>
-                  <th className="text-left text-xs font-medium text-muted-foreground p-3"></th>
+                  <th className="text-left text-xs font-medium text-muted-foreground p-3">Wants to Transition To</th>
+                  <th className="text-right text-xs font-medium text-muted-foreground p-3">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -154,9 +172,27 @@ export default function InstitutionManagement() {
                     <td className="p-3 text-sm">{inst.meals_per_day}</td>
                     <td className="p-3 text-sm capitalize">{inst.current_fuel}</td>
                     <td className="p-3">
-                      <Link to={`/admin/institutions/${inst.id}`}>
-                        <Button variant="ghost" size="sm"><Eye className="h-4 w-4" /></Button>
-                      </Link>
+                      {inst.transition_target_fuel ? (
+                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                          <Target className="h-3 w-3 mr-1" />
+                          {TRANSITION_TARGET_LABELS[inst.transition_target_fuel] ?? inst.transition_target_fuel}
+                        </Badge>
+                      ) : (
+                        <span className="text-xs text-muted-foreground italic">not selected</span>
+                      )}
+                    </td>
+                    <td className="p-3">
+                      <div className="flex justify-end gap-1">
+                        <Link to={`/admin/institutions/${inst.id}`}>
+                          <Button variant="ghost" size="sm" title="View"><Eye className="h-4 w-4" /></Button>
+                        </Link>
+                        <Button variant="ghost" size="sm" title="Edit" onClick={() => setEditing(inst)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" title="Delete" onClick={() => setDeleteTarget(inst)} className="text-destructive hover:text-destructive">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -165,23 +201,71 @@ export default function InstitutionManagement() {
           </div>
         </div>
       )}
+
+      {/* Edit dialog */}
+      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display">Edit Institution</DialogTitle>
+          </DialogHeader>
+          {editing && (
+            <InstitutionForm
+              initial={editing}
+              onSuccess={() => { setEditing(null); queryClient.invalidateQueries({ queryKey: ["institutions"] }); }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirm */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this institution?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteTarget?.name} will be permanently removed along with its assessments, pipeline history, and related records. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? "Deleting…" : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
 
-function InstitutionForm({ onSuccess }: { onSuccess: () => void }) {
+function InstitutionForm({ onSuccess, initial }: { onSuccess: () => void; initial?: any }) {
   const [form, setForm] = useState({
-    name: "", institution_type: "school" as any, county: "", sub_county: "",
-    latitude: "", longitude: "", meals_per_day: "", current_fuel: "firewood" as any,
-    number_of_students: "", number_of_staff: "",
-    contact_person: "", contact_phone: "", contact_email: "", notes: "",
+    name: initial?.name ?? "",
+    institution_type: (initial?.institution_type ?? "school") as any,
+    county: initial?.county ?? "",
+    sub_county: initial?.sub_county ?? "",
+    latitude: initial?.latitude?.toString() ?? "",
+    longitude: initial?.longitude?.toString() ?? "",
+    meals_per_day: initial?.meals_per_day?.toString() ?? "",
+    current_fuel: (initial?.current_fuel ?? "firewood") as any,
+    number_of_students: initial?.number_of_students?.toString() ?? "",
+    number_of_staff: initial?.number_of_staff?.toString() ?? "",
+    contact_person: initial?.contact_person ?? "",
+    contact_phone: initial?.contact_phone ?? "",
+    contact_email: initial?.contact_email ?? "",
+    notes: initial?.notes ?? "",
   });
   const [loading, setLoading] = useState(false);
+  const isEdit = !!initial?.id;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.from("institutions").insert({
+    const payload = {
       name: form.name,
       institution_type: form.institution_type,
       county: form.county,
@@ -196,10 +280,13 @@ function InstitutionForm({ onSuccess }: { onSuccess: () => void }) {
       contact_phone: form.contact_phone || null,
       contact_email: form.contact_email || null,
       notes: form.notes || null,
-    });
+    };
+    const { error } = isEdit
+      ? await supabase.from("institutions").update(payload).eq("id", initial.id)
+      : await supabase.from("institutions").insert(payload);
     setLoading(false);
     if (error) toast.error(error.message);
-    else { toast.success("Institution added"); onSuccess(); }
+    else { toast.success(isEdit ? "Institution updated" : "Institution added"); onSuccess(); }
   };
 
   const set = (key: string, val: string) => setForm(prev => ({ ...prev, [key]: val }));
@@ -272,7 +359,7 @@ function InstitutionForm({ onSuccess }: { onSuccess: () => void }) {
       </div>
       <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={loading}>
         {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-        Add Institution
+        {isEdit ? "Save Changes" : "Add Institution"}
       </Button>
     </form>
   );

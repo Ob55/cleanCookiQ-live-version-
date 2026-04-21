@@ -5,66 +5,74 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import BrandedLoader from "@/components/BrandedLoader";
+import { lazy, Suspense } from "react";
 
+const PageLoader = () => <BrandedLoader />;
+
+// Eagerly loaded (needed on first paint)
 import PublicLayout from "@/components/layouts/PublicLayout";
-import AdminLayout from "@/components/layouts/AdminLayout";
-import InstitutionLayout from "@/components/layouts/InstitutionLayout";
-import SupplierLayout from "@/components/layouts/SupplierLayout";
-import FunderLayout from "@/components/layouts/FunderLayout";
-
 import HomePage from "@/pages/HomePage";
-import MapPage from "@/pages/MapPage";
-import IntelligencePage from "@/pages/IntelligencePage";
-import ProvidersPage from "@/pages/ProvidersPage";
-import AboutPage from "@/pages/AboutPage";
-
 import LoginPage from "@/pages/auth/LoginPage";
-import RegisterPage from "@/pages/auth/RegisterPage";
-import VerifyEmailPage from "@/pages/auth/VerifyEmailPage";
-import PendingApprovalPage from "@/pages/auth/PendingApprovalPage";
-import ForgotPasswordPage from "@/pages/auth/ForgotPasswordPage";
-import ResetPasswordPage from "@/pages/auth/ResetPasswordPage";
 
-import PipelineDashboard from "@/pages/admin/PipelineDashboard";
-import InstitutionManagement from "@/pages/admin/InstitutionManagement";
-import InstitutionDetail from "@/pages/admin/InstitutionDetail";
-import UserManagement from "@/pages/admin/UserManagement";
-import ProviderManagement from "@/pages/admin/ProviderManagement";
-import ProviderDetail from "@/pages/admin/ProviderDetail";
-import AssessmentQueue from "@/pages/admin/AssessmentQueue";
-import OpportunityManagement from "@/pages/admin/OpportunityManagement";
-import BDDashboard from "@/pages/admin/BDDashboard";
-import PortfolioManagement from "@/pages/admin/PortfolioManagement";
-import PortfolioAggregation from "@/pages/admin/PortfolioAggregation";
-import AdminTickets from "@/pages/admin/AdminTickets";
-import Subscribers from "@/pages/admin/Subscribers";
+// Lazy loaded layouts
+const AdminLayout = lazy(() => import("@/components/layouts/AdminLayout"));
+const InstitutionLayout = lazy(() => import("@/components/layouts/InstitutionLayout"));
+const SupplierLayout = lazy(() => import("@/components/layouts/SupplierLayout"));
+const FunderLayout = lazy(() => import("@/components/layouts/FunderLayout"));
 
-import MarketingAnalysis from "@/pages/MarketingAnalysis";
+// Lazy loaded public pages
+const MapPage = lazy(() => import("@/pages/MapPage"));
+const IntelligencePage = lazy(() => import("@/pages/IntelligencePage"));
+const ProvidersPage = lazy(() => import("@/pages/ProvidersPage"));
+const AboutPage = lazy(() => import("@/pages/AboutPage"));
+const MarketingAnalysis = lazy(() => import("@/pages/MarketingAnalysis"));
 
-import TADashboard from "@/pages/ta/TADashboard";
-import FinancingPage from "@/pages/FinancingPage";
+// Lazy loaded auth pages
+const RegisterPage = lazy(() => import("@/pages/auth/RegisterPage"));
+const VerifyEmailPage = lazy(() => import("@/pages/auth/VerifyEmailPage"));
+const PendingApprovalPage = lazy(() => import("@/pages/auth/PendingApprovalPage"));
+const ForgotPasswordPage = lazy(() => import("@/pages/auth/ForgotPasswordPage"));
+const ResetPasswordPage = lazy(() => import("@/pages/auth/ResetPasswordPage"));
 
-import InstitutionSetup from "@/pages/institution/InstitutionSetup";
-import InstitutionDashboard from "@/pages/institution/InstitutionDashboard";
-import InstitutionProfile from "@/pages/institution/InstitutionProfile";
-import CookingAlchemy from "@/pages/institution/CookingAlchemy";
-import InstitutionDocuments from "@/pages/institution/InstitutionDocuments";
+// Lazy loaded admin pages
+const PipelineDashboard = lazy(() => import("@/pages/admin/PipelineDashboard"));
+const InstitutionManagement = lazy(() => import("@/pages/admin/InstitutionManagement"));
+const InstitutionDetail = lazy(() => import("@/pages/admin/InstitutionDetail"));
+const UserManagement = lazy(() => import("@/pages/admin/UserManagement"));
+const ProviderManagement = lazy(() => import("@/pages/admin/ProviderManagement"));
+const ProviderDetail = lazy(() => import("@/pages/admin/ProviderDetail"));
+const AssessmentQueue = lazy(() => import("@/pages/admin/AssessmentQueue"));
+const OpportunityManagement = lazy(() => import("@/pages/admin/OpportunityManagement"));
+const BDDashboard = lazy(() => import("@/pages/admin/BDDashboard"));
+const PortfolioManagement = lazy(() => import("@/pages/admin/PortfolioManagement"));
+const PortfolioAggregation = lazy(() => import("@/pages/admin/PortfolioAggregation"));
+const AdminTickets = lazy(() => import("@/pages/admin/AdminTickets"));
+const Subscribers = lazy(() => import("@/pages/admin/Subscribers"));
 
+// Lazy loaded role pages
+const TADashboard = lazy(() => import("@/pages/ta/TADashboard"));
+const FinancingPage = lazy(() => import("@/pages/FinancingPage"));
 
-import SupplierSetup from "@/pages/supplier/SupplierSetup";
-import SupplierDashboard from "@/pages/supplier/SupplierDashboard";
-import SupplierProducts from "@/pages/supplier/SupplierProducts";
-import SupplierServices from "@/pages/supplier/SupplierServices";
-import SupplierDocuments from "@/pages/supplier/SupplierDocuments";
-import SupplierOpportunities from "@/pages/supplier/SupplierOpportunities";
+const InstitutionSetup = lazy(() => import("@/pages/institution/InstitutionSetup"));
+const InstitutionDashboard = lazy(() => import("@/pages/institution/InstitutionDashboard"));
+const InstitutionProfile = lazy(() => import("@/pages/institution/InstitutionProfile"));
+const CookingAlchemy = lazy(() => import("@/pages/institution/CookingAlchemy"));
+const InstitutionDocuments = lazy(() => import("@/pages/institution/InstitutionDocuments"));
 
-import FunderDashboard from "@/pages/funder/FunderDashboard";
-import FunderInstitutionDetail from "@/pages/funder/FunderInstitutionDetail";
-import FunderDocuments from "@/pages/funder/FunderDocuments";
+const SupplierSetup = lazy(() => import("@/pages/supplier/SupplierSetup"));
+const SupplierDashboard = lazy(() => import("@/pages/supplier/SupplierDashboard"));
+const SupplierProducts = lazy(() => import("@/pages/supplier/SupplierProducts"));
+const SupplierServices = lazy(() => import("@/pages/supplier/SupplierServices"));
+const SupplierDocuments = lazy(() => import("@/pages/supplier/SupplierDocuments"));
+const SupplierOpportunities = lazy(() => import("@/pages/supplier/SupplierOpportunities"));
 
-import TicketsPage from "@/pages/shared/TicketsPage";
+const FunderDashboard = lazy(() => import("@/pages/funder/FunderDashboard"));
+const FunderInstitutionDetail = lazy(() => import("@/pages/funder/FunderInstitutionDetail"));
+const FunderDocuments = lazy(() => import("@/pages/funder/FunderDocuments"));
 
-import NotFound from "@/pages/NotFound";
+const TicketsPage = lazy(() => import("@/pages/shared/TicketsPage"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
 
 const queryClient = new QueryClient();
 
@@ -75,111 +83,114 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            {/* Public pages */}
-            <Route element={<PublicLayout />}>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/map" element={<MapPage />} />
-              <Route path="/intelligence" element={<IntelligencePage />} />
-              <Route path="/providers" element={<ProvidersPage />} />
-              <Route path="/marketing" element={<MarketingAnalysis />} />
-              <Route path="/about" element={<AboutPage />} />
-            </Route>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              {/* Public pages */}
+              <Route element={<PublicLayout />}>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/map" element={<MapPage />} />
+                <Route path="/intelligence" element={<IntelligencePage />} />
+                <Route path="/providers" element={<ProvidersPage />} />
+                <Route path="/marketing" element={<MarketingAnalysis />} />
+                <Route path="/about" element={<AboutPage />} />
+              </Route>
 
-            {/* Auth pages */}
-            <Route path="/auth/login" element={<LoginPage />} />
-            <Route path="/auth/register" element={<RegisterPage />} />
-            <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
-            <Route path="/auth/pending" element={<PendingApprovalPage />} />
-            <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
+              {/* Auth pages */}
+              <Route path="/auth/login" element={<LoginPage />} />
+              <Route path="/auth/register" element={<RegisterPage />} />
+              <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
+              <Route path="/auth/pending" element={<PendingApprovalPage />} />
+              <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-            {/* TA Dashboard */}
-            <Route path="/ta/dashboard" element={
-              <ProtectedRoute allowedRoles={["ta_provider"]} allowedOrgTypes={["supplier"]}>
-                <TADashboard />
-              </ProtectedRoute>
-            } />
+              {/* TA Dashboard */}
+              <Route path="/ta/dashboard" element={
+                <ProtectedRoute allowedRoles={["ta_provider"]} allowedOrgTypes={["supplier"]}>
+                  <TADashboard />
+                </ProtectedRoute>
+              } />
 
-            {/* Financing */}
-            <Route path="/financing" element={
-              <ProtectedRoute allowedRoles={["financing_partner"]} allowedOrgTypes={["funder"]}>
-                <FinancingPage />
-              </ProtectedRoute>
-            } />
+              {/* Financing */}
+              <Route path="/financing" element={
+                <ProtectedRoute allowedRoles={["financing_partner"]} allowedOrgTypes={["funder"]}>
+                  <FinancingPage />
+                </ProtectedRoute>
+              } />
 
-            {/* Institution Setup (no sidebar) */}
-            <Route path="/institution/setup" element={
-              <ProtectedRoute allowedRoles={["institution_admin", "institution_user"]} allowedOrgTypes={["institution"]}>
-                <InstitutionSetup />
-              </ProtectedRoute>
-            } />
+              {/* Institution Setup (no sidebar) */}
+              <Route path="/institution/setup" element={
+                <ProtectedRoute allowedRoles={["institution_admin", "institution_user"]} allowedOrgTypes={["institution"]}>
+                  <InstitutionSetup />
+                </ProtectedRoute>
+              } />
 
-            {/* Institution pages (with sidebar) */}
-            <Route element={
-              <ProtectedRoute allowedRoles={["institution_admin", "institution_user"]} allowedOrgTypes={["institution"]}>
-                <InstitutionLayout />
-              </ProtectedRoute>
-            }>
-              <Route path="/institution/dashboard" element={<InstitutionDashboard />} />
-              <Route path="/institution/profile" element={<InstitutionProfile />} />
-              <Route path="/institution/alchemy" element={<CookingAlchemy />} />
-              <Route path="/institution/documents" element={<InstitutionDocuments />} />
-              <Route path="/institution/support" element={<TicketsPage />} />
-            </Route>
+              {/* Institution pages (with sidebar) */}
+              <Route element={
+                <ProtectedRoute allowedRoles={["institution_admin", "institution_user"]} allowedOrgTypes={["institution"]}>
+                  <InstitutionLayout />
+                </ProtectedRoute>
+              }>
+                <Route path="/institution/dashboard" element={<InstitutionDashboard />} />
+                <Route path="/institution/profile" element={<InstitutionProfile />} />
+                <Route path="/institution/alchemy" element={<CookingAlchemy />} />
+                <Route path="/institution/documents" element={<InstitutionDocuments />} />
+                <Route path="/institution/support" element={<TicketsPage />} />
+              </Route>
 
-            {/* Supplier Setup (no sidebar) */}
-            <Route path="/supplier/setup" element={
-              <ProtectedRoute allowedRoles={["ta_provider"]} allowedOrgTypes={["supplier"]}>
-                <SupplierSetup />
-              </ProtectedRoute>
-            } />
+              {/* Supplier Setup (no sidebar) */}
+              <Route path="/supplier/setup" element={
+                <ProtectedRoute allowedRoles={["ta_provider"]} allowedOrgTypes={["supplier"]}>
+                  <SupplierSetup />
+                </ProtectedRoute>
+              } />
 
-            {/* Supplier pages (with sidebar) */}
-            <Route element={
-              <ProtectedRoute allowedRoles={["ta_provider"]} allowedOrgTypes={["supplier"]}>
-                <SupplierLayout />
-              </ProtectedRoute>
-            }>
-              <Route path="/supplier/dashboard" element={<SupplierDashboard />} />
-              <Route path="/supplier/products" element={<SupplierProducts />} />
-              <Route path="/supplier/services" element={<SupplierServices />} />
-              <Route path="/supplier/documents" element={<SupplierDocuments />} />
-              <Route path="/supplier/opportunities" element={<SupplierOpportunities />} />
-              <Route path="/supplier/support" element={<TicketsPage />} />
-            </Route>
+              {/* Supplier pages (with sidebar) */}
+              <Route element={
+                <ProtectedRoute allowedRoles={["ta_provider"]} allowedOrgTypes={["supplier"]}>
+                  <SupplierLayout />
+                </ProtectedRoute>
+              }>
+                <Route path="/supplier/dashboard" element={<SupplierDashboard />} />
+                <Route path="/supplier/products" element={<SupplierProducts />} />
+                <Route path="/supplier/services" element={<SupplierServices />} />
+                <Route path="/supplier/documents" element={<SupplierDocuments />} />
+                <Route path="/supplier/opportunities" element={<SupplierOpportunities />} />
+                <Route path="/supplier/support" element={<TicketsPage />} />
+              </Route>
 
-            {/* Funder pages (with sidebar) */}
-            <Route element={
-              <ProtectedRoute allowedRoles={["financing_partner"]} allowedOrgTypes={["funder"]}>
-                <FunderLayout />
-              </ProtectedRoute>
-            }>
-              <Route path="/funder/dashboard" element={<FunderDashboard />} />
-              <Route path="/funder/institution/:id" element={<FunderInstitutionDetail />} />
-              <Route path="/funder/documents" element={<FunderDocuments />} />
-              <Route path="/funder/support" element={<TicketsPage />} />
-            </Route>
+              {/* Funder pages (with sidebar) */}
+              <Route element={
+                <ProtectedRoute allowedRoles={["financing_partner"]} allowedOrgTypes={["funder"]}>
+                  <FunderLayout />
+                </ProtectedRoute>
+              }>
+                <Route path="/funder/dashboard" element={<FunderDashboard />} />
+                <Route path="/funder/institution/:id" element={<FunderInstitutionDetail />} />
+                <Route path="/funder/documents" element={<FunderDocuments />} />
+                <Route path="/funder/support" element={<TicketsPage />} />
+              </Route>
 
-            {/* Admin pages (protected) */}
-            <Route element={<ProtectedRoute requireAdmin><AdminLayout /></ProtectedRoute>}>
-              <Route path="/admin/pipeline" element={<PipelineDashboard />} />
-              <Route path="/admin/institutions" element={<InstitutionManagement />} />
-              <Route path="/admin/institutions/:id" element={<InstitutionDetail />} />
-              <Route path="/admin/providers" element={<ProviderManagement />} />
-              <Route path="/admin/providers/:id" element={<ProviderDetail />} />
-              <Route path="/admin/assessments" element={<AssessmentQueue />} />
-              <Route path="/admin/opportunities" element={<OpportunityManagement />} />
-              <Route path="/admin/bd" element={<BDDashboard />} />
-              <Route path="/admin/portfolio" element={<PortfolioManagement />} />
-              <Route path="/admin/portfolio-aggregation" element={<PortfolioAggregation />} />
-              <Route path="/admin/tickets" element={<AdminTickets />} />
-              <Route path="/admin/subscribers" element={<Subscribers />} />
-              <Route path="/admin/users" element={<UserManagement />} />
-            </Route>
+              {/* Admin pages (protected) */}
+              <Route element={<ProtectedRoute requireAdmin><AdminLayout /></ProtectedRoute>}>
+                <Route path="/admin/pipeline" element={<PipelineDashboard />} />
+                <Route path="/admin/institutions" element={<InstitutionManagement />} />
+                <Route path="/admin/institutions/:id" element={<InstitutionDetail />} />
+                <Route path="/admin/providers" element={<ProviderManagement />} />
+                <Route path="/admin/providers/:id" element={<ProviderDetail />} />
+                <Route path="/admin/assessments" element={<AssessmentQueue />} />
+                <Route path="/admin/opportunities" element={<OpportunityManagement />} />
+                <Route path="/admin/bd" element={<BDDashboard />} />
+                <Route path="/admin/portfolio" element={<PortfolioManagement />} />
+                <Route path="/admin/portfolio-aggregation" element={<PortfolioAggregation />} />
+                <Route path="/admin/tickets" element={<AdminTickets />} />
+                <Route path="/admin/subscribers" element={<Subscribers />} />
+                <Route path="/admin/users" element={<UserManagement />} />
+              </Route>
 
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>

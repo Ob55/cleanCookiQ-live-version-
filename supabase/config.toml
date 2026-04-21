@@ -1,1 +1,53 @@
-project_id = "uwvpuedlqgxhcniqkmdc"
+project_id = "bnbhattryqbterblybzw"
+
+[auth]
+site_url = "https://cleancookiq.com"
+additional_redirect_urls = [
+  "https://cleancookiq.com",
+  "https://cleancookiq.com/**",
+  "https://cleancookiq.com/auth/login",
+  "http://localhost:8080",
+  "http://localhost:8080/**",
+  "http://localhost:5173",
+  "http://localhost:5173/**",
+  "http://localhost:3000",
+  "http://localhost:3000/**"
+]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+refresh_token_reuse_interval = 10
+
+[auth.rate_limit]
+token_refresh = 150
+sign_in_sign_ups = 30
+token_verifications = 30
+email_sent = 100
+sms_sent = 30
+web3 = 30
+
+[auth.mfa]
+max_enrolled_factors = 10
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+[auth.mfa.phone]
+enroll_enabled = false
+verify_enabled = false
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = true
+secure_password_change = false
+max_frequency = "1s"
+otp_length = 8
+otp_expiry = 3600
+
+[auth.email.smtp]
+enabled = true
+host = "smtp.office365.com"
+port = 587
+user = "info@ignis-innovation.com"
+pass = "env(SMTP_PASSWORD)"
+admin_email = "info@ignis-innovation.com"
+sender_name = "CleanCook IQ"

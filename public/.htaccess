@@ -1,0 +1,82 @@
+# ============================================
+# SPA Routing - Send all requests to index.html
+# ============================================
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# ============================================
+# GZIP Compression - Dramatically reduces file sizes
+# ============================================
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html
+  AddOutputFilterByType DEFLATE text/css
+  AddOutputFilterByType DEFLATE text/javascript
+  AddOutputFilterByType DEFLATE application/javascript
+  AddOutputFilterByType DEFLATE application/json
+  AddOutputFilterByType DEFLATE image/svg+xml
+  AddOutputFilterByType DEFLATE application/xml
+  AddOutputFilterByType DEFLATE text/xml
+  AddOutputFilterByType DEFLATE text/plain
+</IfModule>
+
+# ============================================
+# Browser Caching - Avoid re-downloading static assets
+# ============================================
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # Hashed assets (JS/CSS with content hash in filename) - cache for 1 year
+  <FilesMatch "\.(js|css)$">
+    ExpiresDefault "access plus 1 year"
+  </FilesMatch>
+
+  # Images - cache for 1 month
+  <FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|ico)$">
+    ExpiresDefault "access plus 1 month"
+  </FilesMatch>
+
+  # Fonts - cache for 1 year
+  <FilesMatch "\.(woff|woff2|ttf|eot)$">
+    ExpiresDefault "access plus 1 year"
+  </FilesMatch>
+
+  # HTML - always revalidate (so users get new deploys)
+  <FilesMatch "\.html$">
+    ExpiresDefault "access plus 0 seconds"
+  </FilesMatch>
+</IfModule>
+
+# Fallback Cache-Control headers
+<IfModule mod_headers.c>
+  # Hashed JS/CSS files - immutable cache
+  <FilesMatch "\.(js|css)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Images
+  <FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|ico)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+
+  # HTML - no cache (always fetch latest)
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+</IfModule>
+
+# ============================================
+# Security Headers
+# ============================================
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "DENY"
+  Header set X-XSS-Protection "1; mode=block"
+</IfModule>

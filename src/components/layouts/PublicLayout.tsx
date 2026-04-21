@@ -95,7 +95,7 @@ export default function PublicLayout() {
       <main className="flex-1"><Outlet /></main>
 
       <footer className="border-t border-border bg-foreground text-primary-foreground">
-        <div className="container max-w-5xl mx-auto py-12">
+        <div className="container py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center gap-2 mb-4">

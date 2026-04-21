@@ -2,18 +2,63 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
+import BrandedLoader from "@/components/BrandedLoader";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
+  const [wrongPassword, setWrongPassword] = useState(false);
   const navigate = useNavigate();
+
+  // Auto-redirect if user is already signed in (e.g. after clicking verification email)
+  useEffect(() => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) return;
+      await redirectUser(session.user.id, session.user);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const redirectUser = async (userId: string, user: any) => {
+    const [{ data: rolesData }, { data: profileData }] = await Promise.all([
+      supabase.from("user_roles").select("role").eq("user_id", userId),
+      supabase.from("profiles").select("org_type, organisation_id, approval_status").eq("user_id", userId).maybeSingle(),
+    ]);
+
+    const roles = rolesData?.map((r: any) => r.role) ?? [];
+    const orgType = profileData?.org_type ?? user?.user_metadata?.org_type ?? null;
+    const approvalStatus = profileData?.approval_status ?? "pending";
+
+    const isAdmin = roles.some((r: string) => ["admin", "manager", "field_agent"].includes(r));
+    if (isAdmin) { setRedirecting(true); navigate("/admin/pipeline"); return; }
+
+    if (approvalStatus === "pending") { setRedirecting(true); navigate("/auth/pending"); return; }
+    if (approvalStatus === "rejected") { toast.error("Your account has not been approved. Contact support."); return; }
+
+    const isInstitution = roles.some((r: string) => ["institution_admin", "institution_user"].includes(r)) || orgType === "institution";
+    const isSupplier = roles.some((r: string) => r === "ta_provider") || orgType === "supplier";
+    const isFunder = roles.some((r: string) => r === "financing_partner") || orgType === "funder";
+
+    setRedirecting(true);
+    if (isInstitution) {
+      // Use profile.organisation_id as the source of truth — it's set only after setup completes
+      navigate(profileData?.organisation_id ? "/institution/dashboard" : "/institution/setup");
+    } else if (isSupplier) {
+      navigate(profileData?.organisation_id ? "/supplier/dashboard" : "/supplier/setup");
+    } else if (isFunder) {
+      navigate("/funder/dashboard");
+    } else {
+      navigate("/auth/pending");
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,9 +67,17 @@ export default function LoginPage() {
     const { data: authData, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setLoading(false);
-      toast.error(error.message);
+      const isCredError = error.message.toLowerCase().includes("invalid login credentials") ||
+        error.message.toLowerCase().includes("invalid credentials");
+      if (isCredError) {
+        setWrongPassword(true);
+        toast.error("Wrong password. Use 'Forgot password?' below to reset it.");
+      } else {
+        toast.error(error.message);
+      }
       return;
     }
+    setWrongPassword(false);
 
     const userId = authData.user?.id;
     if (!userId) {
@@ -33,86 +86,12 @@ export default function LoginPage() {
       return;
     }
 
-    const [{ data: rolesData }, { data: profileData }] = await Promise.all([
-      supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userId),
-      supabase
-        .from("profiles")
-        .select("org_type, organisation_id")
-        .eq("user_id", userId)
-        .maybeSingle(),
-    ]);
-
-    const roles = rolesData?.map((r: { role: string }) => r.role) ?? [];
-    const profileOrgType = profileData?.org_type ?? null;
-    const metadataOrgType = authData.user?.user_metadata?.org_type ?? null;
-
-    const isAdmin = roles.some((r: string) =>
-      ["admin", "manager", "field_agent"].includes(r)
-    );
-    const isInstitutionUser =
-      roles.some((r: string) => ["institution_admin", "institution_user"].includes(r)) ||
-      profileOrgType === "institution" ||
-      metadataOrgType === "institution";
-    const isSupplier =
-      roles.some((r: string) => ["ta_provider"].includes(r)) ||
-      profileOrgType === "supplier" ||
-      metadataOrgType === "supplier";
-
-    setLoading(false);
     toast.success("Logged in successfully");
-
-    // Admin roles take priority
-    if (isAdmin) {
-      navigate("/admin/pipeline");
-      return;
-    }
-
-    if (isInstitutionUser) {
-      const { data: inst } = await supabase
-        .from("institutions")
-        .select("setup_completed")
-        .eq("created_by", userId)
-        .limit(1)
-        .single();
-
-      navigate(inst?.setup_completed ? "/institution/dashboard" : "/institution/setup");
-      return;
-    }
-
-    if (isSupplier) {
-      if (profileData?.organisation_id) {
-        navigate("/supplier/dashboard");
-      } else {
-        navigate("/supplier/setup");
-      }
-      return;
-    }
-
-    // Funder routing
-    const isFunder =
-      roles.some((r: string) => r === "financing_partner") ||
-      profileOrgType === "funder" ||
-      metadataOrgType === "funder";
-
-    if (isFunder) {
-      navigate("/funder/dashboard");
-      return;
-    }
-
-    navigate("/admin/pipeline");
-  };
-
-  const handleMagicLink = async () => {
-    if (!email) { toast.error("Enter your email first"); return; }
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin } });
     setLoading(false);
-    if (error) toast.error(error.message);
-    else toast.success("Magic link sent — check your email");
+    await redirectUser(userId, authData.user);
   };
+
+  if (redirecting) return <BrandedLoader message="Preparing your dashboard…" />;
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4">
@@ -141,6 +120,15 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
+            {wrongPassword && (
+              <div className="rounded-lg bg-destructive/10 border border-destructive/30 p-3 text-sm text-destructive">
+                Wrong password.{" "}
+                <Link to="/auth/forgot-password" className="font-semibold underline">
+                  Click here to reset it
+                </Link>
+                {" "}— a link will be emailed to you instantly.
+              </div>
+            )}
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" className="rounded border-input" />
@@ -156,14 +144,6 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
-            <div className="relative flex justify-center text-xs"><span className="bg-card px-2 text-muted-foreground">or</span></div>
-          </div>
-
-          <Button variant="outline" className="w-full" onClick={handleMagicLink} disabled={loading}>
-            Send Magic Link Instead
-          </Button>
         </div>
 
         <p className="text-center text-sm text-muted-foreground mt-6">

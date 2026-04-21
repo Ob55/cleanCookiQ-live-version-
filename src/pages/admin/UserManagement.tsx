@@ -1,13 +1,17 @@
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Users, Check, X, Loader2 } from "lucide-react";
+import { Users, Check, X, Loader2, Trash2 } from "lucide-react";
+import { sendEmail, emailAccountApproved, emailAccountRejected } from "@/lib/emailService";
 
 export default function UserManagement() {
   const queryClient = useQueryClient();
+  const [deleteTarget, setDeleteTarget] = useState<{ userId: string; name: string } | null>(null);
 
   const { data: profiles, isLoading } = useQuery({
     queryKey: ["admin-profiles"],
@@ -19,9 +23,24 @@ export default function UserManagement() {
   });
 
   const updateStatus = useMutation({
-    mutationFn: async ({ userId, status }: { userId: string; status: string }) => {
+    mutationFn: async ({ userId, status, name }: { userId: string; status: string; name: string }) => {
       const { error } = await supabase.from("profiles").update({ approval_status: status as any }).eq("user_id", userId);
       if (error) throw error;
+
+      const appUrl = window.location.origin;
+      if (status === "approved") {
+        await sendEmail({
+          userId,
+          subject: "Your CleanCook IQ Account Has Been Approved",
+          html: emailAccountApproved(name, appUrl),
+        });
+      } else if (status === "rejected") {
+        await sendEmail({
+          userId,
+          subject: "CleanCook IQ Account Application Update",
+          html: emailAccountRejected(name),
+        });
+      }
     },
     onSuccess: () => {
       toast.success("User status updated");
@@ -30,8 +49,24 @@ export default function UserManagement() {
     onError: (e: any) => toast.error(e.message),
   });
 
+  const deleteUser = useMutation({
+    mutationFn: async (userId: string) => {
+      const { error } = await supabase.functions.invoke("delete-user", { body: { userId } });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("User and all their data deleted");
+      queryClient.invalidateQueries({ queryKey: ["admin-profiles"] });
+      setDeleteTarget(null);
+    },
+    onError: (e: any) => {
+      toast.error(e.message || "Failed to delete user");
+      setDeleteTarget(null);
+    },
+  });
+
   const statusColors: Record<string, string> = {
-    pending: "bg-amber/20 text-amber",
+    pending: "bg-amber-100 text-amber-700",
     approved: "bg-primary/20 text-primary",
     rejected: "bg-destructive/20 text-destructive",
   };
@@ -79,15 +114,22 @@ export default function UserManagement() {
                   <td className="p-3">
                     <div className="flex gap-1">
                       {p.approval_status !== "approved" && (
-                        <Button size="sm" variant="ghost" onClick={() => updateStatus.mutate({ userId: p.user_id, status: "approved" })}>
+                        <Button size="sm" variant="ghost" onClick={() => updateStatus.mutate({ userId: p.user_id, status: "approved", name: p.full_name || "" })}>
                           <Check className="h-4 w-4 text-primary" />
                         </Button>
                       )}
                       {p.approval_status !== "rejected" && (
-                        <Button size="sm" variant="ghost" onClick={() => updateStatus.mutate({ userId: p.user_id, status: "rejected" })}>
+                        <Button size="sm" variant="ghost" onClick={() => updateStatus.mutate({ userId: p.user_id, status: "rejected", name: p.full_name || "" })}>
                           <X className="h-4 w-4 text-destructive" />
                         </Button>
                       )}
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setDeleteTarget({ userId: p.user_id, name: p.full_name || "this user" })}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
                     </div>
                   </td>
                 </tr>
@@ -96,6 +138,30 @@ export default function UserManagement() {
           </table>
         </div>
       )}
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete {deleteTarget?.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This permanently deletes the account and <strong>all associated data</strong> — profile, roles, institution/supplier records, documents, tickets, and everything else. The user will need to sign up again from scratch.
+              <br /><br />
+              <span className="text-destructive font-medium">This cannot be undone.</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => deleteTarget && deleteUser.mutate(deleteTarget.userId)}
+              disabled={deleteUser.isPending}
+            >
+              {deleteUser.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Yes, delete permanently
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { calculateAssessmentScore } from "@/lib/assessmentScoring";
+import { sendEmail, emailInstitutionWelcome } from "@/lib/emailService";
 import CountyCombobox from "@/components/CountyCombobox";
 
 const FUEL_TYPES = [
@@ -36,6 +37,25 @@ export default function InstitutionSetup() {
   const navigate = useNavigate();
   const { user, refreshProfile } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  // If setup already done, skip to dashboard
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("institutions")
+        .select("id, setup_completed")
+        .eq("created_by", user.id)
+        .limit(1)
+        .maybeSingle();
+      if (data?.setup_completed) {
+        navigate("/institution/dashboard", { replace: true });
+      } else {
+        setChecking(false);
+      }
+    })();
+  }, [user, navigate]);
 
   const [name, setName] = useState("");
   const [county, setCounty] = useState("");
@@ -77,12 +97,24 @@ export default function InstitutionSetup() {
       let institutionId: string | null = null;
 
       if (profile?.organisation_id) {
+        // profile.organisation_id stores the institution's primary key
         const { data: existing } = await supabase
           .from("institutions")
           .select("id")
-          .eq("organisation_id", profile.organisation_id)
+          .eq("id", profile.organisation_id)
           .maybeSingle();
         institutionId = existing?.id ?? null;
+      }
+
+      // Also try by created_by if not found via profile
+      if (!institutionId) {
+        const { data: byCreator } = await supabase
+          .from("institutions")
+          .select("id")
+          .eq("created_by", user.id)
+          .limit(1)
+          .maybeSingle();
+        institutionId = byCreator?.id ?? null;
       }
 
       // Calculate assessment score
@@ -127,23 +159,50 @@ export default function InstitutionSetup() {
       };
 
       if (institutionId) {
-        await supabase.from("institutions").update(institutionData).eq("id", institutionId);
+        const { error: updateErr } = await supabase.from("institutions").update(institutionData).eq("id", institutionId);
+        if (updateErr) throw new Error(updateErr.message);
+        // Ensure profile is linked
+        if (!profile?.organisation_id) {
+          await supabase.from("profiles").update({ organisation_id: institutionId }).eq("user_id", user.id);
+        }
       } else {
-        await supabase.from("institutions").insert({
-          ...institutionData,
-          institution_type: "school" as any,
-        });
+        const { data: newInst, error: insertErr } = await supabase
+          .from("institutions")
+          .insert({ ...institutionData, institution_type: "school" as any })
+          .select("id")
+          .single();
+        if (insertErr) throw new Error(insertErr.message);
+        // Link profile to this institution so dashboard can always find it
+        if (newInst?.id) {
+          await supabase.from("profiles").update({ organisation_id: newInst.id }).eq("user_id", user.id);
+        }
       }
 
       await refreshProfile();
+
+      // Send welcome email
+      const recipientEmail = contactEmail || user.email;
+      if (recipientEmail) {
+        await sendEmail({
+          to: recipientEmail,
+          subject: "Your Institution Is Now on CleanCook IQ",
+          html: emailInstitutionWelcome(
+            user.user_metadata?.full_name || contactPerson || "",
+            name.trim(),
+          ),
+        });
+      }
+
       toast.success("Institution setup complete!");
-      navigate("/institution/dashboard");
+      setTimeout(() => navigate("/institution/dashboard"), 100);
     } catch (err: any) {
       toast.error(err.message || "Failed to save");
     } finally {
       setLoading(false);
     }
   };
+
+  if (checking) return null;
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-background">

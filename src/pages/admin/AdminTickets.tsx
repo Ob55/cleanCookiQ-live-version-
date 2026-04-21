@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2, Ticket, Send, MessageSquare, AlertTriangle, CheckCircle } from "lucide-react";
+import { sendEmail, emailTicketResolved } from "@/lib/emailService";
 
 const statusColors: Record<string, string> = {
   open: "bg-amber-100 text-amber-700",
@@ -70,12 +71,25 @@ export default function AdminTickets() {
         .eq("id", selectedTicket.id);
       if (error) throw error;
 
-      // Send notification to the ticket creator
+      // Send in-app notification
       if (selectedTicket.raised_by) {
         await supabase.from("notifications").insert({
           user_id: selectedTicket.raised_by,
           title: "Ticket Resolved: " + selectedTicket.title,
           body: replyText,
+        });
+      }
+
+      // Send email notification
+      if (selectedTicket.raised_by_email) {
+        await sendEmail({
+          to: selectedTicket.raised_by_email,
+          subject: `Support Ticket Resolved: ${selectedTicket.title}`,
+          html: emailTicketResolved(
+            selectedTicket.raised_by_name || "",
+            selectedTicket.title,
+            replyText,
+          ),
         });
       }
     },
