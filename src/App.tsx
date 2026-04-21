@@ -76,6 +76,7 @@ const FunderDocuments = lazy(() => import("@/pages/funder/FunderDocuments"));
 const ResearcherDashboard = lazy(() => import("@/pages/researcher/ResearcherDashboard"));
 const ResearcherInstitutionDetail = lazy(() => import("@/pages/researcher/ResearcherInstitutionDetail"));
 const AdminResearchers = lazy(() => import("@/pages/admin/AdminResearchers"));
+const AdminOthers = lazy(() => import("@/pages/admin/AdminOthers"));
 
 const TicketsPage = lazy(() => import("@/pages/shared/TicketsPage"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
@@ -202,6 +203,7 @@ const App = () => (
                 <Route path="/admin/portfolio" element={<PortfolioManagement />} />
                 <Route path="/admin/portfolio-aggregation" element={<PortfolioAggregation />} />
                 <Route path="/admin/researchers" element={<AdminResearchers />} />
+                <Route path="/admin/others" element={<AdminOthers />} />
                 <Route path="/admin/tickets" element={<AdminTickets />} />
                 <Route path="/admin/subscribers" element={<Subscribers />} />
                 <Route path="/admin/users" element={<UserManagement />} />

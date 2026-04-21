@@ -2,7 +2,7 @@ import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Building2, Users, ClipboardCheck,
   BarChart3, FileText, TrendingUp, Factory, Menu, X, LogOut,
-  Briefcase, Ticket, FlaskConical, Upload,
+  Briefcase, Ticket, FlaskConical, Upload, HelpCircle,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ const adminNav = [
   { label: "Portfolio", href: "/admin/portfolio", icon: Briefcase },
   { label: "Portfolio Aggregation", href: "/admin/portfolio-aggregation", icon: BarChart3 },
   { label: "Researchers", href: "/admin/researchers", icon: FlaskConical },
+  { label: "Others", href: "/admin/others", icon: HelpCircle },
   { label: "Tickets", href: "/admin/tickets", icon: Ticket },
   { label: "Subscribers", href: "/admin/subscribers", icon: Users },
   { label: "Users", href: "/admin/users", icon: Users },

@@ -96,6 +96,7 @@ export default function HomePage() {
     if (profile?.org_type === "institution") return <Navigate to={profile?.organisation_id ? "/institution/dashboard" : "/institution/setup"} replace />;
     if (profile?.org_type === "supplier") return <Navigate to="/supplier/dashboard" replace />;
     if (profile?.org_type === "funder") return <Navigate to="/funder/dashboard" replace />;
+    if (profile?.org_type === "other") return <Navigate to="/auth/pending" replace />;
   }
 
   return (

@@ -2,17 +2,20 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { Building2, Factory, Banknote, FlaskConical, ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react";
+import { Building2, Factory, Banknote, FlaskConical, HelpCircle, ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
+import { sendEmail, emailOtherInterest } from "@/lib/emailService";
 
 const orgTypes = [
   { value: "institution", label: "Institution", desc: "School, hospital, prison, factory", icon: Building2 },
   { value: "supplier", label: "Supplier / Provider", desc: "Equipment, installation, maintenance", icon: Factory },
   { value: "funder", label: "Funder / Financing Partner", desc: "Finance partner or investor", icon: Banknote },
   { value: "researcher", label: "Researcher", desc: "Academic or independent researcher", icon: FlaskConical },
+  { value: "other", label: "Other Organisation", desc: "Other organisations interested in the platform", icon: HelpCircle },
 ];
 
 const fundingTypes = [
@@ -33,11 +36,13 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [fundingType, setFundingType] = useState("");
+  const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const isSupplier = orgType === "supplier";
   const isFunder = orgType === "funder";
+  const isOther = orgType === "other";
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,6 +57,7 @@ export default function RegisterPage() {
       funder: "financing_partner",
       csr: "viewer",
       researcher: "viewer",
+      other: "viewer",
     };
 
     const { data: signUpData, error } = await supabase.auth.signUp({
@@ -82,8 +88,8 @@ export default function RegisterPage() {
     }
 
     if (signUpData.user) {
-      // Store email in profiles so admin can see it
-      await supabase.from("profiles").update({ email }).eq("user_id", signUpData.user.id);
+      // Store email, org_name, description in profiles
+      await supabase.from("profiles").update({ email, org_name: orgName, description: description || null }).eq("user_id", signUpData.user.id);
 
       // If funder, create funder_profiles record
       if (isFunder) {
@@ -96,10 +102,19 @@ export default function RegisterPage() {
           phone,
         });
       }
+
+      // If other, send interest email
+      if (isOther) {
+        await sendEmail({
+          to: email,
+          subject: "Thank you for your interest in CleanCook IQ",
+          html: emailOtherInterest(fullName, orgName),
+        });
+      }
     }
 
     setLoading(false);
-    navigate("/auth/verify-email");
+    navigate(isOther ? "/auth/pending" : "/auth/verify-email");
   };
 
   return (
@@ -188,6 +203,20 @@ export default function RegisterPage() {
                 </div>
               </div>
 
+              {isOther && (
+                <div>
+                  <Label htmlFor="description">Brief Description *</Label>
+                  <Textarea
+                    id="description"
+                    value={description}
+                    onChange={e => setDescription(e.target.value)}
+                    placeholder="Tell us about your organisation and what you're looking for..."
+                    className="mt-1 min-h-[80px]"
+                    required
+                  />
+                </div>
+              )}
+
               {isFunder && (
                 <div>
                   <Label htmlFor="fundingType">Type of Funding You Offer *</Label>
@@ -224,7 +253,7 @@ export default function RegisterPage() {
                 </div>
               )}
 
-              <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={loading || (isSupplier && !termsAccepted) || (isFunder && !fundingType)}>
+              <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={loading || (isSupplier && !termsAccepted) || (isFunder && !fundingType) || (isOther && !description)}>
                 {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                 Create Account
               </Button>

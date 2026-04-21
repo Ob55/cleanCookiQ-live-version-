@@ -1013,8 +1013,11 @@ export type Database = {
         Row: {
           approval_status: Database["public"]["Enums"]["approval_status"]
           created_at: string
+          description: string | null
+          email: string | null
           full_name: string | null
           id: string
+          org_name: string | null
           org_type: Database["public"]["Enums"]["org_type"] | null
           organisation_id: string | null
           phone: string | null
@@ -1024,8 +1027,11 @@ export type Database = {
         Insert: {
           approval_status?: Database["public"]["Enums"]["approval_status"]
           created_at?: string
+          description?: string | null
+          email?: string | null
           full_name?: string | null
           id?: string
+          org_name?: string | null
           org_type?: Database["public"]["Enums"]["org_type"] | null
           organisation_id?: string | null
           phone?: string | null
@@ -1035,8 +1041,11 @@ export type Database = {
         Update: {
           approval_status?: Database["public"]["Enums"]["approval_status"]
           created_at?: string
+          description?: string | null
+          email?: string | null
           full_name?: string | null
           id?: string
+          org_name?: string | null
           org_type?: Database["public"]["Enums"]["org_type"] | null
           organisation_id?: string | null
           phone?: string | null
@@ -1772,7 +1781,7 @@ export type Database = {
         | "restaurant"
         | "faith_based"
         | "other"
-      org_type: "institution" | "supplier" | "funder" | "csr" | "researcher"
+      org_type: "institution" | "supplier" | "funder" | "csr" | "researcher" | "other"
       pipeline_stage:
         | "identified"
         | "assessed"

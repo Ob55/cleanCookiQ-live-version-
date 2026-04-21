@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Building2, Plus, Search, Filter, MapPin, Loader2, Eye, Pencil, Trash2, Target } from "lucide-react";
+import { Building2, Plus, Search, Filter, MapPin, Loader2, Eye, Pencil, Trash2, Target, ClipboardCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { TRANSITION_TARGET_LABELS } from "@/components/institution/TransitionTarget";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -37,6 +37,18 @@ export default function InstitutionManagement() {
   const [editing, setEditing] = useState<any | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
   const queryClient = useQueryClient();
+
+  const assessMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("institutions").update({ pipeline_stage: "assessed" }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Institution marked as assessed");
+      queryClient.invalidateQueries({ queryKey: ["institutions"] });
+    },
+    onError: (err: any) => toast.error(err.message || "Failed to assess"),
+  });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -186,6 +198,18 @@ export default function InstitutionManagement() {
                         <Link to={`/admin/institutions/${inst.id}`}>
                           <Button variant="ghost" size="sm" title="View"><Eye className="h-4 w-4" /></Button>
                         </Link>
+                        {inst.pipeline_stage === "identified" || inst.pipeline_stage === "contacted" ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            title="Mark as Assessed"
+                            onClick={() => assessMutation.mutate(inst.id)}
+                            disabled={assessMutation.isPending}
+                            className="text-sky-600 hover:text-sky-700"
+                          >
+                            <ClipboardCheck className="h-4 w-4" />
+                          </Button>
+                        ) : null}
                         <Button variant="ghost" size="sm" title="Edit" onClick={() => setEditing(inst)}>
                           <Pencil className="h-4 w-4" />
                         </Button>

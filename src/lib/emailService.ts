@@ -127,6 +127,45 @@ export function emailSupplierWelcome(name: string, companyName: string): string 
   `);
 }
 
+export function emailOtherInterest(name: string, orgName: string): string {
+  return layout(`
+    <h2 style="color:#1a3c2e;margin-top:0;">Thank You for Your Interest!</h2>
+    <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
+    <p style="color:#374151;line-height:1.6;">
+      We have seen that <strong>${orgName || "your organisation"}</strong> has shown interest in CleanCook IQ.
+      Kindly be patient as we prepare a dashboard for you.
+    </p>
+    <p style="color:#374151;line-height:1.6;">
+      You will receive a call from our agent with further assistance regarding next steps.
+    </p>
+    <p style="color:#6b7280;font-size:13px;margin-top:24px;">
+      In the meantime, feel free to reach out at
+      <a href="mailto:info@ignis-innovation.com" style="color:#2d6a4f;">info@ignis-innovation.com</a>.
+    </p>
+  `);
+}
+
+export function emailRoleAssigned(name: string, roleLabel: string, dashboardUrl: string): string {
+  return layout(`
+    <h2 style="color:#1a3c2e;margin-top:0;">Your Account Has Been Approved!</h2>
+    <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
+    <p style="color:#374151;line-height:1.6;">
+      Great news! Your CleanCook IQ account has been reviewed and approved as a
+      <strong>${roleLabel}</strong>.
+    </p>
+    <p style="color:#374151;line-height:1.6;">
+      You can now log in and complete your setup to access your dashboard.
+    </p>
+    <p style="text-align:center;">
+      <a href="${dashboardUrl}" style="${BTN_STYLE}">Go to Dashboard</a>
+    </p>
+    <p style="color:#6b7280;font-size:13px;margin-top:24px;">
+      If you have any questions, reach out to our support team at
+      <a href="mailto:info@ignis-innovation.com" style="color:#2d6a4f;">info@ignis-innovation.com</a>.
+    </p>
+  `);
+}
+
 export function emailTicketResolved(name: string, ticketTitle: string, reply: string): string {
   return layout(`
     <h2 style="color:#1a3c2e;margin-top:0;">Your Support Ticket Has Been Resolved</h2>
