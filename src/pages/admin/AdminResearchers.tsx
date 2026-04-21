@@ -21,26 +21,25 @@ export default function AdminResearchers() {
     queryFn: async () => {
       const { data: profiles, error } = await supabase
         .from("profiles")
-        .select("user_id, full_name, phone, approval_status, created_at")
+        .select("user_id, full_name, phone, approval_status, created_at, email")
         .eq("org_type", "researcher")
         .order("created_at", { ascending: false });
       if (error) throw error;
 
-      // Enrich with email from support tickets
+      // Supplement with email + org_name from prime access tickets (fallback)
       const userIds = (profiles ?? []).map((p: any) => p.user_id);
-      const emailMap: Record<string, string> = {};
+      const emailFallback: Record<string, string> = {};
       const orgMap: Record<string, string> = {};
 
       if (userIds.length > 0) {
         const { data: tickets } = await supabase
           .from("support_tickets")
-          .select("raised_by, raised_by_email, title, description")
+          .select("raised_by, raised_by_email, description")
           .in("raised_by", userIds)
           .ilike("title", "%Prime Access Request%");
 
         (tickets ?? []).forEach((t: any) => {
-          if (t.raised_by && t.raised_by_email) emailMap[t.raised_by] = t.raised_by_email;
-          // Extract org name from description
+          if (t.raised_by && t.raised_by_email) emailFallback[t.raised_by] = t.raised_by_email;
           const match = t.description?.match(/from (.+?) is requesting/);
           if (match && t.raised_by) orgMap[t.raised_by] = match[1];
         });
@@ -48,7 +47,7 @@ export default function AdminResearchers() {
 
       return (profiles ?? []).map((p: any) => ({
         ...p,
-        email: emailMap[p.user_id] || "—",
+        email: p.email || emailFallback[p.user_id] || "—",
         org_name: orgMap[p.user_id] || "—",
       }));
     },

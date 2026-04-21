@@ -81,16 +81,21 @@ export default function RegisterPage() {
       return;
     }
 
-    // If funder, create funder_profiles record
-    if (isFunder && signUpData.user) {
-      await supabase.from("funder_profiles").insert({
-        user_id: signUpData.user.id,
-        organisation_name: orgName,
-        full_name: fullName,
-        funding_type: fundingType,
-        email,
-        phone,
-      });
+    if (signUpData.user) {
+      // Store email in profiles so admin can see it
+      await supabase.from("profiles").update({ email }).eq("user_id", signUpData.user.id);
+
+      // If funder, create funder_profiles record
+      if (isFunder) {
+        await supabase.from("funder_profiles").insert({
+          user_id: signUpData.user.id,
+          organisation_name: orgName,
+          full_name: fullName,
+          funding_type: fundingType,
+          email,
+          phone,
+        });
+      }
     }
 
     setLoading(false);

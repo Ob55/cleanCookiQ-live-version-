@@ -81,22 +81,34 @@ export function emailAccountRejected(name: string): string {
   `);
 }
 
-export function emailInstitutionWelcome(name: string, institutionName: string): string {
+const FUEL_DISPLAY: Record<string, string> = {
+  firewood: "firewood",
+  charcoal: "charcoal",
+  lpg: "LPG",
+  biogas: "biogas",
+  electric: "electric (induction)",
+  other: "biomass pellets",
+};
+
+export function emailInstitutionWelcome(name: string, institutionName: string, currentFuel?: string): string {
+  const fuelLabel = currentFuel ? (FUEL_DISPLAY[currentFuel] || currentFuel) : "current fuel";
   return layout(`
-    <h2 style="color:#1a3c2e;margin-top:0;">Institution Profile Created</h2>
+    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to CleanCook IQ</h2>
     <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
     <p style="color:#374151;line-height:1.6;">
-      Your institution <strong>${institutionName}</strong> has been successfully set up on CleanCook IQ.
-      Our team will review your profile and match you with suitable clean cooking solutions.
+      We see you registered on CleanCookIQ. Your <strong>${fuelLabel}</strong> usage suggests
+      real opportunities to cut fuel costs per meal and reduce CO₂ emissions.
+      We help institutions move from registration to financed installation.
     </p>
-    <p style="color:#374151;line-height:1.6;">Here's what happens next:</p>
-    <ul style="color:#374151;line-height:1.8;padding-left:20px;">
-      <li>Assessment of your institution's needs</li>
-      <li>Matching with vetted suppliers and financing partners</li>
-      <li>Guided transition to clean cooking</li>
-    </ul>
+    <p style="color:#374151;line-height:1.6;font-style:italic;">
+      May we walk you through your least-cost pathway?
+    </p>
     <p style="text-align:center;">
-      <a href="${import.meta.env.VITE_APP_URL || "https://cleancookiq.com"}/institution/dashboard" style="${BTN_STYLE}">View Dashboard</a>
+      <a href="${import.meta.env.VITE_APP_URL || "https://cleancookiq.com"}/institution/dashboard" style="${BTN_STYLE}">View Your Dashboard</a>
+    </p>
+    <p style="color:#6b7280;font-size:13px;margin-top:24px;">
+      Reply to this email or contact us at
+      <a href="mailto:info@ignis-innovation.com" style="color:#2d6a4f;">info@ignis-innovation.com</a> to get started.
     </p>
   `);
 }

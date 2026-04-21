@@ -1,5 +1,5 @@
-import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, LogOut, Menu, Ticket, FlaskConical } from "lucide-react";
+import { Outlet, Link, useLocation, useNavigate, Navigate } from "react-router-dom";
+import { LayoutDashboard, LogOut, Menu, Ticket } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import NotificationBell from "@/components/NotificationBell";
@@ -14,12 +14,17 @@ export default function ResearcherLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { signOut, profile } = useAuth();
+  const { signOut, profile, loading } = useAuth();
 
   const handleSignOut = async () => {
     await signOut();
     navigate("/auth/login");
   };
+
+  // Pending researchers must wait for admin approval
+  if (!loading && profile?.approval_status === "pending") {
+    return <Navigate to="/auth/pending" replace />;
+  }
 
   const initials = profile?.full_name
     ? profile.full_name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
