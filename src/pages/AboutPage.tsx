@@ -10,7 +10,6 @@ import {
   LineChart,
   Zap,
   Check,
-  AlertCircle,
   MapPin,
 } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
@@ -134,12 +133,9 @@ export default function AboutPage() {
             {challenges.map((item) => (
               <li
                 key={item}
-                className="flex items-start gap-4 bg-card border border-border rounded-xl p-5 shadow-card"
+                className="bg-card border border-border rounded-xl p-5 shadow-card"
               >
-                <div className="h-9 w-9 rounded-full bg-destructive/15 border border-destructive/30 flex items-center justify-center shrink-0">
-                  <AlertCircle className="h-4 w-4 text-destructive" />
-                </div>
-                <p className="text-foreground font-medium pt-1.5">{item}</p>
+                <p className="text-foreground font-medium">{item}</p>
               </li>
             ))}
           </ul>
@@ -297,18 +293,12 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Not */}
             <div className="bg-card border border-border rounded-xl p-7 shadow-card">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="h-8 w-8 rounded-lg bg-destructive/15 border border-destructive/30 flex items-center justify-center">
-                  <AlertCircle className="h-4 w-4 text-destructive" />
-                </div>
-                <p className="text-destructive text-xs font-bold uppercase tracking-widest">CleanCookIQ is not</p>
+              <div className="mb-6">
+                <p className="text-foreground/70 text-xs font-bold uppercase tracking-widest">CleanCookIQ is not</p>
               </div>
-              <ul className="space-y-4">
+              <ul className="space-y-3">
                 {notList.map((t) => (
-                  <li key={t} className="flex items-start gap-3">
-                    <AlertCircle className="h-4 w-4 text-destructive mt-1 shrink-0" />
-                    <span className="text-foreground">{t}</span>
-                  </li>
+                  <li key={t} className="text-foreground">{t}</li>
                 ))}
               </ul>
             </div>
