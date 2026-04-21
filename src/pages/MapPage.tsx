@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, Loader2, Filter } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MapPin, Loader2, Filter, RotateCcw } from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -65,6 +66,7 @@ export default function MapPage() {
   const [countyFilter, setCountyFilter] = useState("all");
   const [stageFilter, setStageFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [quickFilter, setQuickFilter] = useState<"all" | "school" | "hospital" | "other">("all");
 
   // Fetch institutions
   const { data: institutions, isLoading } = useQuery({
@@ -88,7 +90,10 @@ export default function MapPage() {
     if (countyFilter !== "all" && i.county !== countyFilter) return false;
     if (stageFilter !== "all" && i.pipeline_stage !== stageFilter) return false;
     if (typeFilter !== "all" && typeFilter !== "all_orgs" && i.institution_type !== typeFilter) return false;
-    if (typeFilter === "all_orgs") return false; // hide institutions when viewing orgs only
+    if (typeFilter === "all_orgs") return false;
+    if (quickFilter === "school" && i.institution_type !== "school") return false;
+    if (quickFilter === "hospital" && i.institution_type !== "hospital") return false;
+    if (quickFilter === "other" && (i.institution_type === "school" || i.institution_type === "hospital")) return false;
     return true;
   }) ?? [];
 
@@ -150,7 +155,7 @@ export default function MapPage() {
         // unless they have county info (we could geocode but for now just show institutions)
       });
     }
-  }, [geoFiltered, organisations, typeFilter]);
+  }, [geoFiltered, organisations, typeFilter, quickFilter]);
 
   const counties = [...new Set(institutions?.map(i => i.county) ?? [])].sort();
 
@@ -164,21 +169,52 @@ export default function MapPage() {
             </h1>
             <p className="text-xs text-muted-foreground">{geoFiltered.length} institutions with coordinates · {filtered.length} total</p>
           </div>
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-2 flex-wrap items-center">
+            {/* Quick filter buttons */}
+            <div className="flex gap-1 items-center border border-border rounded-md p-1 bg-muted/40">
+              <Button
+                size="sm"
+                variant={quickFilter === "school" ? "default" : "ghost"}
+                className="h-7 px-3 text-xs"
+                onClick={() => setQuickFilter(quickFilter === "school" ? "all" : "school")}
+              >
+                <span className="inline-block h-2 w-2 rounded-full mr-1.5" style={{ backgroundColor: institutionTypeColors.school }} />
+                Schools
+              </Button>
+              <Button
+                size="sm"
+                variant={quickFilter === "hospital" ? "default" : "ghost"}
+                className="h-7 px-3 text-xs"
+                onClick={() => setQuickFilter(quickFilter === "hospital" ? "all" : "hospital")}
+              >
+                <span className="inline-block h-2 w-2 rounded-full mr-1.5" style={{ backgroundColor: institutionTypeColors.hospital }} />
+                Hospitals
+              </Button>
+              <Button
+                size="sm"
+                variant={quickFilter === "other" ? "default" : "ghost"}
+                className="h-7 px-3 text-xs"
+                onClick={() => setQuickFilter(quickFilter === "other" ? "all" : "other")}
+              >
+                <span className="inline-block h-2 w-2 rounded-full mr-1.5" style={{ backgroundColor: institutionTypeColors.faith_based }} />
+                Other
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-7 px-2 text-xs text-muted-foreground"
+                onClick={() => { setQuickFilter("all"); setCountyFilter("all"); setStageFilter("all"); setTypeFilter("all"); }}
+                title="Reset all filters"
+              >
+                <RotateCcw className="h-3 w-3 mr-1" />
+                Reset
+              </Button>
+            </div>
             <Select value={countyFilter} onValueChange={setCountyFilter}>
               <SelectTrigger className="w-[150px] h-8 text-xs"><Filter className="h-3 w-3 mr-1" /><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Counties</SelectItem>
                 {counties.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-[150px] h-8 text-xs"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                {Object.entries(institutionTypeLabels).map(([k, v]) =>
-                  <SelectItem key={k} value={k}>{v}</SelectItem>
-                )}
               </SelectContent>
             </Select>
             <Select value={stageFilter} onValueChange={setStageFilter}>

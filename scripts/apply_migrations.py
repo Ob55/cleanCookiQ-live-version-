@@ -5,7 +5,7 @@ import sys
 import urllib.request
 import urllib.error
 
-TOKEN = "sbp_278b85e1e9661505def695807df42c2b7bbe0e64"
+TOKEN = "sbp_552c16079ec4acdb33bc542ed0249a5224a05407"
 PROJECT_REF = "bnbhattryqbterblybzw"
 MIGRATIONS_DIR = "/home/brian/Desktop/clean-cook-iq/supabase/migrations"
 URL = f"https://api.supabase.com/v1/projects/{PROJECT_REF}/database/query"
@@ -18,7 +18,8 @@ def run_sql(sql: str):
         headers={
             "Authorization": f"Bearer {TOKEN}",
             "Content-Type": "application/json",
-            "User-Agent": "Mozilla/5.0 (supabase-mgmt-client)",
+            "User-Agent": "python-urllib/3.10",
+            "Accept": "application/json",
         },
         method="POST",
     )

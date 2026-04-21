@@ -25,7 +25,7 @@ try:
 except ImportError:
     sys.exit("openpyxl is required.  pip install openpyxl")
 
-TOKEN = os.environ.get("SUPABASE_MGMT_TOKEN", "sbp_278b85e1e9661505def695807df42c2b7bbe0e64")
+TOKEN = os.environ.get("SUPABASE_MGMT_TOKEN", "sbp_552c16079ec4acdb33bc542ed0249a5224a05407")
 PROJECT_REF = os.environ.get("SUPABASE_PROJECT_REF", "bnbhattryqbterblybzw")
 API_URL = f"https://api.supabase.com/v1/projects/{PROJECT_REF}/database/query"
 
@@ -159,7 +159,8 @@ def run_sql(sql: str):
         headers={
             "Authorization": f"Bearer {TOKEN}",
             "Content-Type": "application/json",
-            "User-Agent": "kobo-importer/1.0",
+            "User-Agent": "python-urllib/3.10",
+            "Accept": "application/json",
         },
         method="POST",
     )
