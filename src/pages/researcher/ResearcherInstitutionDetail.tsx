@@ -130,7 +130,7 @@ export default function ResearcherInstitutionDetail() {
       {inst.assessment_category && (
         <Badge variant="secondary" className={`text-sm px-3 py-1 ${READINESS_COLORS[inst.assessment_category] || "bg-muted text-muted-foreground"}`}>
           {inst.assessment_category}
-          {inst.assessment_score != null ? ` — Score: ${inst.assessment_score}` : ""}
+          {inst.assessment_score != null ? `, Score: ${inst.assessment_score}` : ""}
         </Badge>
       )}
 

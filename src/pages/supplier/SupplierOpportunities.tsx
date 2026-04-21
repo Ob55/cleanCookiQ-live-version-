@@ -84,7 +84,7 @@ export default function SupplierOpportunities() {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base">{opp.title}</CardTitle>
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <MapPin className="h-3 w-3" /> {(opp as any).institutions?.name} — {(opp as any).institutions?.county}
+                    <MapPin className="h-3 w-3" /> {(opp as any).institutions?.name}, {(opp as any).institutions?.county}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">

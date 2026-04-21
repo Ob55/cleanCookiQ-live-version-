@@ -12,6 +12,25 @@ const pipelineStages = [
   "provider_matched", "financed", "in_delivery", "monitored_dmrv",
 ];
 
+const pipelineStageLabels: Record<string, string> = {
+  identified: "Listed",
+  contacted: "Contacted",
+  assessed: "Assessed",
+  scored: "Scored",
+  least_cost_path_assigned: "Solution Selected",
+  provider_matched: "Provider Assigned",
+  financed: "Funded",
+  in_delivery: "Being Installed",
+  monitored_dmrv: "Being Monitored",
+  matched: "Matched",
+  negotiation: "In Negotiation",
+  contracted: "Contracted",
+  installed: "Installed",
+  monitoring: "Being Monitored",
+};
+
+const labelFor = (s: string) => pipelineStageLabels[s] ?? s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
 const orgTypeColors: Record<string, string> = {
   institution: "#3b82f6",  // blue
   supplier: "#f97316",     // orange
@@ -130,7 +149,7 @@ export default function MapPage() {
           <div style="font-family: system-ui; min-width: 220px; line-height: 1.6;">
             <strong style="font-size: 14px;">${escapeHtml(inst.name)}</strong><br/>
             <span style="text-transform: capitalize; color: ${color}; font-size: 12px;">● ${escapeHtml(inst.institution_type)}</span>
-            <span style="color: #999; font-size: 11px;"> · ${escapeHtml(inst.pipeline_stage.replace(/_/g, " "))}</span><br/>
+            <span style="color: #999; font-size: 11px;"> · ${escapeHtml(labelFor(inst.pipeline_stage))}</span><br/>
             <small style="color: #666;">${escapeHtml(`${inst.county}${inst.sub_county ? `, ${inst.sub_county}` : ""}`)}</small>
             <hr style="margin: 6px 0; border: none; border-top: 1px solid #eee;"/>
             <div style="font-size: 12px;">
@@ -165,9 +184,9 @@ export default function MapPage() {
         <div className="container flex items-center justify-between flex-wrap gap-3">
           <div>
             <h1 className="text-xl font-display font-bold flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-primary" /> Pipeline Intelligence Map
+              <MapPin className="h-5 w-5 text-primary" /> Institution Map
             </h1>
-            <p className="text-xs text-muted-foreground">{geoFiltered.length} institutions with coordinates · {filtered.length} total</p>
+            <p className="text-xs text-muted-foreground">{geoFiltered.length} institutions shown, {filtered.length} total</p>
           </div>
           <div className="flex gap-2 flex-wrap items-center">
             {/* Quick filter buttons */}
@@ -222,7 +241,7 @@ export default function MapPage() {
               <SelectContent>
                 <SelectItem value="all">All Stages</SelectItem>
                 {pipelineStages.map(s =>
-                  <SelectItem key={s} value={s}>{s.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</SelectItem>
+                  <SelectItem key={s} value={s}>{labelFor(s)}</SelectItem>
                 )}
               </SelectContent>
             </Select>
@@ -237,19 +256,6 @@ export default function MapPage() {
           </div>
         )}
         <div ref={mapRef} className="h-full min-h-[70vh] w-full" />
-      </div>
-
-      {/* Legend */}
-      <div className="bg-card border-t border-border p-3">
-        <div className="container flex flex-wrap gap-4 items-center">
-          <span className="text-xs font-medium text-muted-foreground">Institution Types:</span>
-          {Object.entries(institutionTypeColors).map(([type, color]) => (
-            <div key={type} className="flex items-center gap-1.5">
-              <div className="h-3 w-3 rounded-full" style={{ backgroundColor: color }} />
-              <span className="text-[10px] capitalize">{institutionTypeLabels[type]}</span>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );

@@ -201,7 +201,7 @@ export default function ResearcherDashboard() {
             </div>
             <Button onClick={handleRequestAccess} disabled={requestSent || requesting}>
               {requesting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-              {requestSent ? "Request Sent — Awaiting Approval" : "Request Prime Access"}
+              {requestSent ? "Request Sent, Awaiting Approval" : "Request Prime Access"}
             </Button>
           </CardContent>
         </Card>
