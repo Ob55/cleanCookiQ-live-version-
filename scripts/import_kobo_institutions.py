@@ -25,7 +25,9 @@ try:
 except ImportError:
     sys.exit("openpyxl is required.  pip install openpyxl")
 
-TOKEN = os.environ.get("SUPABASE_MGMT_TOKEN", "sbp_c604bb70745ba8fc9dab4c9c74f38964979d82a9")
+TOKEN = os.environ.get("SUPABASE_MGMT_TOKEN", "")
+if not TOKEN:
+    sys.exit("Error: set SUPABASE_MGMT_TOKEN env var before running this script.")
 PROJECT_REF = os.environ.get("SUPABASE_PROJECT_REF", "bnbhattryqbterblybzw")
 API_URL = f"https://api.supabase.com/v1/projects/{PROJECT_REF}/database/query"
 

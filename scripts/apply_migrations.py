@@ -5,9 +5,11 @@ import sys
 import urllib.request
 import urllib.error
 
-TOKEN = "sbp_c604bb70745ba8fc9dab4c9c74f38964979d82a9"
-PROJECT_REF = "bnbhattryqbterblybzw"
-MIGRATIONS_DIR = "/home/brian/Desktop/clean-cook-iq/supabase/migrations"
+TOKEN = os.environ.get("SUPABASE_MGMT_TOKEN", "")
+if not TOKEN:
+    sys.exit("Error: set SUPABASE_MGMT_TOKEN env var before running this script.")
+PROJECT_REF = os.environ.get("SUPABASE_PROJECT_REF", "bnbhattryqbterblybzw")
+MIGRATIONS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "supabase", "migrations")
 URL = f"https://api.supabase.com/v1/projects/{PROJECT_REF}/database/query"
 
 def run_sql(sql: str):
