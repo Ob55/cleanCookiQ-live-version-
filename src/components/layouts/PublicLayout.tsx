@@ -6,10 +6,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
 
 const navLinks = [
+  { label: "About", href: "/about" },
   { label: "Map", href: "/map" },
   { label: "Intelligence", href: "/intelligence" },
   { label: "Marketing Analysis", href: "/marketing" },
-  { label: "About", href: "/about" },
 ];
 
 export default function PublicLayout() {

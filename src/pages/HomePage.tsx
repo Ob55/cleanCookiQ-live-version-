@@ -1,8 +1,11 @@
 import { Link, Navigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { MapPin, BarChart3, Users, TrendingUp, Leaf, Building2, ArrowRight, Flame, Factory, Banknote, Briefcase, FolderKanban, GraduationCap, UserPlus, ClipboardCheck, Handshake, Rocket, Activity, ChevronRight } from "lucide-react";
+import { MapPin, BarChart3, Users, TrendingUp, Leaf, Building2, ArrowRight, Flame, Factory, Banknote, Briefcase, FolderKanban, GraduationCap, UserPlus, ClipboardCheck, Handshake, Rocket, Activity, ChevronRight, Check, X } from "lucide-react";
 import FuelOptionsSection from "@/components/institution/FuelOptionsSection";
+import { supabase } from "@/integrations/supabase/client";
 import heroBg from "@/assets/hero-bg.jpg";
+import kitchenTransitionBg from "@/assets/kitchen-transition.png";
 import partner1 from "@/assets/partners/partner1.png";
 import partner2 from "@/assets/partners/partner2.png";
 import partner3 from "@/assets/partners/partner3.png";
@@ -15,13 +18,19 @@ import AnimatedNumber from "@/components/AnimatedNumber";
 
 const partners = [partner1, partner2, partner3, partner4, partner5, partner6, partner7];
 
-const stats = [
-  { label: "Institutions Tracked", num: 2847, suffix: "", decimals: 0, icon: Building2 },
-  { label: "Institutions Assessed", num: 1234, suffix: "", decimals: 0, icon: BarChart3 },
-  { label: "Projects in Delivery", num: 89, suffix: "", decimals: 0, icon: TrendingUp },
-  { label: "Pipeline Value (KSh)", num: 4.2, suffix: "B", decimals: 1, icon: Flame },
-  { label: "Tonnes CO₂ Avoided", num: 12450, suffix: "", decimals: 0, icon: Leaf },
-];
+type StatRow = {
+  pipeline_stage: string | null;
+  assessment_score: number | null;
+  annual_savings_ksh: number | null;
+  co2_reduction_tonnes_pa: number | null;
+};
+
+function formatPipelineValue(totalKsh: number): { num: number; suffix: string; decimals: number } {
+  if (totalKsh >= 1_000_000_000) return { num: totalKsh / 1_000_000_000, suffix: "B", decimals: 1 };
+  if (totalKsh >= 1_000_000) return { num: totalKsh / 1_000_000, suffix: "M", decimals: 1 };
+  if (totalKsh >= 1_000) return { num: totalKsh / 1_000, suffix: "K", decimals: 1 };
+  return { num: totalKsh, suffix: "", decimals: 0 };
+}
 
 const modules = [
   { title: "Pipeline Intelligence & Map", desc: "Interactive national map with institution-level transition data, readiness scores, and pipeline tracking from identification to monitored delivery.", icon: MapPin, color: "bg-primary" },
@@ -51,6 +60,37 @@ const steps = [
 export default function HomePage() {
   const { user, profile, roles, loading } = useAuth();
 
+  const { data: institutionRows } = useQuery({
+    queryKey: ["home-stats-institutions"],
+    queryFn: async (): Promise<StatRow[]> => {
+      const { data } = await supabase
+        .from("institutions")
+        .select("pipeline_stage, assessment_score, annual_savings_ksh, co2_reduction_tonnes_pa");
+      return (data as StatRow[] | null) ?? [];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const totalInstitutions = institutionRows?.length ?? 0;
+  const assessedCount = institutionRows?.filter(r =>
+    r.pipeline_stage === "assessed" || r.pipeline_stage === "scored" ||
+    (r.assessment_score != null && Number(r.assessment_score) > 0)
+  ).length ?? 0;
+  const inDeliveryCount = institutionRows?.filter(r =>
+    r.pipeline_stage === "contracted" || r.pipeline_stage === "installed" || r.pipeline_stage === "in_delivery"
+  ).length ?? 0;
+  const pipelineValueKsh = institutionRows?.reduce((s, r) => s + Number(r.annual_savings_ksh ?? 0), 0) ?? 0;
+  const co2Tonnes = institutionRows?.reduce((s, r) => s + Number(r.co2_reduction_tonnes_pa ?? 0), 0) ?? 0;
+  const pipelineDisplay = formatPipelineValue(pipelineValueKsh);
+
+  const stats = [
+    { label: "Institutions Tracked", num: totalInstitutions, suffix: "", decimals: 0, icon: Building2 },
+    { label: "Institutions Assessed", num: assessedCount, suffix: "", decimals: 0, icon: BarChart3 },
+    { label: "Projects in Delivery", num: inDeliveryCount, suffix: "", decimals: 0, icon: TrendingUp },
+    { label: "Pipeline Value (KSh)", num: pipelineDisplay.num, suffix: pipelineDisplay.suffix, decimals: pipelineDisplay.decimals, icon: Flame },
+    { label: "Tonnes CO₂ Avoided", num: co2Tonnes, suffix: "", decimals: 0, icon: Leaf },
+  ];
+
   if (!loading && user) {
     if (roles.some(r => ["admin", "manager", "field_agent"].includes(r))) return <Navigate to="/admin/pipeline" replace />;
     if (profile?.org_type === "institution") return <Navigate to={profile?.organisation_id ? "/institution/dashboard" : "/institution/setup"} replace />;
@@ -63,7 +103,7 @@ export default function HomePage() {
       {/* Hero */}
       <section className="relative min-h-[85vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
-          <img src={heroBg} alt="Clean cooking facility in rural Kenya" className="w-full h-full object-cover" width={1920} height={1080} />
+          <img src={kitchenTransitionBg} alt="Institutional kitchen transitioning to clean cooking equipment" className="w-full h-full object-cover" width={1920} height={1080} />
           <div className="absolute inset-0 bg-gradient-to-r from-foreground/95 via-foreground/85 to-foreground/50" />
         </div>
         <div className="container relative z-10 py-20">
@@ -75,11 +115,8 @@ export default function HomePage() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-primary-foreground leading-tight mb-6 animate-fade-in" style={{ animationDelay: "150ms" }}>
               Powering Kenya's Clean Cooking Transition
             </h1>
-            <p className="text-lg text-primary-foreground/80 mb-4 max-w-xl font-body animate-fade-in" style={{ animationDelay: "300ms" }}>
-              CleanCookiQ converts fragmented demand, dispersed supply, and available financing into a structured, verified national transition pipeline.
-            </p>
-            <p className="text-sm text-primary-foreground/60 mb-8 max-w-xl font-body italic animate-fade-in" style={{ animationDelay: "400ms" }}>
-              CleanCookiQ builds a transition pipeline per institution — displaying fuel of choice, meals served, recommended solution, and savings potential on an interactive national map.
+            <p className="text-lg text-primary-foreground/80 mb-8 max-w-xl font-body animate-fade-in" style={{ animationDelay: "300ms" }}>
+              Digital Infrastructure that converts fragmented demand, dispersed supply, and available financing into a structured, verified national transition pipeline.
             </p>
             <div className="flex flex-wrap gap-4 animate-fade-in" style={{ animationDelay: "500ms" }}>
               <Link to="/map">
@@ -87,9 +124,13 @@ export default function HomePage() {
                   <MapPin className="mr-2 h-4 w-4" /> Explore the Map
                 </Button>
               </Link>
-              <Link to="/auth/register">
-                <Button size="lg" className="bg-accent text-accent-foreground hover:bg-amber-light font-semibold">
-                  Join the Platform <ArrowRight className="ml-2 h-4 w-4" />
+              <Link to="/about">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="bg-transparent border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground font-semibold"
+                >
+                  About cleancookIQ <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
               </Link>
             </div>
@@ -146,45 +187,55 @@ export default function HomePage() {
       </section>
 
       {/* Five Market Failures — two columns */}
-      <section className="py-20 lg:py-28 bg-muted/20">
-        <div className="container">
+      <section className="relative py-20 lg:py-28 overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src={kitchenTransitionBg}
+            alt="Institutional kitchen transitioning to clean cooking equipment"
+            className="w-full h-full object-cover"
+            width={1920}
+            height={1080}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-foreground/85 via-foreground/80 to-foreground/90" />
+        </div>
+        <div className="container relative z-10">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Five Market Failures, One Solution</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">The institutional clean cooking market is broken. CleanCookiQ is the coordinating intelligence layer that fixes it.</p>
+            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 text-primary-foreground">Five Market Failures, One Solution</h2>
+            <p className="text-primary-foreground/80 max-w-2xl mx-auto">The institutional clean cooking market is broken. CleanCookiQ is the coordinating intelligence layer that fixes it.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 rounded-2xl overflow-hidden shadow-elevated">
+          <div className="grid grid-cols-1 md:grid-cols-2 rounded-2xl overflow-hidden shadow-elevated border border-border">
             {/* Left — Failures */}
-            <div className="p-8 lg:p-10" style={{ background: "linear-gradient(145deg, hsl(36,75%,25%) 0%, hsl(36,80%,36%) 100%)" }}>
+            <div className="p-8 lg:p-10 bg-background">
               <div className="flex items-center gap-3 mb-8">
-                <div className="h-8 w-8 rounded-lg bg-destructive/20 border border-destructive/30 flex items-center justify-center shrink-0">
-                  <span className="text-destructive font-bold text-sm">✕</span>
+                <div className="h-8 w-8 rounded-lg bg-destructive/15 border border-destructive/30 flex items-center justify-center shrink-0">
+                  <X className="h-4 w-4 text-destructive" strokeWidth={3} />
                 </div>
                 <p className="text-destructive text-xs font-bold uppercase tracking-widest">Market Failures</p>
               </div>
               <ul className="space-y-6">
                 {failures.map((item, i) => (
                   <li key={item.fail} className="flex items-start gap-4 animate-slide-up" style={{ animationDelay: `${i * 80}ms`, animationFillMode: "backwards" }}>
-                    <div className="h-9 w-9 rounded-full bg-destructive/20 border border-destructive/30 flex items-center justify-center shrink-0 mt-0.5">
-                      <span className="text-destructive font-bold text-sm">{i + 1}</span>
+                    <div className="h-9 w-9 rounded-full bg-destructive/15 border border-destructive/30 flex items-center justify-center shrink-0 mt-0.5">
+                      <X className="h-4 w-4 text-destructive" strokeWidth={3} />
                     </div>
-                    <h4 className="font-display font-semibold text-black leading-snug pt-1.5">{item.fail}</h4>
+                    <h4 className="font-display font-semibold text-foreground leading-snug pt-1.5">{item.fail}</h4>
                   </li>
                 ))}
               </ul>
             </div>
             {/* Right — Solutions */}
-            <div className="p-8 lg:p-10 bg-primary/5 border-l border-primary/10">
+            <div className="p-8 lg:p-10 bg-background border-t md:border-t-0 md:border-l border-border">
               <div className="flex items-center gap-3 mb-8">
-                <div className="h-8 w-8 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
-                  <ChevronRight className="h-4 w-4 text-primary" />
+                <div className="h-8 w-8 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0">
+                  <Check className="h-4 w-4 text-primary" strokeWidth={3} />
                 </div>
                 <p className="text-primary text-xs font-bold uppercase tracking-widest">Our Solution</p>
               </div>
               <ul className="space-y-6">
                 {failures.map((item, i) => (
                   <li key={item.fix} className="flex items-start gap-4 animate-slide-up" style={{ animationDelay: `${i * 80 + 200}ms`, animationFillMode: "backwards" }}>
-                    <div className="h-9 w-9 rounded-full bg-primary/15 border border-primary/20 flex items-center justify-center shrink-0 mt-0.5">
-                      <ChevronRight className="h-4 w-4 text-primary" />
+                    <div className="h-9 w-9 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0 mt-0.5">
+                      <Check className="h-4 w-4 text-primary" strokeWidth={3} />
                     </div>
                     <p className="text-sm text-foreground leading-relaxed pt-1.5">{item.fix}</p>
                   </li>
