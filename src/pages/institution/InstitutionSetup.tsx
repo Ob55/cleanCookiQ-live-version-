@@ -61,6 +61,8 @@ export default function InstitutionSetup() {
   const [county, setCounty] = useState("");
   const [subCounty, setSubCounty] = useState("");
   const [ownershipType, setOwnershipType] = useState("");
+  const [institutionCategory, setInstitutionCategory] = useState("");
+  const [schoolType, setSchoolType] = useState("");
   const [mealsPerDay, setMealsPerDay] = useState("");
   const [fuelType, setFuelType] = useState("");
   const [consumption, setConsumption] = useState("");
@@ -137,6 +139,7 @@ export default function InstitutionSetup() {
         sub_county: subCounty || null,
         ownership_type: ownershipType,
         meals_per_day: parseInt(mealsPerDay),
+        school_type: schoolType || null,
         current_fuel: fuelType as any,
         consumption_per_term: parseFloat(consumption),
         consumption_unit: unit,
@@ -166,9 +169,13 @@ export default function InstitutionSetup() {
           await supabase.from("profiles").update({ organisation_id: institutionId }).eq("user_id", user.id);
         }
       } else {
+        const instType = institutionCategory === "school" ? "school"
+          : institutionCategory === "hospital" ? "hospital"
+          : institutionCategory === "correctional" ? "prison"
+          : "other";
         const { data: newInst, error: insertErr } = await supabase
           .from("institutions")
-          .insert({ ...institutionData, institution_type: "school" as any })
+          .insert({ ...institutionData, institution_type: instType as any })
           .select("id")
           .single();
         if (insertErr) throw new Error(insertErr.message);
@@ -230,18 +237,45 @@ export default function InstitutionSetup() {
               <CountyCombobox value={county} onValueChange={setCounty} />
             </div>
 
-            {/* Field 3 — Institution Type */}
+            {/* Field 3 — Ownership Type */}
             <div>
-              <Label>Institution Type</Label>
+              <Label>Ownership Type</Label>
               <Select value={ownershipType} onValueChange={setOwnershipType}>
-                <SelectTrigger className="mt-1"><SelectValue placeholder="Select type" /></SelectTrigger>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="Select ownership type" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="private">Private</SelectItem>
                   <SelectItem value="government">Government</SelectItem>
-                  <SelectItem value="catholic">Catholic</SelectItem>
+                  <SelectItem value="faith_based">Faith-based</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Field 3b — Institution Category */}
+            <div>
+              <Label>Institution Type</Label>
+              <Select value={institutionCategory} onValueChange={(v) => { setInstitutionCategory(v); setSchoolType(""); }}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="Select institution type" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="school">School</SelectItem>
+                  <SelectItem value="hospital">Hospital</SelectItem>
+                  <SelectItem value="correctional">Correctional</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Field 3c — School Type (conditional) */}
+            {institutionCategory === "school" && (
+              <div>
+                <Label>School Type</Label>
+                <Select value={schoolType} onValueChange={setSchoolType}>
+                  <SelectTrigger className="mt-1"><SelectValue placeholder="Select school type" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="day">Day</SelectItem>
+                    <SelectItem value="boarding">Boarding</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             {/* Field 4 — Number of Students */}
             <div>

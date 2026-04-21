@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { Building2, Factory, Banknote, ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react";
+import { Building2, Factory, Banknote, FlaskConical, ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -12,6 +12,7 @@ const orgTypes = [
   { value: "institution", label: "Institution", desc: "School, hospital, prison, factory", icon: Building2 },
   { value: "supplier", label: "Supplier / Provider", desc: "Equipment, installation, maintenance", icon: Factory },
   { value: "funder", label: "Funder / Financing Partner", desc: "Finance partner or investor", icon: Banknote },
+  { value: "researcher", label: "Researcher", desc: "Academic or independent researcher", icon: FlaskConical },
 ];
 
 const fundingTypes = [

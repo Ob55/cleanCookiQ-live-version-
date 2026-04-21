@@ -20,6 +20,7 @@ const AdminLayout = lazy(() => import("@/components/layouts/AdminLayout"));
 const InstitutionLayout = lazy(() => import("@/components/layouts/InstitutionLayout"));
 const SupplierLayout = lazy(() => import("@/components/layouts/SupplierLayout"));
 const FunderLayout = lazy(() => import("@/components/layouts/FunderLayout"));
+const ResearcherLayout = lazy(() => import("@/components/layouts/ResearcherLayout"));
 
 // Lazy loaded public pages
 const MapPage = lazy(() => import("@/pages/MapPage"));
@@ -70,6 +71,10 @@ const SupplierOpportunities = lazy(() => import("@/pages/supplier/SupplierOpport
 const FunderDashboard = lazy(() => import("@/pages/funder/FunderDashboard"));
 const FunderInstitutionDetail = lazy(() => import("@/pages/funder/FunderInstitutionDetail"));
 const FunderDocuments = lazy(() => import("@/pages/funder/FunderDocuments"));
+
+const ResearcherDashboard = lazy(() => import("@/pages/researcher/ResearcherDashboard"));
+const ResearcherInstitutionDetail = lazy(() => import("@/pages/researcher/ResearcherInstitutionDetail"));
+const AdminResearchers = lazy(() => import("@/pages/admin/AdminResearchers"));
 
 const TicketsPage = lazy(() => import("@/pages/shared/TicketsPage"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
@@ -171,6 +176,17 @@ const App = () => (
                 <Route path="/funder/support" element={<TicketsPage />} />
               </Route>
 
+              {/* Researcher pages (with sidebar) */}
+              <Route element={
+                <ProtectedRoute allowedOrgTypes={["researcher"]}>
+                  <ResearcherLayout />
+                </ProtectedRoute>
+              }>
+                <Route path="/researcher/dashboard" element={<ResearcherDashboard />} />
+                <Route path="/researcher/institution/:id" element={<ResearcherInstitutionDetail />} />
+                <Route path="/researcher/support" element={<TicketsPage />} />
+              </Route>
+
               {/* Admin pages (protected) */}
               <Route element={<ProtectedRoute requireAdmin><AdminLayout /></ProtectedRoute>}>
                 <Route path="/admin/pipeline" element={<PipelineDashboard />} />
@@ -183,6 +199,7 @@ const App = () => (
                 <Route path="/admin/bd" element={<BDDashboard />} />
                 <Route path="/admin/portfolio" element={<PortfolioManagement />} />
                 <Route path="/admin/portfolio-aggregation" element={<PortfolioAggregation />} />
+                <Route path="/admin/researchers" element={<AdminResearchers />} />
                 <Route path="/admin/tickets" element={<AdminTickets />} />
                 <Route path="/admin/subscribers" element={<Subscribers />} />
                 <Route path="/admin/users" element={<UserManagement />} />

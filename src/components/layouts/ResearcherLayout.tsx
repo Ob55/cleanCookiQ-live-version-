@@ -1,37 +1,20 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
-import {
-  LayoutDashboard, Building2, Users, ClipboardCheck,
-  BarChart3, FileText, TrendingUp, Factory, Menu, X, LogOut,
-  Briefcase, Ticket, FlaskConical,
-} from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, Ticket, FlaskConical } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import NotificationBell from "@/components/NotificationBell";
 import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
 
-
-const adminNav = [
-  { label: "Pipeline", href: "/admin/pipeline", icon: TrendingUp },
-  { label: "Institutions", href: "/admin/institutions", icon: Building2 },
-  { label: "Providers", href: "/admin/providers", icon: Factory },
-  { label: "Assessments", href: "/admin/assessments", icon: ClipboardCheck },
-  { label: "Opportunities", href: "/admin/opportunities", icon: FileText },
-  { label: "BD Dashboard", href: "/admin/bd", icon: BarChart3 },
-  { label: "Portfolio", href: "/admin/portfolio", icon: Briefcase },
-  { label: "Portfolio Aggregation", href: "/admin/portfolio-aggregation", icon: BarChart3 },
-  { label: "Researchers", href: "/admin/researchers", icon: FlaskConical },
-  { label: "Tickets", href: "/admin/tickets", icon: Ticket },
-  { label: "Subscribers", href: "/admin/subscribers", icon: Users },
-  { label: "Users", href: "/admin/users", icon: Users },
+const navItems = [
+  { label: "Dashboard", href: "/researcher/dashboard", icon: LayoutDashboard },
+  { label: "Tickets", href: "/researcher/support", icon: Ticket },
 ];
 
-export default function AdminLayout() {
+export default function ResearcherLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut, profile } = useAuth();
-  
 
   const handleSignOut = async () => {
     await signOut();
@@ -39,8 +22,8 @@ export default function AdminLayout() {
   };
 
   const initials = profile?.full_name
-    ? profile.full_name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
-    : "U";
+    ? profile.full_name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
+    : "R";
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -49,12 +32,12 @@ export default function AdminLayout() {
           <img src={cleancookIqLogo} alt="cleancookIQ logo" className="h-8 w-8 rounded-lg object-contain" />
           <span className="font-display font-bold text-lg text-sidebar-foreground">cleancookIQ</span>
         </Link>
-        <p className="text-xs text-sidebar-foreground/60 mt-1">Admin Console</p>
+        <p className="text-xs text-sidebar-foreground/60 mt-1">Researcher Portal</p>
       </div>
 
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-        {adminNav.map((item) => {
-          const isActive = location.pathname.startsWith(item.href);
+        {navItems.map((item) => {
+          const isActive = location.pathname === item.href;
           return (
             <Link
               key={item.href}

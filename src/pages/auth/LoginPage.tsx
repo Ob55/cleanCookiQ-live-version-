@@ -46,6 +46,7 @@ export default function LoginPage() {
     const isInstitution = roles.some((r: string) => ["institution_admin", "institution_user"].includes(r)) || orgType === "institution";
     const isSupplier = roles.some((r: string) => r === "ta_provider") || orgType === "supplier";
     const isFunder = roles.some((r: string) => r === "financing_partner") || orgType === "funder";
+    const isResearcher = orgType === "researcher";
 
     setRedirecting(true);
     if (isInstitution) {
@@ -55,6 +56,8 @@ export default function LoginPage() {
       navigate(profileData?.organisation_id ? "/supplier/dashboard" : "/supplier/setup");
     } else if (isFunder) {
       navigate("/funder/dashboard");
+    } else if (isResearcher) {
+      navigate("/researcher/dashboard");
     } else {
       navigate("/auth/pending");
     }
