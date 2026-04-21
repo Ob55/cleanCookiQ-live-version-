@@ -34,6 +34,7 @@ const institutionTypeColors: Record<string, string> = {
   factory: "#f59e0b",
   hotel: "#8b5cf6",
   restaurant: "#ec4899",
+  faith_based: "#14b8a6",
   other: "#64748b",
 };
 
@@ -44,6 +45,7 @@ const institutionTypeLabels: Record<string, string> = {
   factory: "Factory",
   hotel: "Hotel",
   restaurant: "Restaurant",
+  faith_based: "Faith-Based",
   other: "Other",
 };
 

@@ -2,7 +2,7 @@ import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Building2, Users, ClipboardCheck,
   BarChart3, FileText, TrendingUp, Factory, Menu, X, LogOut,
-  Briefcase, Ticket, FlaskConical,
+  Briefcase, Ticket, FlaskConical, Upload,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
 const adminNav = [
   { label: "Pipeline", href: "/admin/pipeline", icon: TrendingUp },
   { label: "Institutions", href: "/admin/institutions", icon: Building2 },
+  { label: "Import Institutions", href: "/admin/institutions/import", icon: Upload },
   { label: "Providers", href: "/admin/providers", icon: Factory },
   { label: "Assessments", href: "/admin/assessments", icon: ClipboardCheck },
   { label: "Opportunities", href: "/admin/opportunities", icon: FileText },
@@ -54,7 +55,11 @@ export default function AdminLayout() {
 
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         {adminNav.map((item) => {
-          const isActive = location.pathname.startsWith(item.href);
+          const isActive =
+            location.pathname === item.href ||
+            (location.pathname.startsWith(item.href + "/") && !adminNav.some(
+              (other) => other !== item && other.href.startsWith(item.href + "/") && location.pathname.startsWith(other.href),
+            ));
           return (
             <Link
               key={item.href}
