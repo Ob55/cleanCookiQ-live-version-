@@ -25,9 +25,21 @@ try:
 except ImportError:
     sys.exit("openpyxl is required.  pip install openpyxl")
 
+# Load .env file if token not already in environment
+def _load_env():
+    env_path = Path(__file__).parent.parent / ".env"
+    if env_path.exists():
+        with open(env_path) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    k, v = line.split("=", 1)
+                    os.environ.setdefault(k.strip(), v.strip().strip('"'))
+_load_env()
+
 TOKEN = os.environ.get("SUPABASE_MGMT_TOKEN", "")
 if not TOKEN:
-    sys.exit("Error: set SUPABASE_MGMT_TOKEN env var before running this script.")
+    sys.exit("Error: add SUPABASE_MGMT_TOKEN=<token> to your .env file.")
 PROJECT_REF = os.environ.get("SUPABASE_PROJECT_REF", "bnbhattryqbterblybzw")
 API_URL = f"https://api.supabase.com/v1/projects/{PROJECT_REF}/database/query"
 
