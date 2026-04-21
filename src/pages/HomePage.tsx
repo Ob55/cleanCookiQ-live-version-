@@ -1,7 +1,7 @@
 import { Link, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { MapPin, BarChart3, Users, TrendingUp, Leaf, Building2, ArrowRight, Flame, Factory, Banknote, Briefcase, FolderKanban, GraduationCap, UserPlus, ClipboardCheck, Handshake, Rocket, Activity, ChevronRight, Check, X } from "lucide-react";
+import { MapPin, BarChart3, Users, TrendingUp, Leaf, Building2, ArrowRight, Flame, Factory, Banknote, Briefcase, FolderKanban, GraduationCap, UserPlus, ClipboardCheck, Handshake, Rocket, Activity, ChevronRight, Check, AlertCircle } from "lucide-react";
 import FuelOptionsSection from "@/components/institution/FuelOptionsSection";
 import { supabase } from "@/integrations/supabase/client";
 import heroBg from "@/assets/hero-bg.jpg";
@@ -33,28 +33,28 @@ function formatPipelineValue(totalKsh: number): { num: number; suffix: string; d
 }
 
 const modules = [
-  { title: "Pipeline Intelligence & Map", desc: "Interactive national map with institution-level transition data, readiness scores, and pipeline tracking from identification to monitored delivery.", icon: MapPin, color: "bg-primary" },
-  { title: "Provider & Partner Registry", desc: "Vetted directory of equipment providers, installation technicians, logistics providers, and service partners — with NDA/MoU gating and category classification.", icon: Factory, color: "bg-accent" },
-  { title: "Technical Assistance (TA)", desc: "Matching institutions needing capacity building, technical design, or training support with qualified TA providers by county and expertise.", icon: GraduationCap, color: "bg-emerald-light" },
-  { title: "Financing Platform", desc: "Grant applications, concessional debt, and equity instruments — connecting institutions with verified pipeline data to funders and investors.", icon: Banknote, color: "bg-primary" },
-  { title: "Portfolio Management", desc: "Post-installation monitoring with dMRV records, OPEX contract tracking, and support ticket management for active projects.", icon: Briefcase, color: "bg-accent" },
-  { title: "Program Management", desc: "Multi-institution programme coordination with procurement RFQs, provider bidding, and financial due diligence workflows.", icon: FolderKanban, color: "bg-emerald-light" },
+  { title: "Institution Map", desc: "An interactive map showing every institution, the fuel they cook with today, how ready they are to switch, and the progress of their transition.", icon: MapPin, color: "bg-primary" },
+  { title: "Provider Directory", desc: "A vetted list of equipment suppliers, installers, and service partners, organised by category so institutions can find the right fit.", icon: Factory, color: "bg-accent" },
+  { title: "Training & Technical Support", desc: "Connects institutions that need training or design help with qualified support partners in their county.", icon: GraduationCap, color: "bg-emerald-light" },
+  { title: "Financing", desc: "Brings grants, loans, and investment together in one place, and connects institutions with funders.", icon: Banknote, color: "bg-primary" },
+  { title: "Portfolio Tracking", desc: "Once equipment is installed, the platform tracks performance, service contracts, and support requests.", icon: Briefcase, color: "bg-accent" },
+  { title: "Programme Management", desc: "Tools for running large programmes across many institutions: procurement, provider bidding, and due diligence.", icon: FolderKanban, color: "bg-emerald-light" },
 ];
 
 const failures = [
-  { fail: "No verified demand data", fix: "Institution Demand Registry creates a scored pipeline of real buyers" },
-  { fail: "No trusted supplier directory", fix: "Supply Registry onboards and vets providers with scored profiles" },
-  { fail: "No financing coordination", fix: "Opportunity Layer matches funders to verified project opportunities" },
-  { fail: "No transition pathway clarity", fix: "Least-Cost Engine computes optimal technology per institution" },
-  { fail: "No coordinating actor", fix: "The platform is the trusted neutral coordinator — Ignis operates it commercially" },
+  { fail: "Nobody knows which institutions are ready to switch", fix: "We keep a verified list of institutions ready to transition." },
+  { fail: "There is no trusted list of suppliers", fix: "We vet providers and publish clear profiles with ratings." },
+  { fail: "Funding is scattered and hard to access", fix: "We match funders with projects that are ready to be financed." },
+  { fail: "Institutions do not know where to start", fix: "We work out the best, most affordable clean cooking option for each institution." },
+  { fail: "Nobody is coordinating the work", fix: "We are the neutral coordinator, run by Ignis as a commercial service." },
 ];
 
 const steps = [
-  { step: "01", title: "Register", icon: UserPlus, desc: "Institutions register cooking data — fuel type, population, budget, location." },
-  { step: "02", title: "Assess & Score", icon: ClipboardCheck, desc: "7-dimension readiness engine scores each institution and computes the least-cost pathway." },
-  { step: "03", title: "Match & Finance", icon: Handshake, desc: "Verified providers matched to ready institutions. Funders connect to bankable opportunities." },
-  { step: "04", title: "Deploy", icon: Rocket, desc: "Equipment installed and commissioned. Milestones tracked in real-time through the platform." },
-  { step: "05", title: "Monitor & Verify", icon: Activity, desc: "Post-installation performance monitored. Data feeds carbon credit verification and impact reports." },
+  { step: "01", title: "Register", icon: UserPlus, desc: "Institutions share their cooking details: current fuel, meals served, budget, and location." },
+  { step: "02", title: "Assess", icon: ClipboardCheck, desc: "We assess each institution and work out the best clean cooking option for them." },
+  { step: "03", title: "Match & Finance", icon: Handshake, desc: "We connect ready institutions with vetted suppliers and interested funders." },
+  { step: "04", title: "Install", icon: Rocket, desc: "Equipment is installed and progress is tracked in real time." },
+  { step: "05", title: "Monitor", icon: Activity, desc: "After installation, we track performance and produce impact and carbon reports." },
 ];
 
 export default function HomePage() {
@@ -162,8 +162,8 @@ export default function HomePage() {
       <section className="py-20 lg:py-28 bg-background">
         <div className="container">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">6 First-Class Modules</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">From pipeline intelligence to post-installation monitoring — one integrated platform covering every layer of the clean cooking transition.</p>
+            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">What the Platform Does</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">Everything needed to move an institution from its current fuel to a clean alternative, in one place.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {modules.map((mod, i) => (
@@ -201,23 +201,23 @@ export default function HomePage() {
         </div>
         <div className="container relative z-10">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 text-primary-foreground">Five Market Failures, One Solution</h2>
-            <p className="text-primary-foreground/80 max-w-2xl mx-auto">The institutional clean cooking market is broken. CleanCookiQ is the coordinating intelligence layer that fixes it.</p>
+            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 text-primary-foreground">Five Problems, One Solution</h2>
+            <p className="text-primary-foreground/80 max-w-2xl mx-auto">The clean cooking sector for institutions has real gaps. CleanCookiQ fills them.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 rounded-2xl overflow-hidden shadow-elevated border border-border">
             {/* Left — Failures */}
             <div className="p-8 lg:p-10 bg-background">
               <div className="flex items-center gap-3 mb-8">
                 <div className="h-8 w-8 rounded-lg bg-destructive/15 border border-destructive/30 flex items-center justify-center shrink-0">
-                  <X className="h-4 w-4 text-destructive" strokeWidth={3} />
+                  <AlertCircle className="h-4 w-4 text-destructive" />
                 </div>
-                <p className="text-destructive text-xs font-bold uppercase tracking-widest">Market Failures</p>
+                <p className="text-destructive text-xs font-bold uppercase tracking-widest">The Problem</p>
               </div>
               <ul className="space-y-6">
                 {failures.map((item, i) => (
                   <li key={item.fail} className="flex items-start gap-4 animate-slide-up" style={{ animationDelay: `${i * 80}ms`, animationFillMode: "backwards" }}>
                     <div className="h-9 w-9 rounded-full bg-destructive/15 border border-destructive/30 flex items-center justify-center shrink-0 mt-0.5">
-                      <X className="h-4 w-4 text-destructive" strokeWidth={3} />
+                      <AlertCircle className="h-4 w-4 text-destructive" />
                     </div>
                     <h4 className="font-display font-semibold text-foreground leading-snug pt-1.5">{item.fail}</h4>
                   </li>
@@ -251,8 +251,8 @@ export default function HomePage() {
       <section className="py-20 lg:py-28 bg-background">
         <div className="container">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">How CleanCookiQ Works</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">A structured pipeline that takes institutions from registration to monitored clean kitchens.</p>
+            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">How It Works</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">Five steps take an institution from signup to a fully tracked clean kitchen.</p>
           </div>
           <div className="flex flex-col lg:flex-row items-start justify-center gap-0">
             {steps.map((item, i) => (
@@ -303,7 +303,7 @@ export default function HomePage() {
       <section className="py-20 bg-gradient-hero text-primary-foreground">
         <div className="container text-center">
           <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Ready to Join the Transition?</h2>
-          <p className="text-primary-foreground/80 max-w-xl mx-auto">Whether you're an institution, provider, funder, or researcher — there's a place for you on CleanCookiQ.</p>
+          <p className="text-primary-foreground/80 max-w-xl mx-auto">Whether you are an institution, provider, funder, or researcher, there is a place for you on CleanCookiQ.</p>
         </div>
       </section>
     </div>

@@ -69,7 +69,7 @@ export default function FuelOptionsSection() {
     <Card>
       <CardHeader className="text-center">
         <CardTitle className="text-xl font-display font-bold">
-          Fuel Options — Cost per Meal
+          Fuel Options and Cost per Meal
         </CardTitle>
         <p className="text-sm text-muted-foreground mt-1">
           Comparing institutional cooking fuel costs across Kenya. Figures are indicative averages for a 500-person institution.

@@ -10,62 +10,62 @@ import {
   LineChart,
   Zap,
   Check,
-  X,
+  AlertCircle,
   MapPin,
 } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const challenges = [
-  "Fragmented project pipelines",
-  "Limited visibility for financiers",
-  "Weak coordination between stakeholders",
-  "Lack of standardized data and performance tracking",
-  "Difficulty in scaling proven solutions across regions",
+  "Project pipelines are scattered and disconnected",
+  "Financiers struggle to see which projects are ready",
+  "Partners work in silos instead of coordinating",
+  "There is no shared data or way to track performance",
+  "Proven solutions are hard to scale across regions",
 ];
 
 const approachPillars = [
   {
     icon: Layers,
-    title: "1. Pipeline Aggregation",
-    body: "We bring together institutional clean cooking opportunities — like schools, hospitals, and other large-scale energy users — into a structured, visible pipeline.",
+    title: "1. Building the Pipeline",
+    body: "We bring together clean cooking opportunities, like schools, hospitals, and other large energy users, into one structured, visible pipeline.",
   },
   {
     icon: Users,
-    title: "2. Ecosystem Coordination",
-    body: "The platform connects project developers, solution providers, technology partners, and governments and implementing agencies — ensuring the right solutions meet the right demand efficiently.",
+    title: "2. Connecting the Ecosystem",
+    body: "The platform connects project developers, solution providers, technology partners, governments, and implementing agencies, so the right solutions meet the right demand.",
   },
   {
     icon: Banknote,
-    title: "3. Financing Enablement",
-    body: "By structuring projects and improving visibility, CleanCookIQ helps unlock impact investment, carbon finance opportunities, and blended finance mechanisms — making projects more attractive, bankable, and scalable.",
+    title: "3. Unlocking Financing",
+    body: "By structuring projects and making them visible, CleanCookIQ helps unlock impact investment, carbon finance, and mixed financing options, making projects easier to fund and scale.",
   },
   {
     icon: LineChart,
-    title: "4. Data & Intelligence Layer",
-    body: "Through integrated data systems, the platform supports performance tracking, Monitoring, Reporting, and Verification (MRV/dMRV), and decision-making insights for stakeholders — creating transparency and accountability across the ecosystem.",
+    title: "4. Data and Insights",
+    body: "The platform tracks performance, supports monitoring and reporting, and gives stakeholders clear data to make decisions with.",
   },
 ];
 
 const howItWorksSteps = [
-  { step: "01", title: "Onboard Demand", desc: "Institutions and projects are registered onto the platform." },
-  { step: "02", title: "Match Solutions", desc: "Appropriate technologies and providers are connected to each opportunity." },
-  { step: "03", title: "Enable Financing", desc: "Projects are structured and presented to financiers and partners." },
-  { step: "04", title: "Track & Optimize", desc: "Data systems monitor performance, impact, and scalability." },
+  { step: "01", title: "Sign Up Institutions", desc: "Institutions and projects register on the platform." },
+  { step: "02", title: "Match Solutions", desc: "The right technologies and providers are connected to each institution." },
+  { step: "03", title: "Bring in Financing", desc: "Projects are shaped and shown to funders and partners." },
+  { step: "04", title: "Track Progress", desc: "We keep an eye on performance, impact, and how well things scale." },
 ];
 
 const stakeholders = [
-  { icon: Building2, title: "Institutions", desc: "Access clean, reliable, and scalable cooking solutions." },
-  { icon: Rocket, title: "Project Developers", desc: "Build and scale pipelines with structured support." },
-  { icon: Factory, title: "Solution Providers", desc: "Reach verified demand and deploy technologies effectively." },
-  { icon: Banknote, title: "Financiers & Investors", desc: "Access curated, de-risked, and data-backed opportunities." },
-  { icon: Landmark, title: "Governments & Ecosystem Partners", desc: "Drive coordinated, large-scale transition efforts." },
+  { icon: Building2, title: "Institutions", desc: "Access clean, reliable cooking solutions that can grow with you." },
+  { icon: Rocket, title: "Project Developers", desc: "Build and grow project pipelines with structured support." },
+  { icon: Factory, title: "Solution Providers", desc: "Reach verified institutions and roll out your technology." },
+  { icon: Banknote, title: "Financiers and Investors", desc: "Find curated, lower-risk, data-backed opportunities." },
+  { icon: Landmark, title: "Governments and Partners", desc: "Drive coordinated, large-scale change." },
 ];
 
 const inflectionPoints = [
-  "Increasing climate and health urgency",
-  "Growing interest in carbon markets and results-based financing",
-  "Rapid innovation in electric and clean cooking technologies",
-  "Strong policy momentum across African markets",
+  "Rising climate and health urgency",
+  "Growing interest in carbon markets and results-based funding",
+  "Fast progress in electric and clean cooking technologies",
+  "Strong policy support across African markets",
 ];
 
 const notList = [
@@ -77,7 +77,7 @@ const notList = [
 const isList = [
   "A platform that connects the ecosystem",
   "A pipeline engine for clean cooking markets",
-  "A data and coordination layer enabling scale",
+  "A data and coordination layer that helps the sector scale",
 ];
 
 export default function AboutPage() {
@@ -98,13 +98,13 @@ export default function AboutPage() {
         <div className="container relative z-10 text-center">
           <div className="inline-flex items-center gap-2 bg-accent/20 border border-accent/30 rounded-full px-4 py-1.5 mb-6">
             <Leaf className="h-4 w-4 text-accent" />
-            <span className="text-xs font-medium text-accent">Digital Infrastructure for Clean Cooking</span>
+            <span className="text-xs font-medium text-accent">A Platform for Clean Cooking</span>
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-primary-foreground mb-6 leading-tight">
             About CleanCookIQ
           </h1>
           <p className="text-primary-foreground/80 max-w-3xl mx-auto text-lg leading-relaxed">
-            CleanCookIQ is a digital infrastructure platform accelerating the transition to clean cooking across institutional markets in Africa.
+            CleanCookIQ is a platform that helps institutions across Africa switch to clean cooking, faster.
           </p>
         </div>
       </section>
@@ -113,7 +113,7 @@ export default function AboutPage() {
       <section className="py-20 bg-background">
         <div className="container max-w-3xl">
           <p className="text-muted-foreground text-lg leading-relaxed mb-6">
-            Designed to solve fragmentation across the clean cooking ecosystem, the platform connects institutions, solution providers, financiers, and ecosystem partners — transforming disconnected efforts into coordinated, scalable, and investment-ready opportunities.
+            Built to solve the scattered nature of the clean cooking ecosystem, the platform connects institutions, solution providers, financiers, and partners, turning disconnected efforts into coordinated, ready-to-invest opportunities.
           </p>
           <p className="text-muted-foreground text-lg leading-relaxed">
             Rather than operating as a standalone project or technology provider, CleanCookIQ functions as the coordination and intelligence layer powering the next generation of clean cooking markets.
@@ -127,7 +127,7 @@ export default function AboutPage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">The Challenge</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Despite growing momentum, clean cooking adoption — particularly at the institutional level — remains constrained by systemic barriers.
+              Even with growing momentum, clean cooking, especially at the institutional level, is held back by a few big barriers.
             </p>
           </div>
           <ul className="space-y-4">
@@ -137,7 +137,7 @@ export default function AboutPage() {
                 className="flex items-start gap-4 bg-card border border-border rounded-xl p-5 shadow-card"
               >
                 <div className="h-9 w-9 rounded-full bg-destructive/15 border border-destructive/30 flex items-center justify-center shrink-0">
-                  <X className="h-4 w-4 text-destructive" strokeWidth={3} />
+                  <AlertCircle className="h-4 w-4 text-destructive" />
                 </div>
                 <p className="text-foreground font-medium pt-1.5">{item}</p>
               </li>
@@ -242,7 +242,7 @@ export default function AboutPage() {
             ))}
           </ul>
           <p className="text-muted-foreground text-center mt-10 max-w-2xl mx-auto">
-            CleanCookIQ exists to ensure this momentum translates into real, scalable deployment — not fragmented progress.
+            CleanCookIQ exists to turn this momentum into real, large-scale progress, not scattered wins.
           </p>
         </div>
       </section>
@@ -283,7 +283,7 @@ export default function AboutPage() {
         <div className="container max-w-3xl text-center">
           <h2 className="text-3xl md:text-4xl font-display font-bold mb-6">Our Vision</h2>
           <p className="text-primary-foreground/90 text-xl leading-relaxed font-display italic">
-            To build the operating system for clean cooking markets — enabling coordinated, data-driven, and large-scale transition across Africa and beyond.
+            To build the operating system for clean cooking markets, enabling coordinated, data-driven, large-scale change across Africa and beyond.
           </p>
         </div>
       </section>
@@ -299,14 +299,14 @@ export default function AboutPage() {
             <div className="bg-card border border-border rounded-xl p-7 shadow-card">
               <div className="flex items-center gap-3 mb-6">
                 <div className="h-8 w-8 rounded-lg bg-destructive/15 border border-destructive/30 flex items-center justify-center">
-                  <X className="h-4 w-4 text-destructive" strokeWidth={3} />
+                  <AlertCircle className="h-4 w-4 text-destructive" />
                 </div>
                 <p className="text-destructive text-xs font-bold uppercase tracking-widest">CleanCookIQ is not</p>
               </div>
               <ul className="space-y-4">
                 {notList.map((t) => (
                   <li key={t} className="flex items-start gap-3">
-                    <X className="h-4 w-4 text-destructive mt-1 shrink-0" strokeWidth={3} />
+                    <AlertCircle className="h-4 w-4 text-destructive mt-1 shrink-0" />
                     <span className="text-foreground">{t}</span>
                   </li>
                 ))}

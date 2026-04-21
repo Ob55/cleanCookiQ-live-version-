@@ -92,7 +92,7 @@ export default function TADashboard() {
         <h1 className="text-2xl font-display font-bold flex items-center gap-2">
           <GraduationCap className="h-6 w-6 text-primary" /> TA Provider Dashboard
         </h1>
-        <p className="text-sm text-muted-foreground">Institutions needing Technical Assistance — matched to your expertise and location</p>
+        <p className="text-sm text-muted-foreground">Institutions needing Technical Assistance, matched to your expertise and location.</p>
       </div>
 
       {taProfile && (

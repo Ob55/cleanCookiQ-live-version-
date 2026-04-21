@@ -404,7 +404,7 @@ export default function InstitutionProfile() {
         <CardHeader>
           <CardTitle className="text-lg">Kitchen & Readiness Assessment</CardTitle>
           <CardDescription>
-            {editing ? "Update your kitchen and readiness details — your score will be recalculated on save" : "These details feed into your readiness score"}
+            {editing ? "Update your kitchen and readiness details. Your score will be recalculated when you save." : "These details feed into your readiness score."}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

@@ -49,7 +49,7 @@ export default function TransitionNeedsSection({ institutionId }: Props) {
         <Textarea
           value={needs}
           onChange={e => setNeeds(e.target.value)}
-          placeholder="Describe what you need — equipment, installation support, financing, training, or any specific requirements..."
+          placeholder="Describe what you need: equipment, installation support, financing, training, or anything else..."
           rows={4}
         />
         <Button onClick={handleSave} disabled={saving} size="sm">

@@ -54,7 +54,7 @@ export default function TransitionTarget({ institutionId, institutionName, count
       `${institutionName} in ${county} selected "${label}" as their preferred clean-cooking transition. Review and match them with relevant providers.`
     );
 
-    toast.success(`Saved — you chose ${label}`);
+    toast.success(`Saved. You chose ${label}.`);
     onUpdate(selected);
     setSaving(false);
   };

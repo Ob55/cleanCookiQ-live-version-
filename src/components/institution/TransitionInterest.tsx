@@ -107,7 +107,7 @@ export default function TransitionInterest({
         </div>
         {selected && (
           <p className="text-xs text-muted-foreground mt-3 text-center">
-            Your selection: <strong className="capitalize">{selected}</strong> — you can change this at any time.
+            Your selection: <strong className="capitalize">{selected}</strong>. You can change this at any time.
           </p>
         )}
       </CardContent>

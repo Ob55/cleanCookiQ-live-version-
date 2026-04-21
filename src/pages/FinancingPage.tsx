@@ -123,7 +123,7 @@ export default function FinancingPage() {
                       <SelectTrigger className="mt-1"><SelectValue placeholder="Select institution" /></SelectTrigger>
                       <SelectContent>
                         {institutions?.map(i => (
-                          <SelectItem key={i.id} value={i.id}>{i.name} — {i.county}</SelectItem>
+                          <SelectItem key={i.id} value={i.id}>{`${i.name}, ${i.county}`}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -188,9 +188,9 @@ export default function FinancingPage() {
         <TabsContent value="debt">
           <div className="bg-card border border-border rounded-xl p-12 text-center shadow-card mt-4">
             <Lock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-xl font-display font-bold mb-2">Concessional Debt — Coming Soon</h3>
+            <h3 className="text-xl font-display font-bold mb-2">Low-Interest Loans, Coming Soon</h3>
             <p className="text-sm text-muted-foreground max-w-md mx-auto">
-              Debt financing instruments will be available in Phase 2. Connect with financing partners for concessional lending to verified institutions.
+              Loan options will be available in the next phase. We will connect you with lenders offering low-interest financing to verified institutions.
             </p>
           </div>
         </TabsContent>
@@ -198,9 +198,9 @@ export default function FinancingPage() {
         <TabsContent value="equity">
           <div className="bg-card border border-border rounded-xl p-12 text-center shadow-card mt-4">
             <Lock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-xl font-display font-bold mb-2">Equity — Coming Soon</h3>
+            <h3 className="text-xl font-display font-bold mb-2">Equity Investment, Coming Soon</h3>
             <p className="text-sm text-muted-foreground max-w-md mx-auto">
-              Equity investment pathways will be available in Phase 3 for large-scale institutional transitions.
+              Equity investment options will be available in a later phase, for large clean cooking transitions.
             </p>
           </div>
         </TabsContent>

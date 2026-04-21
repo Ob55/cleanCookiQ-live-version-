@@ -14,7 +14,9 @@
       "Bash(python -c \"import openpyxl; print\\('openpyxl OK'\\)\")",
       "Bash(python *)",
       "Bash(node *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(grep -E \"^\\\\.env$\" .gitignore)",
+      "Bash(git rm *)"
     ]
   }
 }

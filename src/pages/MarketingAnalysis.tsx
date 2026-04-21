@@ -41,10 +41,10 @@ export default function MarketingAnalysis() {
       <section className="py-20 lg:py-28 bg-gradient-hero text-primary-foreground">
         <div className="container text-center">
           <h1 className="text-3xl md:text-5xl font-display font-bold mb-4">
-            Market Intelligence & Insights
+            Market Insights
           </h1>
           <p className="text-primary-foreground/80 max-w-2xl mx-auto text-lg">
-            Stay ahead with CleanCookIQ's market analysis — data-driven insights on Kenya's clean cooking transition landscape.
+            Clear, data-backed insights into Kenya's clean cooking sector.
           </p>
         </div>
       </section>
@@ -57,21 +57,21 @@ export default function MarketingAnalysis() {
               <CardContent className="pt-8 pb-6">
                 <TrendingUp className="h-10 w-10 text-primary mx-auto mb-4" />
                 <h3 className="font-display font-bold text-lg mb-2">Market Growth</h3>
-                <p className="text-sm text-muted-foreground">Kenya's institutional clean cooking market is projected to grow 340% by 2030, driven by government mandates and carbon finance.</p>
+                <p className="text-sm text-muted-foreground">Kenya's institutional clean cooking market is set to grow 340% by 2030, pushed by government policy and carbon finance.</p>
               </CardContent>
             </Card>
             <Card className="text-center">
               <CardContent className="pt-8 pb-6">
                 <BarChart3 className="h-10 w-10 text-primary mx-auto mb-4" />
                 <h3 className="font-display font-bold text-lg mb-2">Pipeline Analytics</h3>
-                <p className="text-sm text-muted-foreground">Real-time data on 2,847+ institutions across 47 counties — fuel usage, transition readiness, and financing needs.</p>
+                <p className="text-sm text-muted-foreground">Live data on 2,847+ institutions across 47 counties, covering fuel usage, readiness to switch, and financing needs.</p>
               </CardContent>
             </Card>
             <Card className="text-center">
               <CardContent className="pt-8 pb-6">
                 <PieChart className="h-10 w-10 text-primary mx-auto mb-4" />
                 <h3 className="font-display font-bold text-lg mb-2">Sector Breakdown</h3>
-                <p className="text-sm text-muted-foreground">Detailed analysis by institution type — schools, hospitals, prisons, and commercial facilities with tailored transition pathways.</p>
+                <p className="text-sm text-muted-foreground">A detailed view by type: schools, hospitals, prisons, and commercial sites, each with its own recommended path to clean cooking.</p>
               </CardContent>
             </Card>
           </div>

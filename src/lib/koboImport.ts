@@ -1,5 +1,5 @@
-// Shared KoBo → institutions transform.
-// Mirrors scripts/import_kobo_institutions.py — keep both in sync.
+// KoBo survey row → institutions-table insert transform.
+// Used by the admin upload page at /admin/institutions/import.
 
 import type { Database } from "@/integrations/supabase/types";
 
@@ -24,7 +24,7 @@ export const KOBO_COL = {
   kobo_id: 164, kobo_uuid: 165,
 } as const;
 
-// KES — update when local rates move. Matches scripts/import_kobo_institutions.py.
+// KES — update when local rates move.
 export const FUEL_PRICE_KES: Record<string, number> = {
   firewood: 25,        // per kg
   charcoal: 55,        // per kg
