@@ -5,7 +5,7 @@ import sys
 import urllib.request
 import urllib.error
 
-TOKEN = "sbp_552c16079ec4acdb33bc542ed0249a5224a05407"
+TOKEN = "sbp_c604bb70745ba8fc9dab4c9c74f38964979d82a9"
 PROJECT_REF = "bnbhattryqbterblybzw"
 MIGRATIONS_DIR = "/home/brian/Desktop/clean-cook-iq/supabase/migrations"
 URL = f"https://api.supabase.com/v1/projects/{PROJECT_REF}/database/query"
