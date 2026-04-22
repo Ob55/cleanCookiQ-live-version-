@@ -19,7 +19,10 @@
       "Bash(git rm *)",
       "Bash(git merge *)",
       "Bash(git ls-tree *)",
-      "Bash(git -c core.protectNTFS=false merge --ff-only origin/main)"
+      "Bash(git -c core.protectNTFS=false merge --ff-only origin/main)",
+      "Read(//home/brian/Desktop/**)",
+      "Bash(unzip -l ~/Desktop/cleancookiq-new.zip)",
+      "Bash(zip -r ~/Desktop/cleancookiq-new.zip .)"
     ]
   }
 }

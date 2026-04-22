@@ -15,7 +15,7 @@ const supplierNav = [
   { label: "Services", href: "/supplier/services", icon: Wrench },
   { label: "Documents & Compliance", href: "/supplier/documents", icon: FileCheck },
   { label: "Opportunities", href: "/supplier/opportunities", icon: FileText },
-  { label: "MOU", href: "/supplier/mou", icon: ScrollText },
+  { label: "MOU / CSCC", href: "/supplier/mou", icon: ScrollText },
   { label: "Tickets", href: "/supplier/support", icon: Ticket },
 ];
 

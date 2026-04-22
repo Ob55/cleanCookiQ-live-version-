@@ -19,8 +19,50 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { sendEmail, emailSignAgreement } from "@/lib/emailService";
-import { Loader2, ExternalLink, Mail, Filter } from "lucide-react";
+import { Loader2, ExternalLink, Mail, Filter, ClipboardCheck, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
+
+interface CsccRow {
+  id: string;
+  provider_id: string;
+  selections: Record<string, Record<string, boolean>>;
+  updated_at: string;
+  provider?: { company_name: string; contact_email: string | null; contact_phone: string | null };
+}
+
+const CSCC_SECTIONS: { id: string; title: string; items: { id: string; label: string }[] }[] = [
+  { id: "section_a", title: "A: Business Compliance", items: [
+    { id: "business_registration", label: "Business Registration" },
+    { id: "tax_compliance", label: "Tax Compliance" },
+    { id: "physical_address", label: "Physical Address" },
+  ]},
+  { id: "section_b", title: "B: Equipment Manufacturers", items: [
+    { id: "kebs_certification", label: "KEBS Product Certification" },
+    { id: "quality_sticker", label: "Quality Sticker" },
+    { id: "lab_test_report", label: "Lab Test Report" },
+    { id: "product_specifications", label: "Product Specifications" },
+    { id: "warranty_terms", label: "Warranty Terms" },
+  ]},
+  { id: "section_c", title: "C: Installation & Service", items: [
+    { id: "technical_certifications", label: "Technical Certifications" },
+    { id: "insurance_coverage", label: "Insurance Coverage" },
+    { id: "haccp_knowledge", label: "HACCP Knowledge" },
+    { id: "customer_references", label: "Customer References" },
+  ]},
+  { id: "section_d", title: "D: Biogas Suppliers", items: [
+    { id: "pressure_vessel", label: "Pressure Vessel Certification" },
+    { id: "biogas_technician", label: "Technician Certification" },
+    { id: "biogas_standards", label: "Biogas System Standards" },
+  ]},
+  { id: "section_e", title: "E: LPG Suppliers", items: [
+    { id: "gas_installation_license", label: "Gas Installation License" },
+    { id: "safety_compliance", label: "Safety Compliance" },
+  ]},
+  { id: "section_f", title: "F: Tiered Approval", items: [
+    { id: "tier2_in_progress", label: "Tier 2 – In Progress" },
+    { id: "tier3_uncertified", label: "Tier 3 – Uncertified" },
+  ]},
+];
 
 interface AgreementDoc {
   id: string;
@@ -61,6 +103,12 @@ export default function AdminMOUIPA() {
   const [sending, setSending] = useState(false);
   const [search, setSearch] = useState("");
 
+  // CSCC state
+  const [csccRows, setCsccRows] = useState<CsccRow[]>([]);
+  const [csccLoading, setCsccLoading] = useState(true);
+  const [expandedCscc, setExpandedCscc] = useState<string | null>(null);
+  const [csccSearch, setCsccSearch] = useState("");
+
   const loadDocs = async () => {
     const { data } = await supabase
       .from("mou_ipa_documents")
@@ -79,9 +127,35 @@ export default function AdminMOUIPA() {
     setProviders(provs ?? []);
   };
 
+  const loadCscc = async () => {
+    setCsccLoading(true);
+    try {
+      const { data } = await (supabase as any)
+        .from("cscc_submissions")
+        .select("id, provider_id, selections, updated_at")
+        .order("updated_at", { ascending: false });
+
+      if (!data || data.length === 0) { setCsccRows([]); setCsccLoading(false); return; }
+
+      const providerIds = [...new Set(data.map((r: any) => r.provider_id))];
+      const { data: provData } = await supabase
+        .from("providers")
+        .select("id, company_name, contact_email, contact_phone")
+        .in("id", providerIds as string[]);
+
+      const provMap = Object.fromEntries((provData ?? []).map((p: any) => [p.id, p]));
+      setCsccRows(data.map((r: any) => ({ ...r, provider: provMap[r.provider_id] ?? null })));
+    } catch {
+      setCsccRows([]);
+    } finally {
+      setCsccLoading(false);
+    }
+  };
+
   useEffect(() => {
     loadDocs();
     loadOrgs();
+    loadCscc();
   }, []);
 
   const filtered = docs.filter(d => {
@@ -309,6 +383,99 @@ export default function AdminMOUIPA() {
           </table>
         </div>
       )}
+
+      {/* ── CSCC Section ── */}
+      <div className="space-y-4 pt-4 border-t border-border">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <ClipboardCheck className="h-5 w-5 text-primary" />
+            <div>
+              <h2 className="text-lg font-display font-bold">Supplier Certification Checklists (CSCC)</h2>
+              <p className="text-sm text-muted-foreground">Submitted certification checklists from suppliers</p>
+            </div>
+          </div>
+          <Badge variant="outline" className="text-xs">{csccRows.length} submission{csccRows.length !== 1 ? "s" : ""}</Badge>
+        </div>
+
+        <Input
+          placeholder="Search supplier…"
+          value={csccSearch}
+          onChange={e => setCsccSearch(e.target.value)}
+          className="max-w-xs"
+        />
+
+        {csccLoading ? (
+          <div className="flex items-center justify-center py-12"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>
+        ) : csccRows.filter(r => !csccSearch || (r.provider?.company_name ?? "").toLowerCase().includes(csccSearch.toLowerCase())).length === 0 ? (
+          <div className="text-center py-12 border-2 border-dashed border-border rounded-xl">
+            <ClipboardCheck className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">No CSCC submissions yet</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {csccRows
+              .filter(r => !csccSearch || (r.provider?.company_name ?? "").toLowerCase().includes(csccSearch.toLowerCase()))
+              .map(row => {
+                const isExpanded = expandedCscc === row.id;
+                const totalChecked = Object.values(row.selections ?? {}).reduce((acc, section) =>
+                  acc + Object.values(section).filter(Boolean).length, 0);
+                const totalItems = CSCC_SECTIONS.reduce((acc, s) => acc + s.items.length, 0);
+
+                return (
+                  <div key={row.id} className="border border-border rounded-xl overflow-hidden">
+                    <button
+                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/30 transition-colors text-left"
+                      onClick={() => setExpandedCscc(isExpanded ? null : row.id)}
+                    >
+                      <div className="flex items-center gap-4 flex-1 min-w-0">
+                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                          <ClipboardCheck className="h-4 w-4 text-primary" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold truncate">{row.provider?.company_name ?? row.provider_id.slice(0, 8) + "…"}</p>
+                          <div className="flex items-center gap-3 mt-0.5">
+                            {row.provider?.contact_email && <span className="text-xs text-muted-foreground">{row.provider.contact_email}</span>}
+                            {row.provider?.contact_phone && <span className="text-xs text-muted-foreground">{row.provider.contact_phone}</span>}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <Badge variant="outline" className="text-xs">{totalChecked}/{totalItems} items</Badge>
+                        <span className="text-xs text-muted-foreground">{new Date(row.updated_at).toLocaleDateString()}</span>
+                        {isExpanded ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                      </div>
+                    </button>
+
+                    {isExpanded && (
+                      <div className="border-t border-border px-4 py-4 bg-muted/10">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {CSCC_SECTIONS.map(section => (
+                            <div key={section.id}>
+                              <p className="text-xs font-bold text-foreground mb-1">{section.title}</p>
+                              <div className="space-y-1">
+                                {section.items.map(item => {
+                                  const checked = row.selections?.[section.id]?.[item.id] ?? false;
+                                  return (
+                                    <div key={item.id} className="flex items-center gap-2">
+                                      <span className={`h-3 w-3 rounded-sm border flex items-center justify-center shrink-0 ${checked ? "bg-primary border-primary" : "border-muted-foreground/40"}`}>
+                                        {checked && <span className="text-[8px] text-white font-bold">✓</span>}
+                                      </span>
+                                      <span className={`text-xs ${checked ? "text-foreground" : "text-muted-foreground line-through"}`}>{item.label}</span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
