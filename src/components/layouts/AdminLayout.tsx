@@ -12,22 +12,33 @@ import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
 
 
 const adminNav = [
+  { section: "Operations" },
   { label: "Pipeline", href: "/admin/pipeline", icon: TrendingUp },
+  { label: "Assessments", href: "/admin/assessments", icon: ClipboardCheck },
+  { label: "Opportunities", href: "/admin/opportunities", icon: FileText },
+
+  { section: "Organisations" },
   { label: "Institutions", href: "/admin/institutions", icon: Building2 },
   { label: "Import Institutions", href: "/admin/institutions/import", icon: Upload },
   { label: "Providers", href: "/admin/providers", icon: Factory },
-  { label: "Assessments", href: "/admin/assessments", icon: ClipboardCheck },
-  { label: "Opportunities", href: "/admin/opportunities", icon: FileText },
+
+  { section: "Finance" },
   { label: "BD Dashboard", href: "/admin/bd", icon: BarChart3 },
   { label: "Portfolio", href: "/admin/portfolio", icon: Briefcase },
   { label: "Portfolio Aggregation", href: "/admin/portfolio-aggregation", icon: BarChart3 },
+
+  { section: "Agreements" },
+  { label: "MOU & IPA", href: "/admin/mou-ipa", icon: ScrollText },
+
+  { section: "People" },
   { label: "Researchers", href: "/admin/researchers", icon: FlaskConical },
   { label: "Others", href: "/admin/others", icon: HelpCircle },
-  { label: "MOU & IPA", href: "/admin/mou-ipa", icon: ScrollText },
-  { label: "Tickets", href: "/admin/tickets", icon: Ticket },
   { label: "Subscribers", href: "/admin/subscribers", icon: Users },
   { label: "Users", href: "/admin/users", icon: Users },
-];
+
+  { section: "Support" },
+  { label: "Tickets", href: "/admin/tickets", icon: Ticket },
+] as const;
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -55,19 +66,26 @@ export default function AdminLayout() {
         <p className="text-xs text-sidebar-foreground/60 mt-1">Admin Console</p>
       </div>
 
-      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-        {adminNav.map((item) => {
+      <nav className="flex-1 p-3 overflow-y-auto space-y-0.5">
+        {adminNav.map((item, i) => {
+          if ("section" in item) {
+            return (
+              <p key={`section-${i}`} className="px-3 pt-4 pb-1 text-[10px] font-semibold uppercase tracking-widest text-sidebar-foreground/40 first:pt-1">
+                {item.section}
+              </p>
+            );
+          }
           const isActive =
             location.pathname === item.href ||
             (location.pathname.startsWith(item.href + "/") && !adminNav.some(
-              (other) => other !== item && other.href.startsWith(item.href + "/") && location.pathname.startsWith(other.href),
+              (other) => "href" in other && other !== item && other.href.startsWith(item.href + "/") && location.pathname.startsWith(other.href),
             ));
           return (
             <Link
               key={item.href}
               to={item.href}
               onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 isActive
                   ? "bg-sidebar-accent text-sidebar-primary"
                   : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"

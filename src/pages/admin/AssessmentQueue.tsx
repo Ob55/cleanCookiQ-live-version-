@@ -15,7 +15,8 @@ export default function AssessmentQueue() {
   const [reviewingId, setReviewingId] = useState<string | null>(null);
   const [reviewNotes, setReviewNotes] = useState("");
 
-  const { data: assessments, isLoading } = useQuery({
+  // Fetch assessments from the assessments table
+  const { data: assessments } = useQuery({
     queryKey: ["admin-assessments"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -23,7 +24,22 @@ export default function AssessmentQueue() {
         .select("*, institutions(name, county, institution_type)")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data;
+      return data ?? [];
+    },
+  });
+
+  // Fetch institutions that have been assessed (pipeline_stage = assessed/scored)
+  // and don't already have an entry in the assessments table
+  const { data: assessedInstitutions, isLoading } = useQuery({
+    queryKey: ["assessed-institutions"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("institutions")
+        .select("id, name, county, institution_type, pipeline_stage, assessment_score, updated_at, created_at")
+        .in("pipeline_stage", ["assessed", "scored"])
+        .order("updated_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
     },
   });
 
@@ -45,7 +61,56 @@ export default function AssessmentQueue() {
     onError: (e: any) => toast.error(e.message),
   });
 
-  const filtered = assessments?.filter(a =>
+  // IDs of institutions already in assessments table
+  const assessedIds = new Set(assessments?.map(a => a.institution_id));
+
+  // Institutions assessed via pipeline but not yet in the assessments table
+  const pipelineAssessed = (assessedInstitutions ?? []).filter(i => !assessedIds.has(i.id));
+
+  // Merge: formal assessment records + pipeline-assessed institutions
+  const combined: Array<{
+    id: string;
+    source: "assessment" | "pipeline";
+    name: string;
+    county: string;
+    institution_type: string;
+    status: string;
+    submitted_at: string | null;
+    reviewer_notes: string | null;
+    pipeline_stage?: string;
+    assessment_score?: number | null;
+    cooking_patterns?: any;
+    energy_consumption?: any;
+    infrastructure_condition?: any;
+  }> = [
+    ...(assessments ?? []).map(a => ({
+      id: a.id,
+      source: "assessment" as const,
+      name: (a as any).institutions?.name ?? "Unknown",
+      county: (a as any).institutions?.county ?? "—",
+      institution_type: (a as any).institutions?.institution_type ?? "",
+      status: a.status,
+      submitted_at: a.submitted_at,
+      reviewer_notes: a.reviewer_notes,
+      cooking_patterns: a.cooking_patterns,
+      energy_consumption: a.energy_consumption,
+      infrastructure_condition: a.infrastructure_condition,
+    })),
+    ...pipelineAssessed.map(i => ({
+      id: i.id,
+      source: "pipeline" as const,
+      name: i.name,
+      county: i.county ?? "—",
+      institution_type: i.institution_type ?? "",
+      status: "submitted",
+      submitted_at: i.updated_at ?? i.created_at,
+      reviewer_notes: null,
+      pipeline_stage: i.pipeline_stage,
+      assessment_score: i.assessment_score,
+    })),
+  ];
+
+  const filtered = combined.filter(a =>
     filterStatus === "all" || a.status === filterStatus
   );
 
@@ -57,11 +122,13 @@ export default function AssessmentQueue() {
   };
 
   const counts = {
-    all: assessments?.length || 0,
-    submitted: assessments?.filter(a => a.status === "submitted").length || 0,
-    reviewed: assessments?.filter(a => a.status === "reviewed").length || 0,
-    approved: assessments?.filter(a => a.status === "approved").length || 0,
+    all: combined.length,
+    submitted: combined.filter(a => a.status === "submitted").length,
+    reviewed: combined.filter(a => a.status === "reviewed").length,
+    approved: combined.filter(a => a.status === "approved").length,
   };
+
+  const reviewing = combined.find(a => a.id === reviewingId);
 
   return (
     <div className="space-y-6">
@@ -108,12 +175,13 @@ export default function AssessmentQueue() {
                 <th className="text-left text-xs font-medium text-muted-foreground p-3">Institution</th>
                 <th className="text-left text-xs font-medium text-muted-foreground p-3">County</th>
                 <th className="text-left text-xs font-medium text-muted-foreground p-3">Status</th>
-                <th className="text-left text-xs font-medium text-muted-foreground p-3">Submitted</th>
+                <th className="text-left text-xs font-medium text-muted-foreground p-3">Score</th>
+                <th className="text-left text-xs font-medium text-muted-foreground p-3">Assessed</th>
                 <th className="text-left text-xs font-medium text-muted-foreground p-3">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filtered?.map(a => (
+              {filtered.map(a => (
                 <tr key={a.id} className="border-b border-border/50 hover:bg-muted/30">
                   <td className="p-3">
                     <div className="flex items-center gap-3">
@@ -121,14 +189,19 @@ export default function AssessmentQueue() {
                         <ClipboardCheck className="h-4 w-4 text-primary" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium">{(a as any).institutions?.name || "Unknown"}</p>
-                        <p className="text-xs text-muted-foreground capitalize">{(a as any).institutions?.institution_type || ""}</p>
+                        <p className="text-sm font-medium">{a.name}</p>
+                        <p className="text-xs text-muted-foreground capitalize">{a.institution_type}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="p-3 text-sm">{(a as any).institutions?.county || "—"}</td>
+                  <td className="p-3 text-sm">{a.county}</td>
                   <td className="p-3">
                     <Badge variant="secondary" className={statusColors[a.status] || ""}>{a.status}</Badge>
+                  </td>
+                  <td className="p-3 text-sm">
+                    {(a as any).assessment_score != null
+                      ? <span className="font-medium text-primary">{(a as any).assessment_score}</span>
+                      : "—"}
                   </td>
                   <td className="p-3 text-sm text-muted-foreground">
                     {a.submitted_at ? new Date(a.submitted_at).toLocaleDateString() : "—"}
@@ -138,19 +211,17 @@ export default function AssessmentQueue() {
                       <Button size="sm" variant="ghost" onClick={() => { setReviewingId(a.id); setReviewNotes(a.reviewer_notes || ""); }}>
                         <Eye className="h-4 w-4" />
                       </Button>
-                      {a.status === "submitted" && (
-                        <>
-                          <Button size="sm" variant="ghost" onClick={() => updateStatus.mutate({ id: a.id, status: "approved" })}>
-                            <Check className="h-4 w-4 text-primary" />
-                          </Button>
-                        </>
+                      {a.status === "submitted" && a.source === "assessment" && (
+                        <Button size="sm" variant="ghost" onClick={() => updateStatus.mutate({ id: a.id, status: "approved" })}>
+                          <Check className="h-4 w-4 text-primary" />
+                        </Button>
                       )}
                     </div>
                   </td>
                 </tr>
               ))}
-              {!filtered?.length && (
-                <tr><td colSpan={5} className="p-8 text-center text-muted-foreground">No assessments found</td></tr>
+              {!filtered.length && (
+                <tr><td colSpan={6} className="p-8 text-center text-muted-foreground">No assessments found</td></tr>
               )}
             </tbody>
           </table>
@@ -162,28 +233,44 @@ export default function AssessmentQueue() {
         <DialogContent>
           <DialogHeader><DialogTitle>Review Assessment</DialogTitle></DialogHeader>
           <div className="space-y-4">
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">Assessment data summary:</p>
-              {assessments?.find(a => a.id === reviewingId) && (
-                <div className="bg-muted/50 rounded-lg p-3 text-sm space-y-1">
-                  <p><span className="font-medium">Cooking Patterns:</span> {JSON.stringify(assessments.find(a => a.id === reviewingId)?.cooking_patterns || {}).slice(0, 100)}</p>
-                  <p><span className="font-medium">Energy:</span> {JSON.stringify(assessments.find(a => a.id === reviewingId)?.energy_consumption || {}).slice(0, 100)}</p>
-                  <p><span className="font-medium">Infrastructure:</span> {JSON.stringify(assessments.find(a => a.id === reviewingId)?.infrastructure_condition || {}).slice(0, 100)}</p>
+            {reviewing && (
+              <div className="bg-muted/50 rounded-lg p-3 text-sm space-y-1">
+                <p><span className="font-medium">Institution:</span> {reviewing.name}</p>
+                <p><span className="font-medium">County:</span> {reviewing.county}</p>
+                {(reviewing as any).assessment_score != null && (
+                  <p><span className="font-medium">Assessment Score:</span> {(reviewing as any).assessment_score}</p>
+                )}
+                {(reviewing as any).pipeline_stage && (
+                  <p><span className="font-medium">Pipeline Stage:</span> {(reviewing as any).pipeline_stage}</p>
+                )}
+                {reviewing.source === "assessment" && (
+                  <>
+                    <p><span className="font-medium">Cooking Patterns:</span> {JSON.stringify(reviewing.cooking_patterns || {}).slice(0, 100)}</p>
+                    <p><span className="font-medium">Energy:</span> {JSON.stringify(reviewing.energy_consumption || {}).slice(0, 100)}</p>
+                    <p><span className="font-medium">Infrastructure:</span> {JSON.stringify(reviewing.infrastructure_condition || {}).slice(0, 100)}</p>
+                  </>
+                )}
+              </div>
+            )}
+            {reviewing?.source === "assessment" && (
+              <>
+                <div>
+                  <p className="text-sm font-medium mb-1">Reviewer Notes</p>
+                  <Textarea value={reviewNotes} onChange={e => setReviewNotes(e.target.value)} placeholder="Add review notes..." />
                 </div>
-              )}
-            </div>
-            <div>
-              <p className="text-sm font-medium mb-1">Reviewer Notes</p>
-              <Textarea value={reviewNotes} onChange={e => setReviewNotes(e.target.value)} placeholder="Add review notes..." />
-            </div>
-            <div className="flex gap-2">
-              <Button className="flex-1" onClick={() => updateStatus.mutate({ id: reviewingId!, status: "approved", notes: reviewNotes })}>
-                <Check className="h-4 w-4 mr-2" /> Approve
-              </Button>
-              <Button variant="destructive" className="flex-1" onClick={() => updateStatus.mutate({ id: reviewingId!, status: "reviewed", notes: reviewNotes })}>
-                Request Changes
-              </Button>
-            </div>
+                <div className="flex gap-2">
+                  <Button className="flex-1" onClick={() => updateStatus.mutate({ id: reviewingId!, status: "approved", notes: reviewNotes })}>
+                    <Check className="h-4 w-4 mr-2" /> Approve
+                  </Button>
+                  <Button variant="destructive" className="flex-1" onClick={() => updateStatus.mutate({ id: reviewingId!, status: "reviewed", notes: reviewNotes })}>
+                    Request Changes
+                  </Button>
+                </div>
+              </>
+            )}
+            {reviewing?.source === "pipeline" && (
+              <p className="text-xs text-muted-foreground">This institution was assessed via the field pipeline. Open the institution profile to take further action.</p>
+            )}
           </div>
         </DialogContent>
       </Dialog>
