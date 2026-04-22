@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { ClipboardCheck, Loader2, Eye, Check, X } from "lucide-react";
+import { ClipboardCheck, Loader2, Eye, Check } from "lucide-react";
 import { useState } from "react";
 
 export default function AssessmentQueue() {
