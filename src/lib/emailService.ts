@@ -166,6 +166,32 @@ export function emailRoleAssigned(name: string, roleLabel: string, dashboardUrl:
   `);
 }
 
+export function emailSignAgreement(orgName: string, docType: "mou" | "ipa"): string {
+  const docLabel = docType === "ipa"
+    ? "Institution Partnership Agreement (IPA)"
+    : "Memorandum of Understanding (MOU)";
+  const portalUrl = docType === "ipa"
+    ? `${import.meta.env.VITE_APP_URL || "https://cleancookiq.com"}/institution/ipa`
+    : `${import.meta.env.VITE_APP_URL || "https://cleancookiq.com"}/supplier/mou`;
+  return layout(`
+    <h2 style="color:#1a3c2e;margin-top:0;">Action Required: Please Sign Your ${docType.toUpperCase()}</h2>
+    <p style="color:#374151;line-height:1.6;">Dear ${orgName || "Partner"},</p>
+    <p style="color:#374151;line-height:1.6;">
+      Kindly sign your <strong>${docLabel}</strong> for further processing of your partnership with CleanCook IQ.
+    </p>
+    <p style="color:#374151;line-height:1.6;">
+      Please log in to your portal, download the document, sign it, and upload the signed copy.
+    </p>
+    <p style="text-align:center;">
+      <a href="${portalUrl}" style="${BTN_STYLE}">Sign ${docType.toUpperCase()} Now</a>
+    </p>
+    <p style="color:#6b7280;font-size:13px;margin-top:24px;">
+      If you have any questions, please contact us at
+      <a href="mailto:info@ignis-innovation.com" style="color:#2d6a4f;">info@ignis-innovation.com</a>.
+    </p>
+  `);
+}
+
 export function emailTicketResolved(name: string, ticketTitle: string, reply: string): string {
   return layout(`
     <h2 style="color:#1a3c2e;margin-top:0;">Your Support Ticket Has Been Resolved</h2>

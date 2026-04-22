@@ -61,6 +61,7 @@ const InstitutionDashboard = lazy(() => import("@/pages/institution/InstitutionD
 const InstitutionProfile = lazy(() => import("@/pages/institution/InstitutionProfile"));
 const CookingAlchemy = lazy(() => import("@/pages/institution/CookingAlchemy"));
 const InstitutionDocuments = lazy(() => import("@/pages/institution/InstitutionDocuments"));
+const InstitutionIPA = lazy(() => import("@/pages/institution/InstitutionIPA"));
 
 const SupplierSetup = lazy(() => import("@/pages/supplier/SupplierSetup"));
 const SupplierDashboard = lazy(() => import("@/pages/supplier/SupplierDashboard"));
@@ -68,6 +69,7 @@ const SupplierProducts = lazy(() => import("@/pages/supplier/SupplierProducts"))
 const SupplierServices = lazy(() => import("@/pages/supplier/SupplierServices"));
 const SupplierDocuments = lazy(() => import("@/pages/supplier/SupplierDocuments"));
 const SupplierOpportunities = lazy(() => import("@/pages/supplier/SupplierOpportunities"));
+const SupplierMOU = lazy(() => import("@/pages/supplier/SupplierMOU"));
 
 const FunderDashboard = lazy(() => import("@/pages/funder/FunderDashboard"));
 const FunderInstitutionDetail = lazy(() => import("@/pages/funder/FunderInstitutionDetail"));
@@ -77,6 +79,7 @@ const ResearcherDashboard = lazy(() => import("@/pages/researcher/ResearcherDash
 const ResearcherInstitutionDetail = lazy(() => import("@/pages/researcher/ResearcherInstitutionDetail"));
 const AdminResearchers = lazy(() => import("@/pages/admin/AdminResearchers"));
 const AdminOthers = lazy(() => import("@/pages/admin/AdminOthers"));
+const AdminMOUIPA = lazy(() => import("@/pages/admin/AdminMOUIPA"));
 
 const TicketsPage = lazy(() => import("@/pages/shared/TicketsPage"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
@@ -142,6 +145,7 @@ const App = () => (
                 <Route path="/institution/profile" element={<InstitutionProfile />} />
                 <Route path="/institution/alchemy" element={<CookingAlchemy />} />
                 <Route path="/institution/documents" element={<InstitutionDocuments />} />
+                <Route path="/institution/ipa" element={<InstitutionIPA />} />
                 <Route path="/institution/support" element={<TicketsPage />} />
               </Route>
 
@@ -163,6 +167,7 @@ const App = () => (
                 <Route path="/supplier/services" element={<SupplierServices />} />
                 <Route path="/supplier/documents" element={<SupplierDocuments />} />
                 <Route path="/supplier/opportunities" element={<SupplierOpportunities />} />
+                <Route path="/supplier/mou" element={<SupplierMOU />} />
                 <Route path="/supplier/support" element={<TicketsPage />} />
               </Route>
 
@@ -204,6 +209,7 @@ const App = () => (
                 <Route path="/admin/portfolio-aggregation" element={<PortfolioAggregation />} />
                 <Route path="/admin/researchers" element={<AdminResearchers />} />
                 <Route path="/admin/others" element={<AdminOthers />} />
+                <Route path="/admin/mou-ipa" element={<AdminMOUIPA />} />
                 <Route path="/admin/tickets" element={<AdminTickets />} />
                 <Route path="/admin/subscribers" element={<Subscribers />} />
                 <Route path="/admin/users" element={<UserManagement />} />

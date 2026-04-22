@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard, Building2, FlaskConical, FileText, LifeBuoy, Menu, LogOut, Ticket
+  LayoutDashboard, Building2, FlaskConical, FileText, LifeBuoy, Menu, LogOut, Ticket, ScrollText
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ const institutionNav = [
   { label: "My Institution", href: "/institution/profile", icon: Building2 },
   { label: "Cooking Counting", href: "/institution/alchemy", icon: FlaskConical },
   { label: "Documents", href: "/institution/documents", icon: FileText },
+  { label: "IPA", href: "/institution/ipa", icon: ScrollText },
   { label: "Tickets", href: "/institution/support", icon: Ticket },
 ];
 
