@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useInstitutionId } from "@/hooks/useInstitution";
 import { Download, Upload, Loader2, CheckCircle2, Clock, FileText, Eye, X, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import mammoth from "mammoth";
 
 interface IpaRecord {
   id: string;
@@ -29,9 +30,8 @@ export default function InstitutionIPA() {
   const [uploading, setUploading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [viewerOpen, setViewerOpen] = useState(false);
-
-  const templateUrl = `${window.location.origin}${TEMPLATE_PATH}`;
-  const officeViewerUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(templateUrl)}`;
+  const [docHtml, setDocHtml] = useState<string | null>(null);
+  const [docLoading, setDocLoading] = useState(false);
 
   useEffect(() => {
     if (!institutionId) return;
@@ -46,6 +46,22 @@ export default function InstitutionIPA() {
       setLoading(false);
     })();
   }, [institutionId]);
+
+  const openViewer = async () => {
+    setViewerOpen(true);
+    if (docHtml) return;
+    setDocLoading(true);
+    try {
+      const res = await fetch(TEMPLATE_PATH);
+      const arrayBuffer = await res.arrayBuffer();
+      const result = await mammoth.convertToHtml({ arrayBuffer });
+      setDocHtml(result.value);
+    } catch {
+      setDocHtml("<p style='color:red'>Failed to load document.</p>");
+    } finally {
+      setDocLoading(false);
+    }
+  };
 
   const handleUpload = async () => {
     if (!file || !institutionId || !user) return;
@@ -95,7 +111,7 @@ export default function InstitutionIPA() {
       {/* Document Viewer Overlay */}
       {viewerOpen && (
         <div className="fixed inset-0 z-50 flex flex-col bg-black/80 backdrop-blur-sm">
-          <div className="flex items-center justify-between px-4 py-3 bg-[#1a3c2e]">
+          <div className="flex items-center justify-between px-4 py-3 bg-[#1a3c2e] shrink-0">
             <div className="flex items-center gap-2 text-white">
               <FileText className="h-4 w-4" />
               <span className="text-sm font-medium">{TEMPLATE_DOWNLOAD_NAME}</span>
@@ -107,36 +123,42 @@ export default function InstitutionIPA() {
               <X className="h-4 w-4" /> Close
             </button>
           </div>
-          <iframe
-            src={officeViewerUrl}
-            className="flex-1 w-full border-0"
-            title="IPA Document Viewer"
-          />
+          <div className="flex-1 overflow-y-auto bg-gray-100 p-4">
+            {docLoading ? (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            ) : (
+              <div
+                className="max-w-3xl mx-auto bg-white shadow-lg rounded p-8 sm:p-12"
+                style={{ fontFamily: "Georgia, 'Times New Roman', serif", lineHeight: 1.7, color: "#1a1a1a" }}
+                dangerouslySetInnerHTML={{ __html: docHtml ?? "" }}
+              />
+            )}
+          </div>
         </div>
       )}
 
       <div className="space-y-6 max-w-2xl">
         {/* Page Header */}
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#1a3c2e]/10 text-[#1a3c2e] border border-[#1a3c2e]/20 uppercase tracking-wide">
-                IPA
-              </span>
-              {isSigned
-                ? <Badge className="bg-green-100 text-green-800 border-green-200 text-xs">Signed</Badge>
-                : record?.sign_requested_at
-                  ? <Badge variant="outline" className="text-amber-600 border-amber-300 text-xs">Action Required</Badge>
-                  : null
-              }
-            </div>
-            <h1 className="text-2xl font-display font-bold text-foreground leading-tight">
-              Institution Partnership Agreement
-            </h1>
-            <p className="text-muted-foreground text-sm mt-1">
-              Review the agreement, sign it, and upload your signed copy to proceed.
-            </p>
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#1a3c2e]/10 text-[#1a3c2e] border border-[#1a3c2e]/20 uppercase tracking-wide">
+              IPA
+            </span>
+            {isSigned
+              ? <Badge className="bg-green-100 text-green-800 border-green-200 text-xs">Signed</Badge>
+              : record?.sign_requested_at
+                ? <Badge variant="outline" className="text-amber-600 border-amber-300 text-xs">Action Required</Badge>
+                : null
+            }
           </div>
+          <h1 className="text-2xl font-display font-bold text-foreground leading-tight">
+            Institution Partnership Agreement
+          </h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            Review the agreement, sign it, and upload your signed copy to proceed.
+          </p>
         </div>
 
         {/* Status Banner */}
@@ -146,7 +168,7 @@ export default function InstitutionIPA() {
             <div>
               <p className="text-sm font-medium text-amber-800">Signature requested</p>
               <p className="text-xs text-amber-700 mt-0.5">
-                Requested on {new Date(record.sign_requested_at).toLocaleDateString()}. Download the document below, sign it, and upload your signed copy.
+                Requested on {new Date(record.sign_requested_at).toLocaleDateString()}. Download or view the document below, sign it, and upload your signed copy.
               </p>
             </div>
           </div>
@@ -211,7 +233,7 @@ export default function InstitutionIPA() {
                 variant="ghost"
                 size="sm"
                 className="gap-2 text-[#1a3c2e] hover:bg-[#1a3c2e]/5"
-                onClick={() => setViewerOpen(true)}
+                onClick={openViewer}
               >
                 <Eye className="h-3.5 w-3.5" />
                 View Document
