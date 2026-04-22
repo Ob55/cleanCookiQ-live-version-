@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import BrandedLoader from "@/components/BrandedLoader";
+import IdleLogoutGuard from "@/components/IdleLogoutGuard";
 import { lazy, Suspense } from "react";
 
 const PageLoader = () => <BrandedLoader />;
@@ -93,6 +94,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <IdleLogoutGuard />
           <Suspense fallback={<PageLoader />}>
             <Routes>
               {/* Public pages */}
