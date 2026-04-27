@@ -1,14 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -61,6 +53,56 @@ function isGroup(item: NavItem | NavGroup): item is NavGroup {
   return "items" in item && Array.isArray((item as NavGroup).items);
 }
 
+function NavGroupDropdown({
+  group, isActive, isActiveItem,
+}: {
+  group: NavGroup;
+  isActive: boolean;
+  isActiveItem: (href?: string) => boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          onMouseEnter={() => setOpen(true)}
+          onMouseLeave={() => setOpen(false)}
+          className={cn(
+            "inline-flex items-center gap-1 h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary",
+            isActive ? "text-primary" : "text-muted-foreground",
+            open && "text-primary",
+          )}
+        >
+          {group.label}
+          <ChevronDown className={cn("h-3 w-3 transition-transform", open && "rotate-180")} />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        align="start"
+        sideOffset={4}
+        className="w-48 p-1"
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+      >
+        {group.items.map((item) => (
+          <Link
+            key={item.href}
+            to={item.href ?? "#"}
+            onClick={() => setOpen(false)}
+            className={cn(
+              "block select-none rounded-md px-3 py-2 text-sm leading-none transition-colors hover:bg-accent hover:text-accent-foreground",
+              isActiveItem(item.href) && "bg-accent text-accent-foreground",
+            )}
+          >
+            {item.label}
+          </Link>
+        ))}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 export default function PublicLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
@@ -85,60 +127,31 @@ export default function PublicLayout() {
             <span className="font-display font-bold text-lg text-foreground">cleancookIQ</span>
           </Link>
 
-          {/* Desktop nav with hover dropdowns */}
-          <NavigationMenu className="hidden md:flex">
-            <NavigationMenuList>
-              {NAV_GROUPS.map((entry) =>
-                isGroup(entry) ? (
-                  <NavigationMenuItem key={entry.label}>
-                    <NavigationMenuTrigger
-                      className={cn(
-                        navigationMenuTriggerStyle(),
-                        "bg-transparent text-sm h-9 px-3",
-                        isActiveGroup(entry) ? "text-primary" : "text-muted-foreground",
-                      )}
-                    >
-                      {entry.label}
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                      <ul className="w-48 p-1">
-                        {entry.items.map((item) => (
-                          <li key={item.href}>
-                            <NavigationMenuLink asChild>
-                              <Link
-                                to={item.href ?? "#"}
-                                className={cn(
-                                  "block select-none rounded-md px-3 py-2 text-sm leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent",
-                                  isActiveItem(item.href) && "bg-accent text-accent-foreground",
-                                )}
-                              >
-                                {item.label}
-                              </Link>
-                            </NavigationMenuLink>
-                          </li>
-                        ))}
-                      </ul>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                ) : (
-                  <NavigationMenuItem key={entry.label}>
-                    <NavigationMenuLink asChild>
-                      <Link
-                        to={entry.href ?? "#"}
-                        className={cn(
-                          navigationMenuTriggerStyle(),
-                          "bg-transparent text-sm h-9 px-3",
-                          isActiveItem(entry.href) ? "text-primary" : "text-muted-foreground",
-                        )}
-                      >
-                        {entry.label}
-                      </Link>
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                ),
-              )}
-            </NavigationMenuList>
-          </NavigationMenu>
+          {/* Desktop nav — each group is its own Popover so dropdowns
+              anchor under their actual trigger (not centered). */}
+          <nav className="hidden md:flex items-center gap-1">
+            {NAV_GROUPS.map((entry) =>
+              isGroup(entry) ? (
+                <NavGroupDropdown
+                  key={entry.label}
+                  group={entry}
+                  isActive={isActiveGroup(entry)}
+                  isActiveItem={isActiveItem}
+                />
+              ) : (
+                <Link
+                  key={entry.label}
+                  to={entry.href ?? "#"}
+                  className={cn(
+                    "inline-flex items-center h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary",
+                    isActiveItem(entry.href) ? "text-primary" : "text-muted-foreground",
+                  )}
+                >
+                  {entry.label}
+                </Link>
+              ),
+            )}
+          </nav>
 
           <div className="hidden md:flex items-center gap-2">
             <Link to="/book-demo">

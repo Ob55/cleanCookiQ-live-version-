@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Flame, Users, Building2, GraduationCap, Stethoscope, ShieldCheck } from "lucide-react";
 import { useState } from "react";
+import { useOnboardingGate } from "@/hooks/useOnboardingGate";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood",
@@ -52,6 +53,7 @@ function dominantFuel(list: { current_fuel?: string }[]): string | null {
 }
 
 export default function FunderDashboard() {
+  useOnboardingGate("funder", "/funder/onboarding");
   const [fuelFilter, setFuelFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
 

@@ -68,6 +68,11 @@ const AdminDeliveryDetail = lazy(() => import("@/pages/admin/AdminDeliveryDetail
 const AdminRiskRegister = lazy(() => import("@/pages/admin/AdminRiskRegister"));
 const AdminMonitoring = lazy(() => import("@/pages/admin/AdminMonitoring"));
 const AdminCarbon = lazy(() => import("@/pages/admin/AdminCarbon"));
+const AdminEvents = lazy(() => import("@/pages/admin/AdminEvents"));
+const AdminNews = lazy(() => import("@/pages/admin/AdminNews"));
+const AdminResources = lazy(() => import("@/pages/admin/AdminResources"));
+const AdminMonitoringEntry = lazy(() => import("@/pages/admin/AdminMonitoringEntry"));
+const SupplierQuotes = lazy(() => import("@/pages/supplier/SupplierQuotes"));
 
 // Lazy loaded role pages
 const TADashboard = lazy(() => import("@/pages/ta/TADashboard"));
@@ -207,6 +212,7 @@ const App = () => (
                 <Route path="/supplier/documents" element={<SupplierDocuments />} />
                 <Route path="/supplier/opportunities" element={<SupplierOpportunities />} />
                 <Route path="/supplier/mou" element={<SupplierMOU />} />
+                <Route path="/supplier/quotes" element={<SupplierQuotes />} />
                 <Route path="/supplier/support" element={<TicketsPage />} />
               </Route>
 
@@ -253,6 +259,10 @@ const App = () => (
                 <Route path="/admin/risk" element={<AdminRiskRegister />} />
                 <Route path="/admin/monitoring" element={<AdminMonitoring />} />
                 <Route path="/admin/carbon" element={<AdminCarbon />} />
+                <Route path="/admin/monitoring/new" element={<AdminMonitoringEntry />} />
+                <Route path="/admin/content/events" element={<AdminEvents />} />
+                <Route path="/admin/content/news" element={<AdminNews />} />
+                <Route path="/admin/content/resources" element={<AdminResources />} />
                 <Route path="/admin/portfolio" element={<PortfolioManagement />} />
                 <Route path="/admin/portfolio-aggregation" element={<PortfolioAggregation />} />
                 <Route path="/admin/researchers" element={<AdminResearchers />} />
