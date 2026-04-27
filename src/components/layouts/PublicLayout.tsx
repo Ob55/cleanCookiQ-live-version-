@@ -10,7 +10,8 @@ const navLinks = [
   { label: "Counties", href: "/counties" },
   { label: "Map", href: "/map" },
   { label: "Intelligence", href: "/intelligence" },
-  { label: "About", href: "/about" },
+  { label: "Marketing Analysis", href: "/marketing" },
+  { label: "Book a Demo", href: "/book-demo" },
 ];
 
 export default function PublicLayout() {
@@ -118,7 +119,7 @@ export default function PublicLayout() {
             <div>
               <h4 className="font-display font-semibold mb-3 text-sm text-primary-foreground">Company</h4>
               <div className="space-y-2">
-                <Link to="/about" className="block text-sm text-primary-foreground/60 hover:text-accent">About cleancookIQ</Link>
+                <Link to="/book-demo" className="block text-sm text-primary-foreground/60 hover:text-accent">Book a Demo</Link>
               </div>
             </div>
             <div>

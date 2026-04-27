@@ -27,7 +27,7 @@ const ResearcherLayout = lazy(() => import("@/components/layouts/ResearcherLayou
 const MapPage = lazy(() => import("@/pages/MapPage"));
 const IntelligencePage = lazy(() => import("@/pages/IntelligencePage"));
 const ProvidersPage = lazy(() => import("@/pages/ProvidersPage"));
-const AboutPage = lazy(() => import("@/pages/AboutPage"));
+const BookDemoPage = lazy(() => import("@/pages/BookDemoPage"));
 const MarketingAnalysis = lazy(() => import("@/pages/MarketingAnalysis"));
 const CountiesIndexPage = lazy(() => import("@/pages/CountiesIndexPage"));
 const CountyDetailPage = lazy(() => import("@/pages/CountyDetailPage"));
@@ -114,7 +114,7 @@ const App = () => (
                 <Route path="/marketplace" element={<MarketplacePage />} />
                 <Route path="/products/:id" element={<ProductDetailPage />} />
                 <Route path="/suppliers/:id" element={<SupplierStorefrontPage />} />
-                <Route path="/about" element={<AboutPage />} />
+                <Route path="/book-demo" element={<BookDemoPage />} />
               </Route>
 
               {/* Auth pages */}

@@ -113,6 +113,11 @@ export default {
           from: { opacity: "0", transform: "translateY(32px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        "flip-down": {
+          "0%": { transform: "rotateX(-90deg)", opacity: "0" },
+          "60%": { transform: "rotateX(20deg)", opacity: "1" },
+          "100%": { transform: "rotateX(0deg)", opacity: "1" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -122,6 +127,7 @@ export default {
         "marquee": "marquee 30s linear infinite",
         "arrow-pulse": "arrow-pulse 1.4s ease-in-out infinite",
         "slide-up": "slide-up 1.6s ease-out forwards",
+        "flip-down": "flip-down 0.55s cubic-bezier(0.33, 1, 0.68, 1)",
       },
     },
   },
