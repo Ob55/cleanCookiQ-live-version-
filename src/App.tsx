@@ -29,6 +29,11 @@ const IntelligencePage = lazy(() => import("@/pages/IntelligencePage"));
 const ProvidersPage = lazy(() => import("@/pages/ProvidersPage"));
 const AboutPage = lazy(() => import("@/pages/AboutPage"));
 const MarketingAnalysis = lazy(() => import("@/pages/MarketingAnalysis"));
+const CountiesIndexPage = lazy(() => import("@/pages/CountiesIndexPage"));
+const CountyDetailPage = lazy(() => import("@/pages/CountyDetailPage"));
+const MarketplacePage = lazy(() => import("@/pages/MarketplacePage"));
+const ProductDetailPage = lazy(() => import("@/pages/ProductDetailPage"));
+const SupplierStorefrontPage = lazy(() => import("@/pages/SupplierStorefrontPage"));
 
 // Lazy loaded auth pages
 const RegisterPage = lazy(() => import("@/pages/auth/RegisterPage"));
@@ -104,6 +109,11 @@ const App = () => (
                 <Route path="/intelligence" element={<IntelligencePage />} />
                 <Route path="/providers" element={<ProvidersPage />} />
                 <Route path="/marketing" element={<MarketingAnalysis />} />
+                <Route path="/counties" element={<CountiesIndexPage />} />
+                <Route path="/counties/:slug" element={<CountyDetailPage />} />
+                <Route path="/marketplace" element={<MarketplacePage />} />
+                <Route path="/products/:id" element={<ProductDetailPage />} />
+                <Route path="/suppliers/:id" element={<SupplierStorefrontPage />} />
                 <Route path="/about" element={<AboutPage />} />
               </Route>
 

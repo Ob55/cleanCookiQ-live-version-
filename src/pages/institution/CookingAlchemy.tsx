@@ -4,33 +4,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Loader2, FlaskConical, TrendingDown, Leaf, DollarSign, Flame, Zap } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { Sourced } from "@/components/Sourced";
+import { useActiveDataPoints } from "@/hooks/useDataPoints";
+import { resolveDataPoint, type FuelKey } from "@/lib/dataPoints";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood", charcoal: "Charcoal", lpg: "LPG",
   biogas: "Biogas", electric: "Electric (Induction)", other: "Biomass Pellets",
-};
-
-// Cost per unit per term (KSh) — simplified reference rates
-const FUEL_COST_PER_UNIT: Record<string, number> = {
-  firewood: 8000,   // per tonne
-  charcoal: 120,    // per kg
-  lpg: 250,         // per kg
-  biogas: 50,       // per m³
-  electric: 25,     // per kWh
-  other: 80,        // per kg (pellets)
-};
-
-// Clean alternative cost multiplier (lower = cheaper)
-const CLEAN_COST_MULTIPLIER = 0.4; // clean cooking is ~40% of dirty fuel cost
-
-// CO2 emission factor per unit (kg CO2)
-const CO2_FACTOR: Record<string, number> = {
-  firewood: 1700,  // per tonne
-  charcoal: 3.7,   // per kg
-  lpg: 3.0,        // per kg
-  biogas: 0.5,     // per m³
-  electric: 0.5,   // per kWh
-  other: 1.5,      // per kg
 };
 
 interface InstitutionData {
@@ -46,6 +26,14 @@ export default function CookingAlchemy() {
   const { user } = useAuth();
   const [institution, setInstitution] = useState<InstitutionData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const { data: dataPoints = [], isLoading: dpLoading } = useActiveDataPoints([
+    "fuel.cost_per_unit",
+    "fuel.co2_factor",
+    "transition.clean_cost_multiplier",
+    "transition.co2_reduction_fraction",
+    "transition.cooking_time_savings",
+  ]);
 
   useEffect(() => {
     if (!user) return;
@@ -78,7 +66,7 @@ export default function CookingAlchemy() {
     })();
   }, [user]);
 
-  if (loading) {
+  if (loading || dpLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -102,23 +90,41 @@ export default function CookingAlchemy() {
     );
   }
 
-  const fuel = institution.current_fuel;
+  const fuel = institution.current_fuel as FuelKey;
   const consumption = institution.consumption_per_term;
-  const costPerUnit = FUEL_COST_PER_UNIT[fuel] || 100;
   const termsPerYear = 3;
+
+  const costPoint = resolveDataPoint(dataPoints, { metricKey: "fuel.cost_per_unit", fuel });
+  const co2Point = resolveDataPoint(dataPoints, { metricKey: "fuel.co2_factor", fuel });
+  const cleanMultiplierPoint = resolveDataPoint(dataPoints, {
+    metricKey: "transition.clean_cost_multiplier",
+  });
+  const co2ReductionPoint = resolveDataPoint(dataPoints, {
+    metricKey: "transition.co2_reduction_fraction",
+  });
+  const timeSavingsPoint = resolveDataPoint(dataPoints, {
+    metricKey: "transition.cooking_time_savings",
+  });
+
+  const costPerUnit = costPoint?.value_numeric ?? 100;
+  const co2PerUnit = co2Point?.value_numeric ?? 1;
+  const cleanMultiplier = cleanMultiplierPoint?.value_numeric ?? 0.4;
+  const co2ReductionFraction = co2ReductionPoint?.value_numeric ?? 0.85;
+  const timeSavingsFraction = timeSavingsPoint?.value_numeric ?? 0.5;
 
   const currentCostPerTerm = consumption * costPerUnit;
   const currentCostPerYear = currentCostPerTerm * termsPerYear;
-  const cleanCostPerYear = currentCostPerYear * CLEAN_COST_MULTIPLIER;
+  const cleanCostPerYear = currentCostPerYear * cleanMultiplier;
   const annualSavings = currentCostPerYear - cleanCostPerYear;
-  const co2PerTerm = consumption * (CO2_FACTOR[fuel] || 1);
+  const co2PerTerm = consumption * co2PerUnit;
   const co2PerYear = co2PerTerm * termsPerYear;
-  const co2Reduction = co2PerYear * 0.85; // 85% reduction with clean cooking
+  const co2Reduction = co2PerYear * co2ReductionFraction;
   const cookingTimeSaved = institution.cooking_time_minutes
-    ? Math.round(institution.cooking_time_minutes * 0.5 * termsPerYear * 90) // 50% time savings, ~90 days/term
+    ? Math.round(institution.cooking_time_minutes * timeSavingsFraction * termsPerYear * 90)
     : null;
 
   const formatKSh = (v: number) => `KSh ${v.toLocaleString("en-KE", { maximumFractionDigits: 0 })}`;
+  const reductionPct = Math.round((1 - cleanMultiplier) * 100);
 
   return (
     <div className="space-y-6">
@@ -129,13 +135,17 @@ export default function CookingAlchemy() {
         <p className="text-muted-foreground mt-1">See how much you could save by transitioning to clean cooking</p>
       </div>
 
-      {/* Current State */}
       <Card className="border-destructive/30 bg-destructive/5">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Flame className="h-5 w-5 text-destructive" /> Your Current Cooking Cost
           </CardTitle>
-          <CardDescription>Based on {FUEL_LABELS[fuel]} usage of {consumption} {institution.consumption_unit}/term</CardDescription>
+          <CardDescription>
+            Based on {FUEL_LABELS[fuel]} usage of {consumption} {institution.consumption_unit}/term at{" "}
+            <Sourced point={costPoint}>
+              {formatKSh(costPerUnit)}/{costPoint?.unit?.split("/")[1] ?? "unit"}
+            </Sourced>
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -149,13 +159,16 @@ export default function CookingAlchemy() {
             </div>
             <div className="text-center p-4 rounded-lg bg-background">
               <p className="text-sm text-muted-foreground">CO₂ Emissions/Year</p>
-              <p className="text-xl font-bold text-destructive">{(co2PerYear / 1000).toFixed(1)} tonnes</p>
+              <p className="text-xl font-bold text-destructive">
+                <Sourced point={co2Point}>
+                  {(co2PerYear / 1000).toFixed(1)} tonnes
+                </Sourced>
+              </p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Savings Projection */}
       <Card className="border-primary/30 bg-primary/5">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
@@ -168,30 +181,41 @@ export default function CookingAlchemy() {
             <div className="text-center p-4 rounded-lg bg-background">
               <DollarSign className="h-6 w-6 mx-auto mb-1 text-primary" />
               <p className="text-sm text-muted-foreground">Annual Savings</p>
-              <p className="text-2xl font-bold text-primary">{formatKSh(annualSavings)}</p>
+              <p className="text-2xl font-bold text-primary">
+                <Sourced point={cleanMultiplierPoint}>{formatKSh(annualSavings)}</Sourced>
+              </p>
             </div>
             <div className="text-center p-4 rounded-lg bg-background">
               <TrendingDown className="h-6 w-6 mx-auto mb-1 text-primary" />
               <p className="text-sm text-muted-foreground">Cost Reduction</p>
-              <p className="text-2xl font-bold text-primary">60%</p>
+              <p className="text-2xl font-bold text-primary">
+                <Sourced point={cleanMultiplierPoint}>{reductionPct}%</Sourced>
+              </p>
             </div>
             <div className="text-center p-4 rounded-lg bg-background">
               <Leaf className="h-6 w-6 mx-auto mb-1 text-primary" />
               <p className="text-sm text-muted-foreground">CO₂ Reduction</p>
-              <p className="text-2xl font-bold text-primary">{(co2Reduction / 1000).toFixed(1)} tonnes/yr</p>
+              <p className="text-2xl font-bold text-primary">
+                <Sourced point={co2ReductionPoint}>
+                  {(co2Reduction / 1000).toFixed(1)} tonnes/yr
+                </Sourced>
+              </p>
             </div>
             {cookingTimeSaved && (
               <div className="text-center p-4 rounded-lg bg-background">
                 <Zap className="h-6 w-6 mx-auto mb-1 text-primary" />
                 <p className="text-sm text-muted-foreground">Time Saved/Year</p>
-                <p className="text-2xl font-bold text-primary">{(cookingTimeSaved / 60).toFixed(0)} hrs</p>
+                <p className="text-2xl font-bold text-primary">
+                  <Sourced point={timeSavingsPoint}>
+                    {(cookingTimeSaved / 60).toFixed(0)} hrs
+                  </Sourced>
+                </p>
               </div>
             )}
           </div>
         </CardContent>
       </Card>
 
-      {/* 5-Year Cost Comparison Chart */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">5-Year Cost Comparison</CardTitle>
@@ -217,7 +241,7 @@ export default function CookingAlchemy() {
       </Card>
 
       <p className="text-xs text-muted-foreground text-center">
-        * These are estimates based on average market rates. Actual savings may vary depending on location, provider, and fuel prices.
+        Each metric above is sourced — click the info icon next to a value to see the underlying citation, publisher, and confidence level.
       </p>
     </div>
   );

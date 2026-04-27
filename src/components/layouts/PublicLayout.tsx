@@ -6,10 +6,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
 
 const navLinks = [
-  { label: "About", href: "/about" },
+  { label: "Marketplace", href: "/marketplace" },
+  { label: "Counties", href: "/counties" },
   { label: "Map", href: "/map" },
   { label: "Intelligence", href: "/intelligence" },
-  { label: "Marketing Analysis", href: "/marketing" },
+  { label: "About", href: "/about" },
 ];
 
 export default function PublicLayout() {
@@ -107,8 +108,10 @@ export default function PublicLayout() {
             <div>
               <h4 className="font-display font-semibold mb-3 text-sm text-primary-foreground">Platform</h4>
               <div className="space-y-2">
+                <Link to="/marketplace" className="block text-sm text-primary-foreground/60 hover:text-accent">Marketplace</Link>
                 <Link to="/map" className="block text-sm text-primary-foreground/60 hover:text-accent">National Map</Link>
                 <Link to="/intelligence" className="block text-sm text-primary-foreground/60 hover:text-accent">Intelligence</Link>
+                <Link to="/counties" className="block text-sm text-primary-foreground/60 hover:text-accent">County Profiles</Link>
                 <Link to="/providers" className="block text-sm text-primary-foreground/60 hover:text-accent">Provider Directory</Link>
               </div>
             </div>
