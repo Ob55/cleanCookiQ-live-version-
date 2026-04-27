@@ -28,3 +28,6 @@ dist-ssr
 supabase/.temp/
 .env
 .env.*
+
+# Claude Code local user settings
+.claude/settings.local.json
