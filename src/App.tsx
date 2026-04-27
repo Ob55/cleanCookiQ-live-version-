@@ -29,6 +29,7 @@ const IntelligencePage = lazy(() => import("@/pages/IntelligencePage"));
 const ProvidersPage = lazy(() => import("@/pages/ProvidersPage"));
 const BookDemoPage = lazy(() => import("@/pages/BookDemoPage"));
 const MarketingAnalysis = lazy(() => import("@/pages/MarketingAnalysis"));
+const AboutPage = lazy(() => import("@/pages/AboutPage"));
 const CountiesIndexPage = lazy(() => import("@/pages/CountiesIndexPage"));
 const CountyDetailPage = lazy(() => import("@/pages/CountyDetailPage"));
 const MarketplacePage = lazy(() => import("@/pages/MarketplacePage"));
@@ -133,6 +134,7 @@ const App = () => (
                 <Route path="/news" element={<NewsPage />} />
                 <Route path="/events" element={<EventsPage />} />
                 <Route path="/book-demo" element={<BookDemoPage />} />
+                <Route path="/about" element={<AboutPage />} />
               </Route>
 
               {/* Auth pages */}
