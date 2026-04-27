@@ -3,9 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { MapPin, Loader2, Filter, RotateCcw } from "lucide-react";
+import {
+  MapPin, Loader2, Filter, RotateCcw,
+  GraduationCap, Stethoscope, Building2,
+} from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import heroBg from "@/assets/hero-bg.jpg";
 
 const pipelineStages = [
   "identified", "contacted", "assessed", "scored", "least_cost_path_assigned",
@@ -69,6 +73,52 @@ const institutionTypeLabels: Record<string, string> = {
   other: "Other",
 };
 
+// Per-institution-type SVG paths — used inside L.divIcon HTML so map
+// markers show the actual icon (not a plain circle). Stroke-only style;
+// the circle around them carries the colour.
+const TYPE_SVG_PATHS: Record<string, string> = {
+  // GraduationCap (Lucide)
+  school: '<path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>',
+  // Stethoscope-ish — use Lucide "Plus" cross for clarity at small size
+  hospital: '<path d="M12 5v14M5 12h14" stroke-width="2.5"/>',
+  // Shield (prison)
+  prison: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  // Factory
+  factory: '<path d="M2 20h20M4 20V8l5 4V8l5 4V8l5 4v8M9 20v-4M14 20v-4"/>',
+  // Hotel/bed
+  hotel: '<path d="M2 4v16M22 12v8M2 12h20M2 8h20M6 8v4"/>',
+  // Utensils (restaurant)
+  restaurant: '<path d="M3 2v7a3 3 0 003 3v10M9 2v20M15 14V2c-2 0-4 2-4 6s2 6 4 6z"/>',
+  // Church (faith_based)
+  faith_based: '<path d="M12 2v6M9 5h6M5 22V11l7-4 7 4v11M9 22v-7h6v7"/>',
+  // Building (other)
+  other: '<path d="M3 22V6a2 2 0 012-2h14a2 2 0 012 2v16M9 8h.01M15 8h.01M9 12h.01M15 12h.01M9 16h.01M15 16h.01"/>',
+};
+
+function makeMarkerIcon(type: string, color: string): L.DivIcon {
+  const svgPath = TYPE_SVG_PATHS[type] ?? TYPE_SVG_PATHS.other;
+  // 28×28 outer pin with the icon centred at 16×16
+  const html = `
+    <div style="
+      width:30px;height:30px;border-radius:50%;
+      background:${color};border:2px solid #fff;
+      box-shadow:0 2px 6px rgba(0,0,0,.35);
+      display:flex;align-items:center;justify-content:center;
+    ">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        ${svgPath}
+      </svg>
+    </div>`;
+  return L.divIcon({
+    html,
+    className: "ccq-marker",
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    popupAnchor: [0, -15],
+  });
+}
+
 function escapeHtml(value: string) {
   return value
     .replaceAll("&", "&amp;")
@@ -131,12 +181,12 @@ export default function MapPage() {
     if (!markersRef.current) return;
     markersRef.current.clearLayers();
 
-    // Add institution markers (colored by institution type)
+    // Add institution markers — divIcon with per-type SVG icons
     if (typeFilter !== "all_orgs") {
       geoFiltered.forEach(inst => {
         const color = institutionTypeColors[inst.institution_type] || "#64748b";
-        const marker = L.circleMarker([inst.latitude!, inst.longitude!], {
-          radius: 8, fillColor: color, color: "#fff", weight: 2, opacity: 1, fillOpacity: 0.8,
+        const marker = L.marker([inst.latitude!, inst.longitude!], {
+          icon: makeMarkerIcon(inst.institution_type, color),
         });
 
         const fuelOfChoice = inst.fuel_of_choice || inst.current_fuel || "—";
@@ -180,42 +230,60 @@ export default function MapPage() {
 
   return (
     <div className="min-h-[85vh] flex flex-col">
+      {/* Compact hero — gives the dropdowns clear space to overlay without
+          fighting with the map filter chips for visual priority. */}
+      <section
+        className="relative h-40 sm:h-48 bg-cover bg-center"
+        style={{ backgroundImage: `url(${heroBg})` }}
+      >
+        <div className="absolute inset-0 bg-foreground/70" />
+        <div className="container relative h-full flex flex-col justify-center text-primary-foreground">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/90 text-accent-foreground text-xs font-medium w-fit mb-2">
+            <MapPin className="h-3.5 w-3.5" /> Institutional pipeline
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-display font-bold">National Institution Map</h1>
+          <p className="text-sm text-primary-foreground/80 mt-1 max-w-xl">
+            Every institution in the clean cooking pipeline, by type, county, and stage.
+          </p>
+        </div>
+      </section>
+
       <div className="bg-card border-b border-border p-4">
         <div className="container flex items-center justify-between flex-wrap gap-3">
           <div>
-            <h1 className="text-xl font-display font-bold flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-primary" /> Institution Map
-            </h1>
+            <h2 className="text-base font-display font-bold flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-primary" /> Filters
+            </h2>
             <p className="text-xs text-muted-foreground">{geoFiltered.length} institutions shown, {filtered.length} total</p>
           </div>
           <div className="flex gap-2 flex-wrap items-center">
-            {/* Quick filter buttons */}
+            {/* Quick filter buttons — now with proper Lucide icons + colour swatches */}
             <div className="flex gap-1 items-center border border-border rounded-md p-1 bg-muted/40">
               <Button
                 size="sm"
                 variant={quickFilter === "school" ? "default" : "ghost"}
-                className="h-7 px-3 text-xs"
+                className="h-7 px-3 text-xs gap-1.5"
                 onClick={() => setQuickFilter(quickFilter === "school" ? "all" : "school")}
               >
-                <span className="inline-block h-2 w-2 rounded-full mr-1.5" style={{ backgroundColor: institutionTypeColors.school }} />
+                <GraduationCap className="h-3.5 w-3.5" style={{ color: quickFilter === "school" ? "currentColor" : institutionTypeColors.school }} />
                 Schools
               </Button>
               <Button
                 size="sm"
                 variant={quickFilter === "hospital" ? "default" : "ghost"}
-                className="h-7 px-3 text-xs"
+                className="h-7 px-3 text-xs gap-1.5"
                 onClick={() => setQuickFilter(quickFilter === "hospital" ? "all" : "hospital")}
               >
-                <span className="inline-block h-2 w-2 rounded-full mr-1.5" style={{ backgroundColor: institutionTypeColors.hospital }} />
+                <Stethoscope className="h-3.5 w-3.5" style={{ color: quickFilter === "hospital" ? "currentColor" : institutionTypeColors.hospital }} />
                 Hospitals
               </Button>
               <Button
                 size="sm"
                 variant={quickFilter === "other" ? "default" : "ghost"}
-                className="h-7 px-3 text-xs"
+                className="h-7 px-3 text-xs gap-1.5"
                 onClick={() => setQuickFilter(quickFilter === "other" ? "all" : "other")}
               >
-                <span className="inline-block h-2 w-2 rounded-full mr-1.5" style={{ backgroundColor: institutionTypeColors.faith_based }} />
+                <Building2 className="h-3.5 w-3.5" style={{ color: quickFilter === "other" ? "currentColor" : institutionTypeColors.faith_based }} />
                 Other
               </Button>
               <Button
@@ -247,6 +315,7 @@ export default function MapPage() {
             </Select>
           </div>
         </div>
+
       </div>
 
       <div className="flex-1 relative">

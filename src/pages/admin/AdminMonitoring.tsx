@@ -1,6 +1,8 @@
-import { Activity, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Activity, AlertTriangle, CheckCircle2, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMonitoringLatest } from "@/hooks/useRisk";
 import { type MonitoringLatest } from "@/lib/risk";
@@ -10,14 +12,19 @@ export default function AdminMonitoring() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-          <Activity className="h-6 w-6 text-primary" /> Monitoring
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Latest fuel-use reading per project. Clean-fuel share &lt; 50% triggers a
-          behavioural-relapse risk and a refresher-training ticket automatically.
-        </p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold flex items-center gap-2">
+            <Activity className="h-6 w-6 text-primary" /> Monitoring
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Latest fuel-use reading per project. Clean-fuel share &lt; 50% triggers a
+            behavioural-relapse risk and a refresher-training ticket automatically.
+          </p>
+        </div>
+        <Link to="/admin/monitoring/new">
+          <Button><Plus className="h-4 w-4 mr-1" /> Record reading</Button>
+        </Link>
       </div>
 
       {isLoading ? (

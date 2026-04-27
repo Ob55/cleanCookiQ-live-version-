@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard, Package, Wrench, FileCheck, Menu, LogOut, FileText, Ticket, ScrollText
+  LayoutDashboard, Package, Wrench, FileCheck, Menu, LogOut, FileText, Ticket, ScrollText, Inbox
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ const supplierNav = [
   { label: "Services", href: "/supplier/services", icon: Wrench },
   { label: "Documents & Compliance", href: "/supplier/documents", icon: FileCheck },
   { label: "Opportunities", href: "/supplier/opportunities", icon: FileText },
+  { label: "Quote Requests", href: "/supplier/quotes", icon: Inbox },
   { label: "MOU / CSCC", href: "/supplier/mou", icon: ScrollText },
   { label: "Tickets", href: "/supplier/support", icon: Ticket },
 ];
