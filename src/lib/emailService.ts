@@ -192,6 +192,44 @@ export function emailSignAgreement(orgName: string, docType: "mou" | "ipa"): str
   `);
 }
 
+export function emailDemoConfirmation(name: string): string {
+  return layout(`
+    <h2 style="color:#1a3c2e;margin-top:0;">We received your demo request</h2>
+    <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
+    <p style="color:#374151;line-height:1.6;">
+      Thanks for your interest in CleanCookIQ! We've received your demo request and someone
+      from our team will reach out within 24 hours to schedule a time that works for you.
+    </p>
+    <p style="color:#374151;line-height:1.6;">
+      In the meantime, if you have any urgent questions, feel free to reply directly to this email.
+    </p>
+    <p style="color:#374151;line-height:1.6;margin-top:24px;">
+      Talk soon,<br/>The CleanCookIQ Team
+    </p>
+  `);
+}
+
+export function emailDemoNotification(
+  name: string,
+  email: string,
+  phone: string,
+  submittedAt: string,
+): string {
+  return layout(`
+    <h2 style="color:#1a3c2e;margin-top:0;">🔔 New demo request</h2>
+    <p style="color:#374151;line-height:1.6;">A new demo has been requested on CleanCookIQ.</p>
+    <p style="color:#374151;line-height:1.6;"><strong>Requester details:</strong></p>
+    <ul style="color:#374151;line-height:1.8;padding-left:20px;">
+      <li><strong>Name:</strong> ${name}</li>
+      <li><strong>Email:</strong> <a href="mailto:${email}" style="color:#2d6a4f;">${email}</a></li>
+      <li><strong>Phone:</strong> ${phone}</li>
+      <li><strong>Submitted:</strong> ${submittedAt}</li>
+    </ul>
+    <p style="color:#374151;line-height:1.6;">Please follow up within 24 hours.</p>
+    <p style="color:#6b7280;font-size:13px;margin-top:24px;">— CleanCookIQ Platform</p>
+  `);
+}
+
 export function emailTicketResolved(name: string, ticketTitle: string, reply: string): string {
   return layout(`
     <h2 style="color:#1a3c2e;margin-top:0;">Your Support Ticket Has Been Resolved</h2>

@@ -15,6 +15,7 @@ import partner6 from "@/assets/partners/partner6.png";
 import partner7 from "@/assets/partners/partner7.png";
 import { useAuth } from "@/contexts/AuthContext";
 import AnimatedNumber from "@/components/AnimatedNumber";
+import SummitCountdown from "@/components/SummitCountdown";
 
 const partners = [partner1, partner2, partner3, partner4, partner5, partner6, partner7];
 
@@ -125,13 +126,13 @@ export default function HomePage() {
                   <MapPin className="mr-2 h-4 w-4" /> Explore the Map
                 </Button>
               </Link>
-              <Link to="/about">
+              <Link to="/book-demo">
                 <Button
                   size="lg"
                   variant="outline"
                   className="bg-transparent border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground font-semibold"
                 >
-                  About cleancookIQ <ChevronRight className="ml-1 h-4 w-4" />
+                  Book a Demo <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
               </Link>
             </div>
@@ -273,6 +274,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <SummitCountdown />
 
       {/* Our Partners - animated marquee */}
       <section className="py-16 lg:py-20 bg-background border-t border-border">

@@ -27,7 +27,7 @@ const ResearcherLayout = lazy(() => import("@/components/layouts/ResearcherLayou
 const MapPage = lazy(() => import("@/pages/MapPage"));
 const IntelligencePage = lazy(() => import("@/pages/IntelligencePage"));
 const ProvidersPage = lazy(() => import("@/pages/ProvidersPage"));
-const AboutPage = lazy(() => import("@/pages/AboutPage"));
+const BookDemoPage = lazy(() => import("@/pages/BookDemoPage"));
 const MarketingAnalysis = lazy(() => import("@/pages/MarketingAnalysis"));
 
 // Lazy loaded auth pages
@@ -104,7 +104,7 @@ const App = () => (
                 <Route path="/intelligence" element={<IntelligencePage />} />
                 <Route path="/providers" element={<ProvidersPage />} />
                 <Route path="/marketing" element={<MarketingAnalysis />} />
-                <Route path="/about" element={<AboutPage />} />
+                <Route path="/book-demo" element={<BookDemoPage />} />
               </Route>
 
               {/* Auth pages */}
