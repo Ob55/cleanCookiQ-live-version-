@@ -3,6 +3,7 @@ import {
   LayoutDashboard, Building2, Users, ClipboardCheck,
   BarChart3, FileText, TrendingUp, Factory, Menu, X, LogOut,
   Briefcase, Ticket, FlaskConical, Upload, HelpCircle, ScrollText,
+  Calculator, Truck, ShieldAlert, Activity, Leaf,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -22,8 +23,17 @@ const adminNav = [
   { label: "Import Institutions", href: "/admin/institutions/import", icon: Upload },
   { label: "Providers", href: "/admin/providers", icon: Factory },
 
+  { section: "Delivery" },
+  { label: "Deliveries", href: "/admin/deliveries", icon: Truck },
+
+  { section: "M&E" },
+  { label: "Monitoring", href: "/admin/monitoring", icon: Activity },
+  { label: "Risk Register", href: "/admin/risk", icon: ShieldAlert },
+  { label: "Carbon Ledger", href: "/admin/carbon", icon: Leaf },
+
   { section: "Finance" },
   { label: "BD Dashboard", href: "/admin/bd", icon: BarChart3 },
+  { label: "Financing Designer", href: "/admin/financing-designer", icon: Calculator },
   { label: "Portfolio", href: "/admin/portfolio", icon: Briefcase },
   { label: "Portfolio Aggregation", href: "/admin/portfolio-aggregation", icon: BarChart3 },
 

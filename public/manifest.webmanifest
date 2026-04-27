@@ -1,0 +1,39 @@
+{
+  "name": "CleanCookiQ",
+  "short_name": "CleanCookiQ",
+  "description": "Kenya's clean cooking transition platform — institutions, suppliers, funders, and field agents.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a3c2e",
+  "lang": "en-KE",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/cleancookiq-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/cleancookiq-og-logo.png",
+      "sizes": "1200x1200",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Marketplace",
+      "url": "/marketplace",
+      "description": "Browse clean cooking products"
+    },
+    {
+      "name": "Deliveries",
+      "url": "/admin/deliveries",
+      "description": "Field agent: track deliveries and commissioning"
+    }
+  ]
+}

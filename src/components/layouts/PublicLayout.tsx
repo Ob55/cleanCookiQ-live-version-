@@ -8,9 +8,10 @@ import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
 const navLinks = [
   { label: "Marketplace", href: "/marketplace" },
   { label: "Counties", href: "/counties" },
+  { label: "Resources", href: "/resources" },
+  { label: "Events", href: "/events" },
+  { label: "News", href: "/news" },
   { label: "Map", href: "/map" },
-  { label: "Intelligence", href: "/intelligence" },
-  { label: "Marketing Analysis", href: "/marketing" },
   { label: "Book a Demo", href: "/book-demo" },
 ];
 
@@ -113,6 +114,10 @@ export default function PublicLayout() {
                 <Link to="/map" className="block text-sm text-primary-foreground/60 hover:text-accent">National Map</Link>
                 <Link to="/intelligence" className="block text-sm text-primary-foreground/60 hover:text-accent">Intelligence</Link>
                 <Link to="/counties" className="block text-sm text-primary-foreground/60 hover:text-accent">County Profiles</Link>
+                <Link to="/policy" className="block text-sm text-primary-foreground/60 hover:text-accent">Policy Library</Link>
+                <Link to="/resources" className="block text-sm text-primary-foreground/60 hover:text-accent">Resources</Link>
+                <Link to="/events" className="block text-sm text-primary-foreground/60 hover:text-accent">Events</Link>
+                <Link to="/news" className="block text-sm text-primary-foreground/60 hover:text-accent">News</Link>
                 <Link to="/providers" className="block text-sm text-primary-foreground/60 hover:text-accent">Provider Directory</Link>
               </div>
             </div>

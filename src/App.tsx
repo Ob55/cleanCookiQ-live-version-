@@ -34,6 +34,10 @@ const CountyDetailPage = lazy(() => import("@/pages/CountyDetailPage"));
 const MarketplacePage = lazy(() => import("@/pages/MarketplacePage"));
 const ProductDetailPage = lazy(() => import("@/pages/ProductDetailPage"));
 const SupplierStorefrontPage = lazy(() => import("@/pages/SupplierStorefrontPage"));
+const PolicyLibraryPage = lazy(() => import("@/pages/PolicyLibraryPage"));
+const ResourcesPage = lazy(() => import("@/pages/ResourcesPage"));
+const NewsPage = lazy(() => import("@/pages/NewsPage"));
+const EventsPage = lazy(() => import("@/pages/EventsPage"));
 
 // Lazy loaded auth pages
 const RegisterPage = lazy(() => import("@/pages/auth/RegisterPage"));
@@ -57,6 +61,12 @@ const PortfolioAggregation = lazy(() => import("@/pages/admin/PortfolioAggregati
 const AdminTickets = lazy(() => import("@/pages/admin/AdminTickets"));
 const Subscribers = lazy(() => import("@/pages/admin/Subscribers"));
 const InstitutionImport = lazy(() => import("@/pages/admin/InstitutionImport"));
+const FinancingDesigner = lazy(() => import("@/pages/admin/FinancingDesigner"));
+const AdminDeliveries = lazy(() => import("@/pages/admin/AdminDeliveries"));
+const AdminDeliveryDetail = lazy(() => import("@/pages/admin/AdminDeliveryDetail"));
+const AdminRiskRegister = lazy(() => import("@/pages/admin/AdminRiskRegister"));
+const AdminMonitoring = lazy(() => import("@/pages/admin/AdminMonitoring"));
+const AdminCarbon = lazy(() => import("@/pages/admin/AdminCarbon"));
 
 // Lazy loaded role pages
 const TADashboard = lazy(() => import("@/pages/ta/TADashboard"));
@@ -80,6 +90,10 @@ const SupplierMOU = lazy(() => import("@/pages/supplier/SupplierMOU"));
 const FunderDashboard = lazy(() => import("@/pages/funder/FunderDashboard"));
 const FunderInstitutionDetail = lazy(() => import("@/pages/funder/FunderInstitutionDetail"));
 const FunderDocuments = lazy(() => import("@/pages/funder/FunderDocuments"));
+const FunderDealFlow = lazy(() => import("@/pages/funder/FunderDealFlow"));
+const FunderPortfolio = lazy(() => import("@/pages/funder/FunderPortfolio"));
+const FunderImpactReport = lazy(() => import("@/pages/funder/FunderImpactReport"));
+const FunderOnboarding = lazy(() => import("@/pages/funder/FunderOnboarding"));
 
 const ResearcherDashboard = lazy(() => import("@/pages/researcher/ResearcherDashboard"));
 const ResearcherInstitutionDetail = lazy(() => import("@/pages/researcher/ResearcherInstitutionDetail"));
@@ -114,6 +128,10 @@ const App = () => (
                 <Route path="/marketplace" element={<MarketplacePage />} />
                 <Route path="/products/:id" element={<ProductDetailPage />} />
                 <Route path="/suppliers/:id" element={<SupplierStorefrontPage />} />
+                <Route path="/policy" element={<PolicyLibraryPage />} />
+                <Route path="/resources" element={<ResourcesPage />} />
+                <Route path="/news" element={<NewsPage />} />
+                <Route path="/events" element={<EventsPage />} />
                 <Route path="/book-demo" element={<BookDemoPage />} />
               </Route>
 
@@ -137,6 +155,13 @@ const App = () => (
               <Route path="/financing" element={
                 <ProtectedRoute allowedRoles={["financing_partner"]} allowedOrgTypes={["funder"]}>
                   <FinancingPage />
+                </ProtectedRoute>
+              } />
+
+              {/* Funder onboarding (no sidebar) */}
+              <Route path="/funder/onboarding" element={
+                <ProtectedRoute allowedRoles={["financing_partner"]} allowedOrgTypes={["funder"]}>
+                  <FunderOnboarding />
                 </ProtectedRoute>
               } />
 
@@ -190,6 +215,9 @@ const App = () => (
                 </ProtectedRoute>
               }>
                 <Route path="/funder/dashboard" element={<FunderDashboard />} />
+                <Route path="/funder/deals" element={<FunderDealFlow />} />
+                <Route path="/funder/portfolio" element={<FunderPortfolio />} />
+                <Route path="/funder/impact" element={<FunderImpactReport />} />
                 <Route path="/funder/institution/:id" element={<FunderInstitutionDetail />} />
                 <Route path="/funder/documents" element={<FunderDocuments />} />
                 <Route path="/funder/support" element={<TicketsPage />} />
@@ -217,6 +245,12 @@ const App = () => (
                 <Route path="/admin/assessments" element={<AssessmentQueue />} />
                 <Route path="/admin/opportunities" element={<OpportunityManagement />} />
                 <Route path="/admin/bd" element={<BDDashboard />} />
+                <Route path="/admin/financing-designer" element={<FinancingDesigner />} />
+                <Route path="/admin/deliveries" element={<AdminDeliveries />} />
+                <Route path="/admin/deliveries/:id" element={<AdminDeliveryDetail />} />
+                <Route path="/admin/risk" element={<AdminRiskRegister />} />
+                <Route path="/admin/monitoring" element={<AdminMonitoring />} />
+                <Route path="/admin/carbon" element={<AdminCarbon />} />
                 <Route path="/admin/portfolio" element={<PortfolioManagement />} />
                 <Route path="/admin/portfolio-aggregation" element={<PortfolioAggregation />} />
                 <Route path="/admin/researchers" element={<AdminResearchers />} />

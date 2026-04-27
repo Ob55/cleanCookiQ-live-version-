@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, LogOut, Menu, FileText, Ticket } from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, FileText, Ticket, TrendingUp, Briefcase, BarChart3 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import NotificationBell from "@/components/NotificationBell";
@@ -46,6 +46,63 @@ export default function FunderLayout() {
             >
               <LayoutDashboard className="h-4 w-4 shrink-0" />
               Dashboard
+            </Link>
+          );
+        })()}
+
+        {/* Deal Flow Link */}
+        {(() => {
+          const isActive = location.pathname === "/funder/deals";
+          return (
+            <Link
+              to="/funder/deals"
+              onClick={() => setSidebarOpen(false)}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                isActive
+                  ? "bg-sidebar-accent text-sidebar-primary"
+                  : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+              }`}
+            >
+              <TrendingUp className="h-4 w-4 shrink-0" />
+              Deal Flow
+            </Link>
+          );
+        })()}
+
+        {/* Portfolio Link */}
+        {(() => {
+          const isActive = location.pathname === "/funder/portfolio";
+          return (
+            <Link
+              to="/funder/portfolio"
+              onClick={() => setSidebarOpen(false)}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                isActive
+                  ? "bg-sidebar-accent text-sidebar-primary"
+                  : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+              }`}
+            >
+              <Briefcase className="h-4 w-4 shrink-0" />
+              Portfolio
+            </Link>
+          );
+        })()}
+
+        {/* Impact Report Link */}
+        {(() => {
+          const isActive = location.pathname === "/funder/impact";
+          return (
+            <Link
+              to="/funder/impact"
+              onClick={() => setSidebarOpen(false)}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                isActive
+                  ? "bg-sidebar-accent text-sidebar-primary"
+                  : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+              }`}
+            >
+              <BarChart3 className="h-4 w-4 shrink-0" />
+              Impact Report
             </Link>
           );
         })()}
