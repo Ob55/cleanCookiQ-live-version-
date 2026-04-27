@@ -34,7 +34,9 @@ export default function CountiesIndexPage() {
         </div>
       )}
 
-      {data && groupCountiesByRegion(data).map((group) => (
+      {data && groupCountiesByRegion(
+        data.map((d) => ({ ...d, name: d.county_name })),
+      ).map((group) => (
         <section key={group.region} className="space-y-3">
           <h2 className="text-xl font-display font-semibold flex items-center gap-2">
             <MapPin className="h-5 w-5 text-primary" /> {group.region}
