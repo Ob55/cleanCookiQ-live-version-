@@ -24,6 +24,7 @@ dist-ssr
 *.sw?
 .codex
 .codex/
+.claude/settings.local.json
 .vercel/
 supabase/.temp/
 .env
