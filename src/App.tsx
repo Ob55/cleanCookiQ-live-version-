@@ -72,6 +72,14 @@ const AdminEvents = lazy(() => import("@/pages/admin/AdminEvents"));
 const AdminNews = lazy(() => import("@/pages/admin/AdminNews"));
 const AdminResources = lazy(() => import("@/pages/admin/AdminResources"));
 const AdminMonitoringEntry = lazy(() => import("@/pages/admin/AdminMonitoringEntry"));
+const AdminDataSources = lazy(() => import("@/pages/admin/AdminDataSources"));
+const AdminDataPoints = lazy(() => import("@/pages/admin/AdminDataPoints"));
+const AdminFinancingInstruments = lazy(() => import("@/pages/admin/AdminFinancingInstruments"));
+const AdminCommissioningTemplates = lazy(() => import("@/pages/admin/AdminCommissioningTemplates"));
+const AdminInstallationCrews = lazy(() => import("@/pages/admin/AdminInstallationCrews"));
+const AdminProductCategories = lazy(() => import("@/pages/admin/AdminProductCategories"));
+const AdminCreditVerifications = lazy(() => import("@/pages/admin/AdminCreditVerifications"));
+const AssessmentEditor = lazy(() => import("@/pages/admin/AssessmentEditor"));
 const SupplierQuotes = lazy(() => import("@/pages/supplier/SupplierQuotes"));
 
 // Lazy loaded role pages
@@ -98,6 +106,8 @@ const FunderInstitutionDetail = lazy(() => import("@/pages/funder/FunderInstitut
 const FunderDocuments = lazy(() => import("@/pages/funder/FunderDocuments"));
 const FunderDealFlow = lazy(() => import("@/pages/funder/FunderDealFlow"));
 const FunderPortfolio = lazy(() => import("@/pages/funder/FunderPortfolio"));
+const FunderCoinvestment = lazy(() => import("@/pages/funder/FunderCoinvestment"));
+const OrganisationProfilePage = lazy(() => import("@/pages/OrganisationProfilePage"));
 const FunderImpactReport = lazy(() => import("@/pages/funder/FunderImpactReport"));
 const FunderOnboarding = lazy(() => import("@/pages/funder/FunderOnboarding"));
 
@@ -191,6 +201,7 @@ const App = () => (
                 <Route path="/institution/documents" element={<InstitutionDocuments />} />
                 <Route path="/institution/ipa" element={<InstitutionIPA />} />
                 <Route path="/institution/support" element={<TicketsPage />} />
+                <Route path="/institution/account/organisation" element={<OrganisationProfilePage />} />
               </Route>
 
               {/* Supplier Setup (no sidebar) */}
@@ -214,6 +225,7 @@ const App = () => (
                 <Route path="/supplier/mou" element={<SupplierMOU />} />
                 <Route path="/supplier/quotes" element={<SupplierQuotes />} />
                 <Route path="/supplier/support" element={<TicketsPage />} />
+                <Route path="/supplier/account/organisation" element={<OrganisationProfilePage />} />
               </Route>
 
               {/* Funder pages (with sidebar) */}
@@ -225,10 +237,12 @@ const App = () => (
                 <Route path="/funder/dashboard" element={<FunderDashboard />} />
                 <Route path="/funder/deals" element={<FunderDealFlow />} />
                 <Route path="/funder/portfolio" element={<FunderPortfolio />} />
+                <Route path="/funder/coinvestment" element={<FunderCoinvestment />} />
                 <Route path="/funder/impact" element={<FunderImpactReport />} />
                 <Route path="/funder/institution/:id" element={<FunderInstitutionDetail />} />
                 <Route path="/funder/documents" element={<FunderDocuments />} />
                 <Route path="/funder/support" element={<TicketsPage />} />
+                <Route path="/funder/account/organisation" element={<OrganisationProfilePage />} />
               </Route>
 
               {/* Researcher pages (with sidebar) */}
@@ -240,6 +254,7 @@ const App = () => (
                 <Route path="/researcher/dashboard" element={<ResearcherDashboard />} />
                 <Route path="/researcher/institution/:id" element={<ResearcherInstitutionDetail />} />
                 <Route path="/researcher/support" element={<TicketsPage />} />
+                <Route path="/researcher/account/organisation" element={<OrganisationProfilePage />} />
               </Route>
 
               {/* Admin pages (protected) */}
@@ -251,6 +266,7 @@ const App = () => (
                 <Route path="/admin/providers" element={<ProviderManagement />} />
                 <Route path="/admin/providers/:id" element={<ProviderDetail />} />
                 <Route path="/admin/assessments" element={<AssessmentQueue />} />
+                <Route path="/admin/assessments/:id/edit" element={<AssessmentEditor />} />
                 <Route path="/admin/opportunities" element={<OpportunityManagement />} />
                 <Route path="/admin/bd" element={<BDDashboard />} />
                 <Route path="/admin/financing-designer" element={<FinancingDesigner />} />
@@ -271,6 +287,14 @@ const App = () => (
                 <Route path="/admin/tickets" element={<AdminTickets />} />
                 <Route path="/admin/subscribers" element={<Subscribers />} />
                 <Route path="/admin/users" element={<UserManagement />} />
+                <Route path="/admin/reference/data-sources" element={<AdminDataSources />} />
+                <Route path="/admin/reference/data-points" element={<AdminDataPoints />} />
+                <Route path="/admin/reference/financing-instruments" element={<AdminFinancingInstruments />} />
+                <Route path="/admin/reference/commissioning-templates" element={<AdminCommissioningTemplates />} />
+                <Route path="/admin/reference/product-categories" element={<AdminProductCategories />} />
+                <Route path="/admin/installation-crews" element={<AdminInstallationCrews />} />
+                <Route path="/admin/credit-verifications" element={<AdminCreditVerifications />} />
+                <Route path="/admin/account/organisation" element={<OrganisationProfilePage />} />
               </Route>
 
               <Route path="*" element={<NotFound />} />

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import AuthBackButton from "@/components/auth/AuthBackButton";
 
 export default function VerifyEmailPage() {
   const [resending, setResending] = useState(false);
@@ -17,7 +18,8 @@ export default function VerifyEmailPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4">
+    <div className="relative min-h-screen flex items-center justify-center py-12 px-4">
+      <AuthBackButton />
       <div className="w-full max-w-md text-center">
         <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
           <Mail className="h-8 w-8 text-primary" />

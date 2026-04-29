@@ -65,7 +65,7 @@ export default function AdminOthers() {
       if (profile.email) {
         await sendEmail({
           to: profile.email,
-          subject: `Your CleanCook IQ account has been approved as ${label}`,
+          subject: `Your cleancookIQ account has been approved as ${label}`,
           html: emailRoleAssigned(profile.full_name || profile.org_name || "there", label, dashboardUrl),
         });
       }

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Eye, EyeOff } from "lucide-react";
+import AuthBackButton from "@/components/auth/AuthBackButton";
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
@@ -55,7 +56,8 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4">
+    <div className="relative min-h-screen flex items-center justify-center py-12 px-4">
+      <AuthBackButton />
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-display font-bold">Set new password</h1>

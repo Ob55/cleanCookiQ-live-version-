@@ -220,7 +220,7 @@ export default function InstitutionIPA() {
           </CardHeader>
           <CardContent className="pt-4 space-y-3">
             <p className="text-sm text-muted-foreground leading-relaxed">
-              This agreement formalises the partnership between your institution and CleanCook IQ / Ignis Innovation for clean cooking transition support and financing facilitation.
+              This agreement formalises the partnership between your institution and cleancookIQ / Ignis Innovation for clean cooking transition support and financing facilitation.
             </p>
             <div className="flex items-center gap-2 flex-wrap">
               <a href={TEMPLATE_PATH} download={TEMPLATE_DOWNLOAD_NAME}>

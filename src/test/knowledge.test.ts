@@ -53,7 +53,7 @@ const baseEvent: EventSummary = {
   hero_image_url: null,
   recording_url: null,
   status: "upcoming",
-  organiser: "CleanCookiQ",
+  organiser: "cleancookIQ",
   contact_email: null,
   tags: [],
   is_published: true,

@@ -11,7 +11,7 @@ export default function BrandedLoader({ message = "Loading your dashboard…" }:
         <div className="absolute inset-0 rounded-full border-4 border-primary/10" />
         <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary border-r-accent animate-spin" />
         <div className="absolute inset-2 rounded-full bg-background flex items-center justify-center shadow-inner">
-          <img src={cleancookIqLogo} alt="CleanCookiQ" className="h-12 w-12 object-contain animate-pulse" />
+          <img src={cleancookIqLogo} alt="cleancookIQ" className="h-12 w-12 object-contain animate-pulse" />
         </div>
       </div>
       <p className="font-display font-semibold text-lg text-foreground/90">CleanCook<span className="text-accent">iQ</span></p>

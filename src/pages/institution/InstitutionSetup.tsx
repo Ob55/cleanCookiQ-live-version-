@@ -192,7 +192,7 @@ export default function InstitutionSetup() {
       if (recipientEmail) {
         await sendEmail({
           to: recipientEmail,
-          subject: "We see you registered on CleanCookIQ",
+          subject: "We see you registered on cleancookIQ",
           html: emailInstitutionWelcome(
             user.user_metadata?.full_name || contactPerson || "",
             name.trim(),

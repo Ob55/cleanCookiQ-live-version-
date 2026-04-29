@@ -61,7 +61,7 @@ export default function SupplierSetup() {
       if (recipientEmail) {
         await sendEmail({
           to: recipientEmail,
-          subject: "Welcome to CleanCook IQ as a Supplier",
+          subject: "Welcome to cleancookIQ as a Supplier",
           html: emailSupplierWelcome(
             user.user_metadata?.full_name || "",
             companyName.trim(),

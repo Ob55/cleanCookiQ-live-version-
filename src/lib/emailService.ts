@@ -38,8 +38,8 @@ function layout(body: string): string {
 <div style="${BASE_STYLE}">
   <div style="${HEADER_STYLE}">
     <img src="https://bnbhattryqbterblybzw.supabase.co/storage/v1/object/public/assets/logo.png"
-      alt="CleanCook IQ" height="36" style="display:inline-block;" onerror="this.style.display='none'" />
-    <h1 style="color:#ffffff;margin:8px 0 0;font-size:20px;font-weight:700;">CleanCook IQ</h1>
+      alt="cleancookIQ" height="36" style="display:inline-block;" onerror="this.style.display='none'" />
+    <h1 style="color:#ffffff;margin:8px 0 0;font-size:20px;font-weight:700;">cleancookIQ</h1>
   </div>
   <div style="${BODY_STYLE}">${body}</div>
   <div style="${FOOTER_STYLE}">
@@ -54,7 +54,7 @@ export function emailAccountApproved(name: string, dashboardUrl: string): string
     <h2 style="color:#1a3c2e;margin-top:0;">Your Account Has Been Approved!</h2>
     <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
     <p style="color:#374151;line-height:1.6;">
-      Great news! Your CleanCook IQ account has been reviewed and <strong>approved</strong>.
+      Great news! Your cleancookIQ account has been reviewed and <strong>approved</strong>.
       You can now log in and access your dashboard to get started.
     </p>
     <p style="text-align:center;">
@@ -71,7 +71,7 @@ export function emailAccountRejected(name: string): string {
     <h2 style="color:#1a3c2e;margin-top:0;">Account Application Update</h2>
     <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
     <p style="color:#374151;line-height:1.6;">
-      Thank you for your interest in CleanCook IQ. After reviewing your application,
+      Thank you for your interest in cleancookIQ. After reviewing your application,
       we're unable to approve your account at this time.
     </p>
     <p style="color:#374151;line-height:1.6;">
@@ -93,10 +93,10 @@ const FUEL_DISPLAY: Record<string, string> = {
 export function emailInstitutionWelcome(name: string, institutionName: string, currentFuel?: string): string {
   const fuelLabel = currentFuel ? (FUEL_DISPLAY[currentFuel] || currentFuel) : "current fuel";
   return layout(`
-    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to CleanCook IQ</h2>
+    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to cleancookIQ</h2>
     <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
     <p style="color:#374151;line-height:1.6;">
-      We see you registered on CleanCookIQ. Your <strong>${fuelLabel}</strong> usage suggests
+      We see you registered on cleancookIQ. Your <strong>${fuelLabel}</strong> usage suggests
       real opportunities to cut fuel costs per meal and reduce CO₂ emissions.
       We help institutions move from registration to financed installation.
     </p>
@@ -115,10 +115,10 @@ export function emailInstitutionWelcome(name: string, institutionName: string, c
 
 export function emailSupplierWelcome(name: string, companyName: string): string {
   return layout(`
-    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to CleanCook IQ</h2>
+    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to cleancookIQ</h2>
     <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
     <p style="color:#374151;line-height:1.6;">
-      Your company <strong>${companyName}</strong> has been registered as a supplier on CleanCook IQ.
+      Your company <strong>${companyName}</strong> has been registered as a supplier on cleancookIQ.
       You can now browse institution opportunities and submit proposals.
     </p>
     <p style="text-align:center;">
@@ -132,7 +132,7 @@ export function emailOtherInterest(name: string, orgName: string): string {
     <h2 style="color:#1a3c2e;margin-top:0;">Thank You for Your Interest!</h2>
     <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
     <p style="color:#374151;line-height:1.6;">
-      We have seen that <strong>${orgName || "your organisation"}</strong> has shown interest in CleanCook IQ.
+      We have seen that <strong>${orgName || "your organisation"}</strong> has shown interest in cleancookIQ.
       Kindly be patient as we prepare a dashboard for you.
     </p>
     <p style="color:#374151;line-height:1.6;">
@@ -150,7 +150,7 @@ export function emailRoleAssigned(name: string, roleLabel: string, dashboardUrl:
     <h2 style="color:#1a3c2e;margin-top:0;">Your Account Has Been Approved!</h2>
     <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
     <p style="color:#374151;line-height:1.6;">
-      Great news! Your CleanCook IQ account has been reviewed and approved as a
+      Great news! Your cleancookIQ account has been reviewed and approved as a
       <strong>${roleLabel}</strong>.
     </p>
     <p style="color:#374151;line-height:1.6;">
@@ -177,7 +177,7 @@ export function emailSignAgreement(orgName: string, docType: "mou" | "ipa"): str
     <h2 style="color:#1a3c2e;margin-top:0;">Action Required: Please Sign Your ${docType.toUpperCase()}</h2>
     <p style="color:#374151;line-height:1.6;">Dear ${orgName || "Partner"},</p>
     <p style="color:#374151;line-height:1.6;">
-      Kindly sign your <strong>${docLabel}</strong> for further processing of your partnership with CleanCook IQ.
+      Kindly sign your <strong>${docLabel}</strong> for further processing of your partnership with cleancookIQ.
     </p>
     <p style="color:#374151;line-height:1.6;">
       Please log in to your portal, download the document, sign it, and upload the signed copy.
@@ -197,14 +197,14 @@ export function emailDemoConfirmation(name: string): string {
     <h2 style="color:#1a3c2e;margin-top:0;">We received your demo request</h2>
     <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
     <p style="color:#374151;line-height:1.6;">
-      Thanks for your interest in CleanCookIQ! We've received your demo request and someone
+      Thanks for your interest in cleancookIQ! We've received your demo request and someone
       from our team will reach out within 24 hours to schedule a time that works for you.
     </p>
     <p style="color:#374151;line-height:1.6;">
       In the meantime, if you have any urgent questions, feel free to reply directly to this email.
     </p>
     <p style="color:#374151;line-height:1.6;margin-top:24px;">
-      Talk soon,<br/>The CleanCookIQ Team
+      Talk soon,<br/>The cleancookIQ Team
     </p>
   `);
 }
@@ -217,7 +217,7 @@ export function emailDemoNotification(
 ): string {
   return layout(`
     <h2 style="color:#1a3c2e;margin-top:0;">🔔 New demo request</h2>
-    <p style="color:#374151;line-height:1.6;">A new demo has been requested on CleanCookIQ.</p>
+    <p style="color:#374151;line-height:1.6;">A new demo has been requested on cleancookIQ.</p>
     <p style="color:#374151;line-height:1.6;"><strong>Requester details:</strong></p>
     <ul style="color:#374151;line-height:1.8;padding-left:20px;">
       <li><strong>Name:</strong> ${name}</li>
@@ -226,7 +226,7 @@ export function emailDemoNotification(
       <li><strong>Submitted:</strong> ${submittedAt}</li>
     </ul>
     <p style="color:#374151;line-height:1.6;">Please follow up within 24 hours.</p>
-    <p style="color:#6b7280;font-size:13px;margin-top:24px;">— CleanCookIQ Platform</p>
+    <p style="color:#6b7280;font-size:13px;margin-top:24px;">— cleancookIQ Platform</p>
   `);
 }
 

@@ -4,7 +4,8 @@ import {
   BarChart3, FileText, TrendingUp, Factory, Menu, X, LogOut,
   Briefcase, Ticket, FlaskConical, Upload, HelpCircle, ScrollText,
   Calculator, Truck, ShieldAlert, Activity, Leaf,
-  Calendar, Newspaper, Library,
+  Calendar, Newspaper, Library, Database, Banknote, ClipboardList,
+  Wrench, Tag, ShieldCheck,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -26,11 +27,20 @@ const adminNav = [
 
   { section: "Delivery" },
   { label: "Deliveries", href: "/admin/deliveries", icon: Truck },
+  { label: "Installation Crews", href: "/admin/installation-crews", icon: Wrench },
 
   { section: "M&E" },
   { label: "Monitoring", href: "/admin/monitoring", icon: Activity },
   { label: "Risk Register", href: "/admin/risk", icon: ShieldAlert },
   { label: "Carbon Ledger", href: "/admin/carbon", icon: Leaf },
+  { label: "Credit Verifications", href: "/admin/credit-verifications", icon: ShieldCheck },
+
+  { section: "Reference Data" },
+  { label: "Data Sources", href: "/admin/reference/data-sources", icon: Library },
+  { label: "Data Points", href: "/admin/reference/data-points", icon: Database },
+  { label: "Financing Instruments", href: "/admin/reference/financing-instruments", icon: Banknote },
+  { label: "Commissioning Templates", href: "/admin/reference/commissioning-templates", icon: ClipboardList },
+  { label: "Product Categories", href: "/admin/reference/product-categories", icon: Tag },
 
   { section: "Content" },
   { label: "Events", href: "/admin/content/events", icon: Calendar },
@@ -170,9 +180,9 @@ export default function AdminLayout() {
           <div className="flex-1" />
           <div className="flex items-center gap-3">
             <NotificationBell />
-            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
+            <Link to="/admin/account/organisation" title="Manage organisation" className="h-8 w-8 rounded-full bg-primary flex items-center justify-center hover:ring-2 hover:ring-primary/30 transition">
               <span className="text-xs font-bold text-primary-foreground">{initials}</span>
-            </div>
+            </Link>
           </div>
         </header>
 

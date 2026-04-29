@@ -117,7 +117,7 @@ export default function FunderOnboarding() {
       );
 
     await refreshProfile();
-    toast.success("Welcome to CleanCookiQ.");
+    toast.success("Welcome to cleancookIQ.");
     navigate("/funder/deals");
   };
 

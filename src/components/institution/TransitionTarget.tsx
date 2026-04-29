@@ -23,7 +23,7 @@ export const TRANSITION_TARGETS: { value: string; label: string; desc: string }[
   { value: "ethanol", label: "Ethanol", desc: "Liquid bioethanol stoves" },
   { value: "biomass_pellets", label: "Biomass Pellets", desc: "Compressed clean biomass pellets" },
   { value: "solar_hybrid", label: "Solar Hybrid", desc: "Solar + electric/LPG hybrid" },
-  { value: "other", label: "Other / Undecided", desc: "I'd like the CleanCookiQ team to advise" },
+  { value: "other", label: "Other / Undecided", desc: "I'd like the cleancookIQ team to advise" },
 ];
 
 export const TRANSITION_TARGET_LABELS: Record<string, string> = Object.fromEntries(

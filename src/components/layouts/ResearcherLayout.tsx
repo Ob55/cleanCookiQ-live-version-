@@ -96,9 +96,9 @@ export default function ResearcherLayout() {
           <div className="flex-1" />
           <div className="flex items-center gap-3">
             <NotificationBell />
-            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
+            <Link to="/researcher/account/organisation" title="Manage organisation" className="h-8 w-8 rounded-full bg-primary flex items-center justify-center hover:ring-2 hover:ring-primary/30 transition">
               <span className="text-xs font-bold text-primary-foreground">{initials}</span>
-            </div>
+            </Link>
           </div>
         </header>
 
