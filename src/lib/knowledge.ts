@@ -188,7 +188,7 @@ export function eventToIcs(event: EventSummary, baseUrl: string): string {
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//CleanCookiQ//Events//EN",
+    "PRODID:-//cleancookIQ//Events//EN",
     "BEGIN:VEVENT",
     `UID:${event.id}@cleancookiq.com`,
     `DTSTAMP:${fmt(new Date().toISOString())}`,

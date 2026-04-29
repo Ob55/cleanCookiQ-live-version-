@@ -55,7 +55,7 @@ export default function SupplierStorefrontPage() {
                 <h1 className="text-3xl font-display font-bold">{supplier.name}</h1>
                 <CSCCTierBadge tier={tier} />
                 {supplier.verified && (
-                  <Badge variant="secondary">Verified by CleanCookiQ</Badge>
+                  <Badge variant="secondary">Verified by cleancookIQ</Badge>
                 )}
               </div>
               {supplier.website && (

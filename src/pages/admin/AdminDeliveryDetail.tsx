@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDelivery, useCommissioningChecklist, useCommissioningTemplates } from "@/hooks/useDeliveries";
+import ProjectMilestonesSection from "@/components/admin/ProjectMilestonesSection";
 import {
   DELIVERY_STAGES, deliveryProgress, isReadyForSignoff, stageLabel,
   type DeliveryStage,
@@ -172,6 +173,9 @@ export default function AdminDeliveryDetail() {
           )}
         </CardContent>
       </Card>
+
+      {/* Project milestones */}
+      <ProjectMilestonesSection projectId={delivery.project_id} />
 
       {/* Acceptance */}
       <Card>

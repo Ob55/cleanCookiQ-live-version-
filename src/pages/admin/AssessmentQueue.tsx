@@ -6,8 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { ClipboardCheck, Loader2, Eye, Check } from "lucide-react";
+import { ClipboardCheck, Loader2, Eye, Check, Pencil, Plus } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function AssessmentQueue() {
   const queryClient = useQueryClient();
@@ -132,9 +133,14 @@ export default function AssessmentQueue() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold">Assessment Review Queue</h1>
-        <p className="text-sm text-muted-foreground">Review and approve institution assessments</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-display font-bold">Assessment Review Queue</h1>
+          <p className="text-sm text-muted-foreground">Review and approve institution assessments</p>
+        </div>
+        <Link to="/admin/assessments/new/edit">
+          <Button><Plus className="h-4 w-4 mr-1" /> New assessment</Button>
+        </Link>
       </div>
 
       {/* Stats */}
@@ -211,6 +217,11 @@ export default function AssessmentQueue() {
                       <Button size="sm" variant="ghost" onClick={() => { setReviewingId(a.id); setReviewNotes(a.reviewer_notes || ""); }}>
                         <Eye className="h-4 w-4" />
                       </Button>
+                      {a.source === "assessment" && (
+                        <Link to={`/admin/assessments/${a.id}/edit`}>
+                          <Button size="sm" variant="ghost"><Pencil className="h-4 w-4" /></Button>
+                        </Link>
+                      )}
                       {a.status === "submitted" && a.source === "assessment" && (
                         <Button size="sm" variant="ghost" onClick={() => updateStatus.mutate({ id: a.id, status: "approved" })}>
                           <Check className="h-4 w-4 text-primary" />

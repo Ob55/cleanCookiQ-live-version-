@@ -11,15 +11,78 @@ import {
   Zap,
   Check,
   MapPin,
+  AlertCircle,
 } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
 
-const challenges = [
-  "Project pipelines are scattered and disconnected",
-  "Financiers struggle to see which projects are ready",
-  "Partners work in silos instead of coordinating",
-  "There is no shared data or way to track performance",
-  "Proven solutions are hard to scale across regions",
+const challenges: Array<{
+  title: string;
+  scenario: string;
+  pattern: string;
+  cost: string;
+  fix: string;
+}> = [
+  {
+    title: "Project pipelines are scattered and disconnected",
+    scenario:
+      "A boarding school in Bungoma decides to switch from firewood to LPG. Two valleys away, a hospital is making the same decision in the same week. Neither knows the other exists. A supplier in Nairobi visits each one separately, quotes them separately, and travels back twice.",
+    pattern:
+      "Multiply that by hundreds of institutions across 47 counties. Demand exists, but it is invisible — locked inside individual procurement officers, county education offices, and dusty assessment reports that never reach the people who could act on them together.",
+    cost:
+      "Suppliers price every visit as a one-off. Financiers see no aggregated demand. Programmes overlap or miss whole regions. The transition happens one slow handshake at a time when it could happen in coordinated waves.",
+    fix:
+      "cleancookIQ keeps one verified, county-by-county pipeline of institutions with their fuel, readiness, and contact details — so demand becomes a map instead of a rumour.",
+  },
+  {
+    title: "Financiers struggle to see which projects are ready",
+    scenario:
+      "A development finance institution has a USD 50 million facility earmarked for clean cooking in East Africa. Its investment committee wants ten investable projects on its desk by quarter-end. What it actually receives are scattered concept notes, individual school pitches too small to underwrite, and verbal claims of \"strong pipeline\" with no shared definition of ready.",
+    pattern:
+      "Without a common standard for what \"investment-ready\" means — verified energy baseline, costed technology, signed institutional agreement, identified counterparties — every funder builds its own due-diligence machine from scratch for every deal.",
+    cost:
+      "Capital that is willing to deploy sits idle. Promising projects miss windows because they cannot be packaged fast enough. The cost of capital stays high because perceived risk stays high.",
+    fix:
+      "cleancookIQ scores each opportunity against a transparent readiness rubric — financial, operational, technical, social — so funders filter on facts, not on whoever pitched them last.",
+  },
+  {
+    title: "Partners work in silos instead of coordinating",
+    scenario:
+      "In one Kenyan county, a government programme is installing improved cookstoves in primary schools. A bilateral donor is rolling out biogas to secondary schools. An NGO is training cooks at TVETs. None of the three programmes share a list of which schools they have touched, what equipment is installed, or who is responsible if something breaks next month.",
+    pattern:
+      "Each partner reports up its own chain. Beneficiaries get visited three times by three teams asking the same questions. Maintenance falls through the cracks because no one agreed who owns what after handover.",
+    cost:
+      "Beneficiary fatigue, double-spending on assessment, gaps in service, and donor reports that paint isolated wins instead of a coherent national picture.",
+    fix:
+      "cleancookIQ acts as the neutral coordination layer — one institution record, one source of truth on stage, supplier, and funder — so every partner can see who else is in the room.",
+  },
+  {
+    title: "There is no shared data or way to track performance",
+    scenario:
+      "Six months after a brand-new biogas digester is commissioned at a girls' school, the donor wants to know: are the cooks actually using it, how much firewood was avoided, what is the carbon impact? The school has no meter readings, the supplier moved on to the next project, and the baseline that was measured at the start of the engagement was never digitised.",
+    pattern:
+      "The sector measures inputs (units installed, money spent) far better than it measures outcomes (fuel actually displaced, meals actually cooked, emissions actually avoided). Carbon credits worth real money go unclaimed because no one collected the evidence in a verifiable form.",
+    cost:
+      "Funders cannot prove impact. Carbon revenue stays on the table. Repeat investment becomes harder to justify because last year's investment cannot be evaluated.",
+    fix:
+      "cleancookIQ captures monthly readings, photos, and acceptance signoffs against per-fuel templates — and keeps the citations behind every metric, so a credit verifier can audit the chain of evidence.",
+  },
+  {
+    title: "Proven solutions are hard to scale across regions",
+    scenario:
+      "An electric pressure cooker pilot in Kakamega works beautifully — cooks love it, fuel bills drop, and the maintenance crew is local and trained. The donor asks: can we replicate this in five neighbouring counties next year? The honest answer is: not without rebuilding the supplier relationships, the financing structure, and the training network from scratch in each new place.",
+    pattern:
+      "What makes a pilot succeed is rarely the hardware. It is the surrounding network — installers, financiers, county officials, lead users. Without a way to transplant that network, every \"proven solution\" stays trapped in the county where it was born.",
+    cost:
+      "The sector keeps re-piloting things that already work. Time, money, and momentum that should compound into national reach gets reset every time the geography changes.",
+    fix:
+      "cleancookIQ carries the pattern across regions — the same vetted suppliers, the same financing instruments, the same readiness rubric — so a working model in Kakamega becomes a launchable model in Migori without starting from zero.",
+  },
 ];
 
 const approachPillars = [
@@ -36,7 +99,7 @@ const approachPillars = [
   {
     icon: Banknote,
     title: "3. Unlocking Financing",
-    body: "By structuring projects and making them visible, CleanCookIQ helps unlock impact investment, carbon finance, and mixed financing options, making projects easier to fund and scale.",
+    body: "By structuring projects and making them visible, cleancookIQ helps unlock impact investment, carbon finance, and mixed financing options, making projects easier to fund and scale.",
   },
   {
     icon: LineChart,
@@ -100,10 +163,10 @@ export default function AboutPage() {
             <span className="text-xs font-medium text-accent">A Platform for Clean Cooking</span>
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-primary-foreground mb-6 leading-tight">
-            About CleanCookIQ
+            About cleancookIQ
           </h1>
           <p className="text-primary-foreground/80 max-w-3xl mx-auto text-lg leading-relaxed">
-            CleanCookIQ is a platform that helps institutions across Africa switch to clean cooking, faster.
+            cleancookIQ is a platform that helps institutions across Africa switch to clean cooking, faster.
           </p>
         </div>
       </section>
@@ -115,7 +178,7 @@ export default function AboutPage() {
             Built to solve the scattered nature of the clean cooking ecosystem, the platform connects institutions, solution providers, financiers, and partners, turning disconnected efforts into coordinated, ready-to-invest opportunities.
           </p>
           <p className="text-muted-foreground text-lg leading-relaxed">
-            Rather than operating as a standalone project or technology provider, CleanCookIQ functions as the coordination and intelligence layer powering the next generation of clean cooking markets.
+            Rather than operating as a standalone project or technology provider, cleancookIQ functions as the coordination and intelligence layer powering the next generation of clean cooking markets.
           </p>
         </div>
       </section>
@@ -129,16 +192,57 @@ export default function AboutPage() {
               Even with growing momentum, clean cooking, especially at the institutional level, is held back by a few big barriers.
             </p>
           </div>
-          <ul className="space-y-4">
-            {challenges.map((item) => (
-              <li
-                key={item}
-                className="bg-card border border-border rounded-xl p-5 shadow-card"
+          <p className="text-xs text-muted-foreground text-center mb-4 italic">
+            Click any challenge to read the story behind it.
+          </p>
+          <Accordion type="single" collapsible className="space-y-4">
+            {challenges.map((item, i) => (
+              <AccordionItem
+                key={item.title}
+                value={`challenge-${i}`}
+                className="bg-card border border-border rounded-xl shadow-card overflow-hidden data-[state=open]:shadow-elevated transition-shadow"
               >
-                <p className="text-foreground font-medium">{item}</p>
-              </li>
+                <AccordionTrigger className="px-5 py-4 hover:no-underline hover:bg-muted/30 text-left">
+                  <div className="flex items-start gap-4 flex-1">
+                    <div className="h-9 w-9 rounded-full bg-destructive/10 border border-destructive/30 flex items-center justify-center shrink-0">
+                      <AlertCircle className="h-4 w-4 text-destructive" />
+                    </div>
+                    <span className="font-display font-semibold text-foreground pt-1.5 leading-snug">
+                      {item.title}
+                    </span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-5 pb-6">
+                  <div className="ml-13 pl-13 space-y-4 text-sm leading-relaxed">
+                    <div>
+                      <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-1">
+                        What it looks like on the ground
+                      </p>
+                      <p className="text-foreground/85">{item.scenario}</p>
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-1">
+                        The pattern
+                      </p>
+                      <p className="text-foreground/85">{item.pattern}</p>
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-1">
+                        Why it matters
+                      </p>
+                      <p className="text-foreground/85">{item.cost}</p>
+                    </div>
+                    <div className="border-l-4 border-primary bg-primary/5 rounded-r-lg p-4 mt-4">
+                      <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-1 flex items-center gap-1">
+                        <Check className="h-3 w-3" strokeWidth={3} /> How cleancookIQ closes this gap
+                      </p>
+                      <p className="text-foreground/90">{item.fix}</p>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
             ))}
-          </ul>
+          </Accordion>
           <p className="text-muted-foreground text-center mt-10 max-w-2xl mx-auto">
             These challenges slow down deployment, limit investment flows, and prevent the ecosystem from reaching its full potential.
           </p>
@@ -151,7 +255,7 @@ export default function AboutPage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Our Approach</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              CleanCookIQ addresses these gaps by building a unified platform that enables:
+              cleancookIQ addresses these gaps by building a unified platform that enables:
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -177,7 +281,7 @@ export default function AboutPage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">How It Works</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              CleanCookIQ transforms clean cooking deployment into a coordinated process.
+              cleancookIQ transforms clean cooking deployment into a coordinated process.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -198,7 +302,7 @@ export default function AboutPage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Who We Serve</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              CleanCookIQ is designed for a multi-stakeholder ecosystem.
+              cleancookIQ is designed for a multi-stakeholder ecosystem.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -238,7 +342,7 @@ export default function AboutPage() {
             ))}
           </ul>
           <p className="text-muted-foreground text-center mt-10 max-w-2xl mx-auto">
-            CleanCookIQ exists to turn this momentum into real, large-scale progress, not scattered wins.
+            cleancookIQ exists to turn this momentum into real, large-scale progress, not scattered wins.
           </p>
         </div>
       </section>
@@ -284,17 +388,17 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* What Makes CleanCookIQ Different */}
+      {/* What Makes cleancookIQ Different */}
       <section className="py-20 bg-background">
         <div className="container max-w-5xl">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">What Makes CleanCookIQ Different</h2>
+            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">What Makes cleancookIQ Different</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Not */}
             <div className="bg-card border border-border rounded-xl p-7 shadow-card">
               <div className="mb-6">
-                <p className="text-foreground/70 text-xs font-bold uppercase tracking-widest">CleanCookIQ is not</p>
+                <p className="text-foreground/70 text-xs font-bold uppercase tracking-widest">cleancookIQ is not</p>
               </div>
               <ul className="space-y-3">
                 {notList.map((t) => (

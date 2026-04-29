@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
 import BrandedLoader from "@/components/BrandedLoader";
+import AuthBackButton from "@/components/auth/AuthBackButton";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -97,7 +98,8 @@ export default function LoginPage() {
   if (redirecting) return <BrandedLoader message="Preparing your dashboard…" />;
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4">
+    <div className="relative min-h-screen flex items-center justify-center py-12 px-4">
+      <AuthBackButton />
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">

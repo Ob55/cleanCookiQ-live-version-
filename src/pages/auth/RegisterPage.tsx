@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { sendEmail, emailOtherInterest } from "@/lib/emailService";
+import AuthBackButton from "@/components/auth/AuthBackButton";
+import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
 
 const orgTypes = [
   { value: "institution", label: "Institution", desc: "School, hospital, prison, factory", icon: Building2 },
@@ -107,7 +109,7 @@ export default function RegisterPage() {
       if (isOther) {
         await sendEmail({
           to: email,
-          subject: "Thank you for your interest in CleanCook IQ",
+          subject: "Thank you for your interest in cleancookIQ",
           html: emailOtherInterest(fullName, orgName),
         });
       }
@@ -118,16 +120,13 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4">
+    <div className="relative min-h-screen flex items-center justify-center py-12 px-4">
+      <AuthBackButton />
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-display font-bold text-lg">C</span>
-            </div>
-            <span className="font-display font-bold text-xl">
-              CleanCook<span className="text-accent">IQ</span>
-            </span>
+            <img src={cleancookIqLogo} alt="cleancookIQ" className="h-12 w-auto" />
+            <span className="font-display font-bold text-xl">cleancookIQ</span>
           </Link>
           <h1 className="text-2xl font-display font-bold">Create your account</h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -238,7 +237,7 @@ export default function RegisterPage() {
               {isSupplier && (
                 <div className="p-4 rounded-lg border border-border bg-muted/30">
                   <p className="text-xs text-muted-foreground mb-3">
-                    By registering as a Supplier/Provider, you agree to CleanCookIQ's terms of service, including compliance with quality standards, timely delivery of products and services, and adherence to our partner code of conduct. You acknowledge that your profile and product listings will be visible to institutions and administrators on the platform.
+                    By registering as a Supplier/Provider, you agree to cleancookIQ's terms of service, including compliance with quality standards, timely delivery of products and services, and adherence to our partner code of conduct. You acknowledge that your profile and product listings will be visible to institutions and administrators on the platform.
                   </p>
                   <div className="flex items-center gap-2">
                     <Checkbox

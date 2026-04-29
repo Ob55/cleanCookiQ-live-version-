@@ -87,7 +87,7 @@ export default function AdminResearchers() {
       user_id: userId,
       title: grant ? "Prime Access Granted" : "Prime Access Revoked",
       body: grant
-        ? "You have been granted prime access to institution data on CleanCookIQ."
+        ? "You have been granted prime access to institution data on cleancookIQ."
         : "Your prime access to institution data has been revoked.",
     });
 

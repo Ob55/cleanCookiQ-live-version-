@@ -1,7 +1,7 @@
 import { Link, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { MapPin, BarChart3, Users, TrendingUp, Leaf, Building2, ArrowRight, Flame, Factory, Banknote, Briefcase, FolderKanban, GraduationCap, UserPlus, ClipboardCheck, Handshake, Rocket, Activity, ChevronRight, Check } from "lucide-react";
+import { MapPin, BarChart3, Users, TrendingUp, Leaf, Building2, ArrowRight, Flame, Factory, Banknote, Briefcase, FolderKanban, GraduationCap, UserPlus, ClipboardCheck, Handshake, Rocket, Activity, ChevronRight, Check, X } from "lucide-react";
 import FuelOptionsSection from "@/components/institution/FuelOptionsSection";
 import { supabase } from "@/integrations/supabase/client";
 import heroBg from "@/assets/hero-bg.jpg";
@@ -43,11 +43,8 @@ const modules = [
 ];
 
 const failures = [
-  { fail: "Nobody knows which institutions are ready to switch", fix: "We keep a verified list of institutions ready to transition." },
-  { fail: "There is no trusted list of suppliers", fix: "We vet providers and publish clear profiles with ratings." },
-  { fail: "Funding is scattered and hard to access", fix: "We match funders with projects that are ready to be financed." },
-  { fail: "Institutions do not know where to start", fix: "We work out the best, most affordable clean cooking option for each institution." },
-  { fail: "Nobody is coordinating the work", fix: "We are the neutral coordinator, run by Ignis as a commercial service." },
+  { fail: "Demand is invisible — no one knows which institutions are ready to switch.", fix: "We maintain a verified, county-level pipeline of institutions ready to transition." },
+  { fail: "Capital is fragmented and slow to deploy where it is needed.", fix: "We match funders to investment-ready projects with vetted suppliers and clear impact." },
 ];
 
 const steps = [
@@ -202,8 +199,8 @@ export default function HomePage() {
         </div>
         <div className="container relative z-10">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 text-primary-foreground">Five Problems, One Solution</h2>
-            <p className="text-primary-foreground/80 max-w-2xl mx-auto">The clean cooking sector for institutions has real gaps. CleanCookiQ fills them.</p>
+            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 text-primary-foreground">Closing the Gaps in Institutional Clean Cooking</h2>
+            <p className="text-primary-foreground/80 max-w-2xl mx-auto">The clean cooking sector for institutions has real gaps. cleancookIQ fills them.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 rounded-2xl overflow-hidden shadow-elevated border border-border">
             {/* Left — Failures */}
@@ -213,8 +210,11 @@ export default function HomePage() {
               </div>
               <ul className="space-y-6">
                 {failures.map((item, i) => (
-                  <li key={item.fail} className="animate-slide-up" style={{ animationDelay: `${i * 80}ms`, animationFillMode: "backwards" }}>
-                    <h4 className="font-display font-semibold text-foreground leading-snug">{item.fail}</h4>
+                  <li key={item.fail} className="flex items-start gap-4 animate-slide-up" style={{ animationDelay: `${i * 80}ms`, animationFillMode: "backwards" }}>
+                    <div className="h-9 w-9 rounded-full bg-destructive/10 border border-destructive/30 flex items-center justify-center shrink-0 mt-0.5">
+                      <X className="h-4 w-4 text-destructive" strokeWidth={3} />
+                    </div>
+                    <h4 className="font-display font-semibold text-foreground leading-snug pt-1">{item.fail}</h4>
                   </li>
                 ))}
               </ul>
@@ -238,6 +238,11 @@ export default function HomePage() {
                 ))}
               </ul>
             </div>
+          </div>
+          <div className="text-center mt-10">
+            <Link to="/about" className="inline-flex items-center gap-2 text-accent hover:text-amber-light font-semibold transition-colors">
+              Learn more about how we close these gaps <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       </section>
@@ -300,7 +305,23 @@ export default function HomePage() {
       <section className="py-20 bg-gradient-hero text-primary-foreground">
         <div className="container text-center">
           <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Ready to Join the Transition?</h2>
-          <p className="text-primary-foreground/80 max-w-xl mx-auto">Whether you are an institution, provider, funder, or researcher, there is a place for you on CleanCookiQ.</p>
+          <p className="text-primary-foreground/80 max-w-xl mx-auto mb-8">Whether you are an institution, provider, funder, or researcher, there is a place for you on cleancookIQ.</p>
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Link to="/auth/register">
+              <Button size="lg" className="bg-accent text-accent-foreground hover:bg-amber-light font-semibold">
+                Join the Platform <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+            <Link to="/book-demo">
+              <Button
+                size="lg"
+                variant="outline"
+                className="bg-transparent border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground font-semibold"
+              >
+                Book a Demo
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
     </div>

@@ -1,13 +1,15 @@
 import { Link } from "react-router-dom";
 import { Clock, Phone } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import AuthBackButton from "@/components/auth/AuthBackButton";
 
 export default function PendingApprovalPage() {
   const { profile } = useAuth();
   const isOther = profile?.org_type === "other";
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4">
+    <div className="relative min-h-screen flex items-center justify-center py-12 px-4">
+      <AuthBackButton />
       <div className="w-full max-w-md text-center">
         <div className="h-16 w-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-6">
           {isOther ? <Phone className="h-8 w-8 text-accent" /> : <Clock className="h-8 w-8 text-accent" />}
@@ -17,7 +19,7 @@ export default function PendingApprovalPage() {
         </h1>
         <p className="text-muted-foreground mb-6">
           {isOther
-            ? "Thank you for showing interest in CleanCook IQ. Our team is preparing your account."
+            ? "Thank you for showing interest in cleancookIQ. Our team is preparing your account."
             : "Your account has been created and is awaiting admin verification. You'll receive an email once approved."}
         </p>
         <div className="bg-card border border-border rounded-xl p-6 shadow-card text-left">

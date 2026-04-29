@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, LogOut, Menu, FileText, Ticket, TrendingUp, Briefcase, BarChart3 } from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, FileText, Ticket, TrendingUp, Briefcase, BarChart3, Handshake } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import NotificationBell from "@/components/NotificationBell";
@@ -84,6 +84,25 @@ export default function FunderLayout() {
             >
               <Briefcase className="h-4 w-4 shrink-0" />
               Portfolio
+            </Link>
+          );
+        })()}
+
+        {/* Co-investment Link */}
+        {(() => {
+          const isActive = location.pathname === "/funder/coinvestment";
+          return (
+            <Link
+              to="/funder/coinvestment"
+              onClick={() => setSidebarOpen(false)}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                isActive
+                  ? "bg-sidebar-accent text-sidebar-primary"
+                  : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+              }`}
+            >
+              <Handshake className="h-4 w-4 shrink-0" />
+              Co-investment
             </Link>
           );
         })()}
@@ -182,9 +201,9 @@ export default function FunderLayout() {
           <div className="flex-1" />
           <div className="flex items-center gap-3">
             <NotificationBell />
-            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
+            <Link to="/funder/account/organisation" title="Manage organisation" className="h-8 w-8 rounded-full bg-primary flex items-center justify-center hover:ring-2 hover:ring-primary/30 transition">
               <span className="text-xs font-bold text-primary-foreground">{initials}</span>
-            </div>
+            </Link>
           </div>
         </header>
 

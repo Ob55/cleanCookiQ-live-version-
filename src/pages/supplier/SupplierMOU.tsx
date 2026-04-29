@@ -309,7 +309,7 @@ export default function SupplierMOU() {
                 </div>
               </CardHeader>
               <CardContent className="pt-4 space-y-3">
-                <p className="text-sm text-muted-foreground leading-relaxed">This MOU outlines the terms of engagement between your company and CleanCookIQ / Ignis Innovation for the supply of clean cooking solutions.</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">This MOU outlines the terms of engagement between your company and cleancookIQ / Ignis Innovation for the supply of clean cooking solutions.</p>
                 <div className="flex gap-2 flex-wrap">
                   <a href={TEMPLATE_PATH} download={TEMPLATE_DOWNLOAD_NAME}>
                     <Button variant="outline" size="sm" className="gap-2 border-[#1a3c2e]/30 text-[#1a3c2e] hover:bg-[#1a3c2e]/5"><Download className="h-3.5 w-3.5" />Download</Button>
