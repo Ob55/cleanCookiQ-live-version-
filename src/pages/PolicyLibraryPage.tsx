@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePolicies } from "@/hooks/useKnowledge";
 import { policyStatusLabel } from "@/lib/knowledge";
+import { DownloadReportButton, dateColumn, listColumn } from "@/components/admin/DownloadReportButton";
 
 export default function PolicyLibraryPage() {
   const { data, isLoading, error } = usePolicies();
@@ -29,15 +30,36 @@ export default function PolicyLibraryPage() {
 
   return (
     <div className="container py-10 space-y-6">
-      <div>
-        <h1 className="text-3xl font-display font-bold flex items-center gap-2">
-          <Scale className="h-7 w-7 text-primary" /> Policy Library
-        </h1>
-        <p className="text-muted-foreground mt-2 max-w-2xl">
-          National, sectoral, and international policies relevant to clean cooking
-          deployments in Kenya — EPRA licensing, KEBS standards, KRA tax incentives,
-          NEMA requirements, and more.
-        </p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-3xl font-display font-bold flex items-center gap-2">
+            <Scale className="h-7 w-7 text-primary" /> Policy Library
+          </h1>
+          <p className="text-muted-foreground mt-2 max-w-2xl">
+            National, sectoral, and international policies relevant to clean cooking
+            deployments in Kenya — EPRA licensing, KEBS standards, KRA tax incentives,
+            NEMA requirements, and more.
+          </p>
+        </div>
+        <DownloadReportButton
+          rows={filtered}
+          columns={[
+            { key: "title", label: "Title" },
+            { key: "jurisdiction", label: "Jurisdiction" },
+            { key: "policy_type", label: "Type" },
+            { key: "status", label: "Status", format: (r) => policyStatusLabel(r.status) },
+            dateColumn("effective_date", "Effective"),
+            dateColumn("expires_date", "Expires"),
+            { key: "summary", label: "Summary" },
+            { key: "full_text_url", label: "Document URL" },
+            listColumn("applies_to_org_types", "Applies To Org Types"),
+            listColumn("applies_to_fuels", "Applies To Fuels"),
+            listColumn("tags", "Tags"),
+          ]}
+          title="Policy Library"
+          filename="policies"
+          subtitle={`Filters — jurisdiction: ${jurisdiction || "all"}, search: "${search || "—"}"`}
+        />
       </div>
 
       <Card>

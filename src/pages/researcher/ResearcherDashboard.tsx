@@ -15,6 +15,7 @@ import {
 import { toast } from "sonner";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood",
@@ -162,10 +163,30 @@ export default function ResearcherDashboard() {
               : "Request prime access to unlock institution data."}
           </p>
         </div>
-        <Button onClick={() => setReportOpen(true)} variant="outline" className="flex items-center gap-2 shrink-0">
-          <Send className="h-4 w-4" />
-          Send Report
-        </Button>
+        <div className="flex gap-2 shrink-0">
+          {hasPrimeAccess && (
+            <DownloadReportButton
+              rows={filtered}
+              columns={[
+                { key: "name", label: "Institution" },
+                { key: "county", label: "County" },
+                { key: "ownership_type", label: "Ownership" },
+                { key: "current_fuel", label: "Current Fuel", format: (r: any) => FUEL_LABELS[r.current_fuel] ?? r.current_fuel ?? "" },
+                { key: "number_of_students", label: "Students" },
+                { key: "meals_per_day", label: "Meals/Day" },
+                { key: "assessment_score", label: "Readiness Score" },
+                { key: "assessment_category", label: "Readiness" },
+              ]}
+              title="Researcher — Institutions"
+              filename="researcher-institutions"
+              subtitle={searchTerm ? `Search: "${searchTerm}"` : undefined}
+            />
+          )}
+          <Button onClick={() => setReportOpen(true)} variant="outline" className="flex items-center gap-2">
+            <Send className="h-4 w-4" />
+            Send Report
+          </Button>
+        </div>
       </div>
 
       {/* Researcher identity card */}

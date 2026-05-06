@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Package, Wrench, FileCheck, Bell, Building2 } from "lucide-react";
 import { toast } from "sonner";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 interface InstitutionNeed {
   id: string;
@@ -83,9 +84,26 @@ export default function SupplierDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold">Supplier Dashboard</h1>
-        <p className="text-muted-foreground text-sm mt-1">Overview of your products, services, and opportunities</p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold">Supplier Dashboard</h1>
+          <p className="text-muted-foreground text-sm mt-1">Overview of your products, services, and opportunities</p>
+        </div>
+        <DownloadReportButton
+          rows={needs}
+          columns={[
+            { key: "description", label: "Need" },
+            { key: "technology_type", label: "Technology" },
+            { key: "status", label: "Status" },
+            { key: "institutions", label: "Institution", format: (r) => r.institutions?.name ?? "" },
+            { key: "institutions", label: "County", format: (r) => r.institutions?.county ?? "" },
+            { key: "id", label: "Interest Expressed", format: (r) => myInterests.has(r.id) ? "Yes" : "No" },
+            dateColumn("created_at", "Posted"),
+          ]}
+          title="Supplier Dashboard — Open Needs"
+          filename="supplier-dashboard-needs"
+          subtitle={`${stats.products} products · ${stats.services} services · ${stats.documents} documents on file`}
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

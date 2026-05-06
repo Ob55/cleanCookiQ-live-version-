@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFunderPortfolio, useFunderPortfolioSummary } from "@/hooks/useFunder";
 import { formatBigNumber } from "@/lib/funder";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 const STATUS_COLORS: Record<string, string> = {
   pipeline: "bg-slate-100 text-slate-700",
@@ -22,14 +23,33 @@ export default function FunderPortfolio() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-          <Briefcase className="h-6 w-6 text-primary" /> Your Portfolio
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Capital deployed and outcomes attributed to your share, across every project
-          you've committed to.
-        </p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold flex items-center gap-2">
+            <Briefcase className="h-6 w-6 text-primary" /> Your Portfolio
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Capital deployed and outcomes attributed to your share, across every project
+            you've committed to.
+          </p>
+        </div>
+        <DownloadReportButton
+          rows={portfolio ?? []}
+          columns={[
+            { key: "project_id", label: "Project ID" },
+            { key: "capital_amount", label: "Capital Amount" },
+            { key: "capital_currency", label: "Currency" },
+            { key: "capital_share_pct", label: "Share %", format: (r) => r.capital_share_pct == null ? "" : `${(r.capital_share_pct * 100).toFixed(1)}%` },
+            { key: "status", label: "Status" },
+            dateColumn("committed_at", "Committed"),
+            dateColumn("disbursed_at", "Disbursed"),
+            { key: "instrument_id", label: "Instrument ID" },
+            { key: "notes", label: "Notes" },
+          ]}
+          title="Funder Portfolio"
+          filename="funder-portfolio"
+          subtitle={`${summary?.project_count ?? 0} projects · KSh ${formatBigNumber(summary?.total_committed)} committed`}
+        />
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

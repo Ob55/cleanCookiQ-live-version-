@@ -15,6 +15,7 @@ import {
   type ResourceType,
 } from "@/lib/knowledge";
 import { useAuth } from "@/contexts/AuthContext";
+import { DownloadReportButton, listColumn, dateColumn } from "@/components/admin/DownloadReportButton";
 
 const TYPES: ResourceType[] = [
   "guide", "standard", "template", "report", "case_study",
@@ -37,14 +38,34 @@ export default function ResourcesPage() {
 
   return (
     <div className="container py-10 space-y-6">
-      <div>
-        <h1 className="text-3xl font-display font-bold flex items-center gap-2">
-          <Library className="h-7 w-7 text-primary" /> Resource Library
-        </h1>
-        <p className="text-muted-foreground mt-2 max-w-2xl">
-          Guides, standards, templates, reports, and training modules for institutions,
-          suppliers, funders, and researchers in Kenya's clean cooking sector.
-        </p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-3xl font-display font-bold flex items-center gap-2">
+            <Library className="h-7 w-7 text-primary" /> Resource Library
+          </h1>
+          <p className="text-muted-foreground mt-2 max-w-2xl">
+            Guides, standards, templates, reports, and training modules for institutions,
+            suppliers, funders, and researchers in Kenya's clean cooking sector.
+          </p>
+        </div>
+        <DownloadReportButton
+          rows={filtered}
+          columns={[
+            { key: "title", label: "Title" },
+            { key: "resource_type", label: "Type", format: (r: Resource) => resourceTypeLabel(r.resource_type) },
+            { key: "description", label: "Description" },
+            listColumn("audience", "Audience"),
+            { key: "file_url", label: "File URL" },
+            { key: "external_url", label: "External URL" },
+            { key: "view_count", label: "Views" },
+            { key: "download_count", label: "Downloads" },
+            listColumn("tags", "Tags"),
+            dateColumn("published_at", "Published"),
+          ]}
+          title="Resource Library"
+          filename="resources"
+          subtitle={`Filters — type: ${type || "all"}, search: "${search || "—"}"`}
+        />
       </div>
 
       <Card>

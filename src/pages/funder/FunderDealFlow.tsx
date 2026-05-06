@@ -11,6 +11,7 @@ import {
   type DealRow, type FunderPreferences,
 } from "@/lib/funder";
 import { riskBand, riskBandColorClass } from "@/lib/risk";
+import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 
 export default function FunderDealFlow() {
   const { profile } = useAuth();
@@ -21,14 +22,44 @@ export default function FunderDealFlow() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-          <TrendingUp className="h-6 w-6 text-primary" /> Deal Flow
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Pipeline projects ranked against your stated preferences. Set or update them
-          on the Preferences page to refine the ranking.
-        </p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold flex items-center gap-2">
+            <TrendingUp className="h-6 w-6 text-primary" /> Deal Flow
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Pipeline projects ranked against your stated preferences. Set or update them
+            on the Preferences page to refine the ranking.
+          </p>
+        </div>
+        <DownloadReportButton
+          rows={ranked.map(({ deal, score }) => ({
+            ...deal,
+            match_score_pct: score === null ? "" : Math.round(score * 100),
+            risk_band: deal.max_open_risk_score > 0 ? riskBand(deal.max_open_risk_score) : "",
+          }))}
+          columns={[
+            { key: "project_title", label: "Project" },
+            { key: "institution_name", label: "Institution" },
+            { key: "county", label: "County" },
+            { key: "institution_type", label: "Type" },
+            { key: "baseline_fuel", label: "Baseline Fuel" },
+            { key: "students", label: "Students" },
+            { key: "project_status", label: "Status" },
+            { key: "match_score_pct", label: "Match %" },
+            { key: "risk_band", label: "Risk Band" },
+            { key: "max_open_risk_score", label: "Max Open Risk" },
+            { key: "open_risk_count", label: "Open Risks" },
+            { key: "total_budget", label: "Total Budget (KSh)" },
+            { key: "already_committed_capital", label: "Committed (KSh)" },
+            { key: "funding_gap", label: "Funding Gap (KSh)" },
+            { key: "forecast_annual_tco2e", label: "Forecast Annual tCO₂e" },
+            { key: "provider_name", label: "Provider" },
+          ]}
+          title="Funder Deal Flow"
+          filename="deal-flow"
+          subtitle={prefs ? "Ranked against your preferences" : "No preferences set — unranked"}
+        />
       </div>
 
       {!prefs && (

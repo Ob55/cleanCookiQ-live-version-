@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 interface QuoteRequest {
   id: string;
@@ -159,13 +160,32 @@ export default function SupplierQuotes() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-          <Inbox className="h-6 w-6 text-primary" /> Quote Requests
-        </h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          Buyer-submitted RFQs addressed to your products. Send a quote, accept, or decline.
-        </p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold flex items-center gap-2">
+            <Inbox className="h-6 w-6 text-primary" /> Quote Requests
+          </h1>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Buyer-submitted RFQs addressed to your products. Send a quote, accept, or decline.
+          </p>
+        </div>
+        <DownloadReportButton
+          rows={sorted}
+          columns={[
+            { key: "id", label: "RFQ ID", format: (r: QuoteRequest) => r.id.slice(0, 8) },
+            { key: "product_id", label: "Product ID" },
+            { key: "buyer_county", label: "Buyer County" },
+            { key: "quantity", label: "Quantity" },
+            { key: "message", label: "Message" },
+            { key: "status", label: "Status" },
+            { key: "quoted_amount", label: "Quoted Amount" },
+            { key: "quoted_currency", label: "Currency" },
+            dateColumn("quoted_at", "Quoted At"),
+            dateColumn("created_at", "Created"),
+          ]}
+          title="Supplier Quote Requests"
+          filename="supplier-quotes"
+        />
       </div>
 
       {isLoading ? (

@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, Flame, Users, Building2, GraduationCap, Stethoscope, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { useOnboardingGate } from "@/hooks/useOnboardingGate";
+import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood",
@@ -110,11 +111,28 @@ export default function FunderDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold">Funder Dashboard</h1>
-        <p className="text-sm text-muted-foreground">
-          Institution overview across Kenya — ready for clean cooking transition.
-        </p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold">Funder Dashboard</h1>
+          <p className="text-sm text-muted-foreground">
+            Institution overview across Kenya — ready for clean cooking transition.
+          </p>
+        </div>
+        <DownloadReportButton
+          rows={base}
+          columns={[
+            { key: "institution_type", label: "Type" },
+            { key: "ownership_type", label: "Ownership" },
+            { key: "county", label: "County" },
+            { key: "current_fuel", label: "Current Fuel", format: (r: any) => FUEL_LABELS[r.current_fuel] ?? r.current_fuel ?? "" },
+            { key: "number_of_students", label: "Students" },
+            { key: "meals_per_day", label: "Meals/Day" },
+            { key: "assessment_category", label: "Readiness" },
+          ]}
+          title="Funder Institution Overview"
+          filename="funder-institutions"
+          subtitle={`Filters — fuel: ${fuelFilter}, type: ${typeFilter}`}
+        />
       </div>
 
       {/* Filters */}

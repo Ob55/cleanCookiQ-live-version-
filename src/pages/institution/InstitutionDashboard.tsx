@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Flame, UtensilsCrossed, Droplets, BarChart3, Loader2, User, Phone, Mail, MapPin } from "lucide-react";
 import TransitionTarget from "@/components/institution/TransitionTarget";
+import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 
 
 const FUEL_LABELS: Record<string, string> = {
@@ -120,22 +121,55 @@ export default function InstitutionDashboard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-display font-bold">
-          Welcome back, {institution.name}
-        </h1>
-        <div className="flex items-center gap-2 mt-2">
-          <Badge variant="secondary">{institution.county}</Badge>
-          {institution.ownership_type && (
-            <Badge variant="outline" className="capitalize">{institution.ownership_type}</Badge>
-          )}
-        </div>
-        <div className="mt-4 max-w-md">
-          <div className="flex items-center justify-between text-sm mb-1">
-            <span className="text-muted-foreground">Profile {completion}% complete</span>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold">
+            Welcome back, {institution.name}
+          </h1>
+          <div className="flex items-center gap-2 mt-2">
+            <Badge variant="secondary">{institution.county}</Badge>
+            {institution.ownership_type && (
+              <Badge variant="outline" className="capitalize">{institution.ownership_type}</Badge>
+            )}
           </div>
-          <Progress value={completion} className="h-2.5" />
         </div>
+        <DownloadReportButton
+          rows={[institution]}
+          columns={[
+            { key: "name", label: "Institution" },
+            { key: "institution_type", label: "Type" },
+            { key: "ownership_type", label: "Ownership" },
+            { key: "county", label: "County" },
+            { key: "sub_county", label: "Sub-County" },
+            { key: "current_fuel", label: "Current Fuel", format: (r) => FUEL_LABELS[r.current_fuel ?? ""] ?? r.current_fuel ?? "" },
+            { key: "consumption_per_term", label: "Consumption/Term" },
+            { key: "consumption_unit", label: "Unit" },
+            { key: "monthly_fuel_spend", label: "Monthly Fuel Spend (KSh)" },
+            { key: "meals_per_day", label: "Meals/Day" },
+            { key: "number_of_students", label: "Students" },
+            { key: "number_of_staff", label: "Staff" },
+            { key: "fuel_of_choice", label: "Preferred Fuel" },
+            { key: "transition_target_fuel", label: "Transition Target" },
+            { key: "transition_interest", label: "Transition Interest" },
+            { key: "recommended_solution", label: "Recommended Solution" },
+            { key: "annual_savings_ksh", label: "Annual Savings (KSh)" },
+            { key: "co2_reduction_tonnes_pa", label: "CO₂ Reduction (t/yr)" },
+            { key: "assessment_score", label: "Readiness Score" },
+            { key: "assessment_category", label: "Readiness Category" },
+            { key: "contact_person", label: "Contact" },
+            { key: "contact_email", label: "Email" },
+            { key: "contact_phone", label: "Phone" },
+          ]}
+          title={`Institution Profile — ${institution.name}`}
+          filename={`institution-${institution.id}`}
+        />
+      </div>
+
+      <div className="max-w-md">
+        <div className="flex items-center justify-between text-sm mb-1">
+          <span className="text-muted-foreground">Profile {completion}% complete</span>
+        </div>
+        <Progress value={completion} className="h-2.5" />
       </div>
 
       {/* Summary Cards */}

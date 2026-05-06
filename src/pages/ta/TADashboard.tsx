@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { GraduationCap, Loader2, Search, Building2, MapPin, Calendar, CheckCircle } from "lucide-react";
 import { useState } from "react";
+import { DownloadReportButton, listColumn, dateColumn } from "@/components/admin/DownloadReportButton";
 
 const expertiseLabels: Record<string, string> = {
   capacity_building: "Capacity Building",
@@ -88,11 +89,33 @@ export default function TADashboard() {
 
   return (
     <div className="space-y-6 p-4 lg:p-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-          <GraduationCap className="h-6 w-6 text-primary" /> TA Provider Dashboard
-        </h1>
-        <p className="text-sm text-muted-foreground">Institutions needing Technical Assistance, matched to your expertise and location.</p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold flex items-center gap-2">
+            <GraduationCap className="h-6 w-6 text-primary" /> TA Provider Dashboard
+          </h1>
+          <p className="text-sm text-muted-foreground">Institutions needing Technical Assistance, matched to your expertise and location.</p>
+        </div>
+        <DownloadReportButton
+          rows={(filtered ?? []).map((inst: any) => ({
+            ...inst,
+            match_score: getMatchScore(inst),
+          }))}
+          columns={[
+            { key: "name", label: "Institution" },
+            { key: "county", label: "County" },
+            { key: "institution_type", label: "Type" },
+            listColumn("ta_type_needed", "TA Types Needed"),
+            dateColumn("ta_resource_window_start", "Window Start"),
+            dateColumn("ta_resource_window_end", "Window End"),
+            { key: "match_score", label: "Match %" },
+            { key: "current_fuel", label: "Current Fuel" },
+            { key: "number_of_students", label: "Students" },
+          ]}
+          title="TA Dashboard"
+          filename="ta-institutions"
+          subtitle={`Filters — search: "${search || "—"}", expertise: ${expertiseFilter}`}
+        />
       </div>
 
       {taProfile && (

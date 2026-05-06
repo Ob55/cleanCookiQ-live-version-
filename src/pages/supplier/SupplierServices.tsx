@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Plus, Wrench, Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 
 interface Service {
   id: string;
@@ -69,15 +70,26 @@ export default function SupplierServices() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-2xl font-display font-bold">Services</h1>
           <p className="text-muted-foreground text-sm mt-1">Manage the services you offer</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button><Plus className="h-4 w-4 mr-2" /> Add Service</Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={services}
+            columns={[
+              { key: "name", label: "Service" },
+              { key: "details", label: "Details" },
+              { key: "price", label: "Price (KSh)" },
+            ]}
+            title="Supplier Services"
+            filename="supplier-services"
+          />
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button><Plus className="h-4 w-4 mr-2" /> Add Service</Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Add New Service</DialogTitle>
@@ -101,7 +113,8 @@ export default function SupplierServices() {
               </Button>
             </div>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       {services.length === 0 ? (

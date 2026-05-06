@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Plus, FileCheck, Loader2, Upload, Image, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 interface Doc {
   id: string;
@@ -104,6 +105,18 @@ export default function SupplierDocuments() {
             <h1 className="text-2xl font-display font-bold">Documents & Compliance</h1>
             <p className="text-muted-foreground text-sm mt-1">Upload project photos, documentation, and track your EOIs</p>
           </div>
+          <div className="flex gap-2">
+          <DownloadReportButton
+            rows={docs}
+            columns={[
+              { key: "title", label: "Title" },
+              { key: "document_type", label: "Type" },
+              { key: "file_url", label: "URL" },
+              dateColumn("created_at", "Uploaded"),
+            ]}
+            title="Supplier Documents"
+            filename="supplier-documents"
+          />
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button><Plus className="h-4 w-4 mr-2" /> Upload Document</Button>
@@ -129,6 +142,7 @@ export default function SupplierDocuments() {
               </div>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         {docs.length === 0 ? (

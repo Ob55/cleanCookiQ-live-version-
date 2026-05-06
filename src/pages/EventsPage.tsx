@@ -9,6 +9,7 @@ import { useEvents, useRegisterEvent } from "@/hooks/useKnowledge";
 import { eventToIcs, partitionEvents, type EventSummary } from "@/lib/knowledge";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { DownloadReportButton, dateColumn, listColumn } from "@/components/admin/DownloadReportButton";
 
 export default function EventsPage() {
   const { data, isLoading } = useEvents();
@@ -19,13 +20,35 @@ export default function EventsPage() {
 
   return (
     <div className="container py-10 space-y-6">
-      <div>
-        <h1 className="text-3xl font-display font-bold flex items-center gap-2">
-          <Calendar className="h-7 w-7 text-primary" /> Events
-        </h1>
-        <p className="text-muted-foreground mt-2 max-w-2xl">
-          Summits, webinars, workshops, and trainings across Kenya's clean cooking sector.
-        </p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-3xl font-display font-bold flex items-center gap-2">
+            <Calendar className="h-7 w-7 text-primary" /> Events
+          </h1>
+          <p className="text-muted-foreground mt-2 max-w-2xl">
+            Summits, webinars, workshops, and trainings across Kenya's clean cooking sector.
+          </p>
+        </div>
+        <DownloadReportButton
+          rows={list}
+          columns={[
+            { key: "title", label: "Title" },
+            { key: "event_type", label: "Type" },
+            { key: "status", label: "Status" },
+            dateColumn("start_at", "Start"),
+            dateColumn("end_at", "End"),
+            { key: "location_type", label: "Location Type" },
+            { key: "venue_name", label: "Venue" },
+            { key: "county_name", label: "County" },
+            { key: "organiser", label: "Organiser" },
+            { key: "capacity", label: "Capacity" },
+            { key: "registration_count", label: "Registered" },
+            { key: "seats_remaining", label: "Seats Remaining" },
+            listColumn("tags", "Tags"),
+          ]}
+          title={`Events — ${tab === "upcoming" ? "Upcoming" : "Past"}`}
+          filename={`events-${tab}`}
+        />
       </div>
 
       <div className="flex gap-2 border-b">

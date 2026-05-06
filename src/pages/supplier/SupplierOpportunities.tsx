@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loader2, FileText, MapPin, DollarSign, Calendar, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 export default function SupplierOpportunities() {
   const { user, profile } = useAuth();
@@ -64,9 +65,28 @@ export default function SupplierOpportunities() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold">Opportunities</h1>
-        <p className="text-sm text-muted-foreground">Browse and take available project opportunities</p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold">Opportunities</h1>
+          <p className="text-sm text-muted-foreground">Browse and take available project opportunities</p>
+        </div>
+        <DownloadReportButton
+          rows={opportunities ?? []}
+          columns={[
+            { key: "title", label: "Title" },
+            { key: "description", label: "Description" },
+            { key: "institutions", label: "Institution", format: (r: any) => r.institutions?.name ?? "" },
+            { key: "institutions", label: "County", format: (r: any) => r.institutions?.county ?? "" },
+            { key: "technology_required", label: "Technology" },
+            { key: "estimated_value", label: "Estimated Value (KSh)" },
+            { key: "status", label: "Status" },
+            { key: "awarded_provider_name", label: "Awarded To" },
+            dateColumn("deadline", "Deadline"),
+            dateColumn("created_at", "Created"),
+          ]}
+          title="Supplier Opportunities"
+          filename="supplier-opportunities"
+        />
       </div>
 
       {/* Open Opportunities */}
