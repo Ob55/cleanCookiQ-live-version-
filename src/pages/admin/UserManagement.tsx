@@ -3,10 +3,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Users, Check, X, Loader2, Trash2 } from "lucide-react";
+import { Users, Check, X, Loader2, Trash2, MailWarning, Send } from "lucide-react";
 import { sendEmail, emailAccountApproved, emailAccountRejected } from "@/lib/emailService";
 
 export default function UserManagement() {
@@ -78,6 +77,8 @@ export default function UserManagement() {
         <p className="text-sm text-muted-foreground">Manage user accounts and approval status</p>
       </div>
 
+      <UnverifiedRegistrationsPanel />
+
       {isLoading ? (
         <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
       ) : (
@@ -139,6 +140,7 @@ export default function UserManagement() {
         </div>
       )}
 
+      {/* delete confirm */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -162,6 +164,180 @@ export default function UserManagement() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
+  );
+}
+
+interface ListUsersRow {
+  user_id: string;
+  email: string | null;
+  email_confirmed_at: string | null;
+  last_sign_in_at: string | null;
+  auth_created_at: string;
+  full_name: string | null;
+  org_name: string | null;
+  org_type: string | null;
+  has_profile: boolean;
+  source: "auth" | "orphan_profile";
+}
+
+interface UnverifiedUser {
+  id: string;
+  email: string | null;
+  full_name: string | null;
+  org_name: string | null;
+  org_type: string | null;
+  created_at: string;
+}
+
+function UnverifiedRegistrationsPanel() {
+  const queryClient = useQueryClient();
+  const [nudgingId, setNudgingId] = useState<string | null>(null);
+  const [bulkRunning, setBulkRunning] = useState(false);
+
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ["unverified-users"],
+    queryFn: async (): Promise<UnverifiedUser[]> => {
+      const { data: payload, error } = await supabase.functions.invoke("list-users");
+      if (error) throw error;
+      const rows = (payload?.users ?? []) as ListUsersRow[];
+      // Filter to users whose email is NOT yet confirmed.
+      // Skip orphan profiles (no auth row → can't send a verification link to them).
+      return rows
+        .filter((r) => !r.email_confirmed_at && r.source === "auth")
+        .map((r) => ({
+          id: r.user_id,
+          email: r.email,
+          full_name: r.full_name,
+          org_name: r.org_name,
+          org_type: r.org_type,
+          created_at: r.auth_created_at,
+        }))
+        .sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+    },
+  });
+
+  const sendOne = async (userId: string) => {
+    const { error } = await supabase.functions.invoke("nudge-unverified-user", {
+      body: { userId },
+    });
+    if (error) throw error;
+  };
+
+  const nudgeOne = async (u: UnverifiedUser) => {
+    setNudgingId(u.id);
+    try {
+      await sendOne(u.id);
+      toast.success(`Reminder sent to ${u.email ?? "user"}`);
+    } catch (e: any) {
+      toast.error(e.message || "Could not send reminder");
+    } finally {
+      setNudgingId(null);
+      // Refresh — the user may have verified between list & click
+      queryClient.invalidateQueries({ queryKey: ["unverified-users"] });
+    }
+  };
+
+  const nudgeAll = async () => {
+    if (!data || data.length === 0) return;
+    setBulkRunning(true);
+    let ok = 0;
+    let fail = 0;
+    for (const u of data) {
+      try {
+        await sendOne(u.id);
+        ok++;
+      } catch {
+        fail++;
+      }
+    }
+    setBulkRunning(false);
+    if (fail === 0) toast.success(`Reminder sent to ${ok} ${ok === 1 ? "person" : "people"}`);
+    else toast.warning(`Sent ${ok} reminder${ok === 1 ? "" : "s"}, ${fail} failed`);
+    queryClient.invalidateQueries({ queryKey: ["unverified-users"] });
+  };
+
+  return (
+    <div className="bg-card border border-amber-200 rounded-xl shadow-card overflow-hidden">
+      <div className="bg-amber-50 border-b border-amber-200 px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-2">
+          <MailWarning className="h-4 w-4 text-amber-700" />
+          <p className="text-sm font-semibold text-amber-900">
+            Unverified registrations
+            {data ? <span className="ml-2 text-amber-700 font-normal">({data.length})</span> : null}
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button size="sm" variant="ghost" onClick={() => refetch()} className="h-8 text-xs">
+            Refresh
+          </Button>
+          <Button
+            size="sm"
+            onClick={nudgeAll}
+            disabled={bulkRunning || !data || data.length === 0}
+            className="h-8 text-xs bg-amber-600 hover:bg-amber-700 text-white"
+          >
+            {bulkRunning ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Send className="h-3 w-3 mr-1" />}
+            Send reminder to all
+          </Button>
+        </div>
+      </div>
+
+      <div className="p-4">
+        <p className="text-xs text-muted-foreground mb-3">
+          People who created an account but haven't yet clicked the verification link in their email.
+          They don't appear on the platform until they verify. Click "Send reminder" to email them a
+          fresh one-click sign-in link.
+        </p>
+
+        {isLoading ? (
+          <div className="flex justify-center py-6"><Loader2 className="h-6 w-6 animate-spin text-amber-700" /></div>
+        ) : error ? (
+          <p className="text-sm text-destructive">Could not load unverified users. {(error as any).message}</p>
+        ) : !data || data.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No unverified registrations. 🎉</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="text-xs text-muted-foreground border-b">
+                <tr>
+                  <th className="text-left py-2 px-2">Name</th>
+                  <th className="text-left py-2 px-2">Email</th>
+                  <th className="text-left py-2 px-2">Org</th>
+                  <th className="text-left py-2 px-2">Type</th>
+                  <th className="text-left py-2 px-2">Registered</th>
+                  <th className="text-right py-2 px-2">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((u) => (
+                  <tr key={u.id} className="border-b last:border-0">
+                    <td className="py-2 px-2">{u.full_name ?? "—"}</td>
+                    <td className="py-2 px-2 font-mono text-xs">{u.email ?? "—"}</td>
+                    <td className="py-2 px-2">{u.org_name ?? "—"}</td>
+                    <td className="py-2 px-2 capitalize">{u.org_type ?? "—"}</td>
+                    <td className="py-2 px-2 text-xs text-muted-foreground">
+                      {new Date(u.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="py-2 px-2 text-right">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => nudgeOne(u)}
+                        disabled={nudgingId === u.id || bulkRunning}
+                        className="h-7 text-xs"
+                      >
+                        {nudgingId === u.id ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Send className="h-3 w-3 mr-1" />}
+                        Send reminder
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

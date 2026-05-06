@@ -1,7 +1,7 @@
 import { Link, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { MapPin, BarChart3, Users, TrendingUp, Leaf, Building2, ArrowRight, Flame, Factory, Banknote, Briefcase, FolderKanban, GraduationCap, UserPlus, ClipboardCheck, Handshake, Rocket, Activity, ChevronRight, Check, X } from "lucide-react";
+import { MapPin, BarChart3, Users, TrendingUp, Leaf, Building2, ArrowRight, Flame, Factory, Banknote, Briefcase, FolderKanban, GraduationCap, UserPlus, ClipboardCheck, Handshake, Rocket, Activity, ChevronRight, Check, AlertCircle } from "lucide-react";
 import FuelOptionsSection from "@/components/institution/FuelOptionsSection";
 import { supabase } from "@/integrations/supabase/client";
 import heroBg from "@/assets/hero-bg.jpg";
@@ -205,16 +205,19 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 rounded-2xl overflow-hidden shadow-elevated border border-border">
             {/* Left — Failures */}
             <div className="p-8 lg:p-10 bg-background">
-              <div className="mb-8">
-                <p className="text-foreground/70 text-xs font-bold uppercase tracking-widest">The Problem</p>
+              <div className="flex items-center gap-3 mb-8">
+                <div className="h-8 w-8 rounded-lg bg-destructive/10 border border-destructive/30 flex items-center justify-center shrink-0">
+                  <AlertCircle className="h-4 w-4 text-destructive" strokeWidth={2.5} />
+                </div>
+                <p className="text-destructive text-xs font-bold uppercase tracking-widest">The Problem</p>
               </div>
               <ul className="space-y-6">
                 {failures.map((item, i) => (
                   <li key={item.fail} className="flex items-start gap-4 animate-slide-up" style={{ animationDelay: `${i * 80}ms`, animationFillMode: "backwards" }}>
                     <div className="h-9 w-9 rounded-full bg-destructive/10 border border-destructive/30 flex items-center justify-center shrink-0 mt-0.5">
-                      <X className="h-4 w-4 text-destructive" strokeWidth={3} />
+                      <AlertCircle className="h-4 w-4 text-destructive" strokeWidth={2.5} />
                     </div>
-                    <h4 className="font-display font-semibold text-foreground leading-snug pt-1">{item.fail}</h4>
+                    <p className="text-sm text-foreground leading-relaxed pt-1.5">{item.fail}</p>
                   </li>
                 ))}
               </ul>
@@ -240,7 +243,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="text-center mt-10">
-            <Link to="/about" className="inline-flex items-center gap-2 text-accent hover:text-amber-light font-semibold transition-colors">
+            <Link to="/about#challenges" className="inline-flex items-center gap-2 text-accent hover:text-amber-light font-semibold transition-colors">
               Learn more about how we close these gaps <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
