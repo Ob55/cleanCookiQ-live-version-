@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { sbAny as supabase } from "@/lib/sbAny";
+import { DownloadReportButton, listColumn } from "@/components/admin/DownloadReportButton";
 
 const INSTRUMENT_TYPES = [
   "cash", "concessional_loan", "lease_to_own", "paygo", "rbf",
@@ -173,7 +174,26 @@ export default function AdminFinancingInstruments() {
             Catalogue of financing options (grants, loans, lease-to-own, RBF, carbon, blended) used by the Financing Modeller.
           </p>
         </div>
-        <Button onClick={() => { setForm(EMPTY); setOpen(true); }}><Plus className="h-4 w-4 mr-1" /> New instrument</Button>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={data ?? []}
+            columns={[
+              { key: "name", label: "Instrument" },
+              { key: "slug", label: "Slug" },
+              { key: "instrument_type", label: "Type" },
+              { key: "description", label: "Description" },
+              { key: "best_for", label: "Best For" },
+              listColumn("bearer_org_types", "Bearer Org Types"),
+              { key: "default_terms", label: "Default Terms (JSON)", format: (r) => JSON.stringify(r.default_terms ?? {}) },
+              { key: "risk_notes", label: "Risk Notes" },
+              { key: "display_order", label: "Order" },
+              { key: "is_active", label: "Active" },
+            ]}
+            title="Financing Instruments"
+            filename="financing-instruments"
+          />
+          <Button onClick={() => { setForm(EMPTY); setOpen(true); }}><Plus className="h-4 w-4 mr-1" /> New instrument</Button>
+        </div>
       </div>
 
       {isLoading ? <Skeleton className="h-32 w-full" /> : (data ?? []).length === 0 ? (

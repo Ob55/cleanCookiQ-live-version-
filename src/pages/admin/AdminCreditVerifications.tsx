@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { sbAny as supabase } from "@/lib/sbAny";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 type Verification = {
   id: string;
@@ -156,7 +157,26 @@ export default function AdminCreditVerifications() {
             Third-party VVB verification events that issue carbon credits against vintages.
           </p>
         </div>
-        <Button onClick={() => { setForm(EMPTY); setOpen(true); }}><Plus className="h-4 w-4 mr-1" /> Record verification</Button>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={data ?? []}
+            columns={[
+              { key: "verifier", label: "Verifier (VVB)" },
+              dateColumn("verified_on", "Verified On"),
+              dateColumn("vintage_start", "Vintage Start"),
+              dateColumn("vintage_end", "Vintage End"),
+              { key: "verified_tco2e", label: "Verified (tCO₂e)" },
+              { key: "serial_range", label: "Serial Range" },
+              { key: "carbon_projects", label: "Methodology", format: (r: any) => r.carbon_projects?.methodology ?? "" },
+              { key: "carbon_projects", label: "Registry", format: (r: any) => r.carbon_projects?.registry ?? "" },
+              { key: "evidence_url", label: "Evidence URL" },
+              { key: "notes", label: "Notes" },
+            ]}
+            title="Credit Verifications"
+            filename="credit-verifications"
+          />
+          <Button onClick={() => { setForm(EMPTY); setOpen(true); }}><Plus className="h-4 w-4 mr-1" /> Record verification</Button>
+        </div>
       </div>
 
       {isLoading ? <Skeleton className="h-32 w-full" /> : (data ?? []).length === 0 ? (

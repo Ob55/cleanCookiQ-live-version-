@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 export default function Subscribers() {
   const { data: subscribers, isLoading } = useQuery({
@@ -18,11 +19,23 @@ export default function Subscribers() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-          <Users className="h-6 w-6 text-primary" /> Newsletter Subscribers
-        </h1>
-        <p className="text-sm text-muted-foreground">Users who subscribed via the Marketing Analysis page</p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold flex items-center gap-2">
+            <Users className="h-6 w-6 text-primary" /> Newsletter Subscribers
+          </h1>
+          <p className="text-sm text-muted-foreground">Users who subscribed via the Marketing Analysis page</p>
+        </div>
+        <DownloadReportButton
+          rows={subscribers ?? []}
+          columns={[
+            { key: "full_name", label: "Full Name" },
+            { key: "email", label: "Email" },
+            dateColumn("created_at", "Subscribed"),
+          ]}
+          title="Newsletter Subscribers"
+          filename="subscribers"
+        />
       </div>
 
       <div className="bg-card border border-border rounded-lg p-4 shadow-card inline-block">

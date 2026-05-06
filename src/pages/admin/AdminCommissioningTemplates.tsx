@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { sbAny as supabase } from "@/lib/sbAny";
+import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 
 type ChecklistItem = { key: string; label: string; required: boolean; evidence_type?: string };
 
@@ -133,7 +134,23 @@ export default function AdminCommissioningTemplates() {
             Per-fuel checklists used at delivery sign-off (LPG, biogas, electric, improved biomass).
           </p>
         </div>
-        <Button onClick={() => { setForm(EMPTY); setOpen(true); }}><Plus className="h-4 w-4 mr-1" /> New template</Button>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={data ?? []}
+            columns={[
+              { key: "name", label: "Template" },
+              { key: "slug", label: "Slug" },
+              { key: "fuel_type", label: "Fuel Type" },
+              { key: "description", label: "Description" },
+              { key: "items", label: "Items Count", format: (r) => r.items?.length ?? 0 },
+              { key: "items", label: "Required Items", format: (r) => r.items?.filter((i: ChecklistItem) => i.required).length ?? 0 },
+              { key: "is_active", label: "Active" },
+            ]}
+            title="Commissioning Templates"
+            filename="commissioning-templates"
+          />
+          <Button onClick={() => { setForm(EMPTY); setOpen(true); }}><Plus className="h-4 w-4 mr-1" /> New template</Button>
+        </div>
       </div>
 
       {isLoading ? <Skeleton className="h-32 w-full" /> : (data ?? []).length === 0 ? (

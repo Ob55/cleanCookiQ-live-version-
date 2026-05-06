@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { TrendingUp, Building2, Factory, BarChart3, FileText, Loader2 } from "lucide-react";
+import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 
 export default function PipelineDashboard() {
   const { data: institutions } = useQuery({
@@ -48,9 +49,26 @@ export default function PipelineDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold">Pipeline Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Real-time national transition pipeline</p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold">Pipeline Dashboard</h1>
+          <p className="text-sm text-muted-foreground">Real-time national transition pipeline</p>
+        </div>
+        <DownloadReportButton
+          rows={[
+            ...stages.map(s => ({ stage: s.stage, count: s.count, pct: `${s.pct}%` })),
+            { stage: "Total Institutions", count: total, pct: "100%" },
+            { stage: "Assessed", count: assessedCount, pct: total ? `${Math.round((assessedCount/total)*100)}%` : "0%" },
+            { stage: "Providers", count: providers?.length ?? 0, pct: "—" },
+          ]}
+          columns={[
+            { key: "stage", label: "Pipeline Stage" },
+            { key: "count", label: "Count" },
+            { key: "pct", label: "% of Total" },
+          ]}
+          title="Pipeline Funnel"
+          filename="pipeline-funnel"
+        />
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

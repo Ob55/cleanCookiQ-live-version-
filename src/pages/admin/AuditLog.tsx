@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Search, Shield, Clock } from "lucide-react";
 import { useState } from "react";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 export default function AuditLog() {
   const [search, setSearch] = useState("");
@@ -49,9 +50,26 @@ export default function AuditLog() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold">System Audit Log</h1>
-        <p className="text-sm text-muted-foreground">Complete record of all system actions</p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold">System Audit Log</h1>
+          <p className="text-sm text-muted-foreground">Complete record of all system actions</p>
+        </div>
+        <DownloadReportButton
+          rows={filtered ?? []}
+          columns={[
+            dateColumn("created_at", "Timestamp"),
+            { key: "action", label: "Action" },
+            { key: "table_name", label: "Table" },
+            { key: "record_id", label: "Record ID" },
+            { key: "user_id", label: "User ID" },
+            { key: "old_data", label: "Old Data" },
+            { key: "new_data", label: "New Data" },
+          ]}
+          title="Audit Log"
+          filename="audit-log"
+          subtitle={`Filters — search: "${search || "—"}", table: ${filterTable}`}
+        />
       </div>
 
       <div className="flex gap-3">

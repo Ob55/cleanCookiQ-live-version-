@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { HelpCircle, Building2, Factory, Banknote, Loader2, Mail, Phone, FileText } from "lucide-react";
 import { sendEmail, emailRoleAssigned } from "@/lib/emailService";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 const ROLE_OPTIONS = [
   { label: "Institution", value: "institution", role: "institution_admin", icon: Building2, color: "text-blue-600", setupUrl: "/institution/setup" },
@@ -83,13 +84,29 @@ export default function AdminOthers() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-          <HelpCircle className="h-6 w-6 text-muted-foreground" /> Other Organisations
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Organisations that registered as "Other" — review and assign them to an appropriate role.
-        </p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold flex items-center gap-2">
+            <HelpCircle className="h-6 w-6 text-muted-foreground" /> Other Organisations
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Organisations that registered as "Other" — review and assign them to an appropriate role.
+          </p>
+        </div>
+        <DownloadReportButton
+          rows={others ?? []}
+          columns={[
+            { key: "org_name", label: "Organisation" },
+            { key: "full_name", label: "Contact" },
+            { key: "email", label: "Email" },
+            { key: "phone", label: "Phone" },
+            { key: "description", label: "Description" },
+            { key: "approval_status", label: "Status" },
+            dateColumn("created_at", "Registered"),
+          ]}
+          title="Other Organisations"
+          filename="other-organisations"
+        />
       </div>
 
       {isLoading ? (

@@ -13,6 +13,7 @@ import { useResources } from "@/hooks/useKnowledge";
 import { useDeleteContent, useUpsertContent } from "@/hooks/useContentMutations";
 import { marketplaceSlug } from "@/lib/marketplace";
 import type { Resource, ResourceType } from "@/lib/knowledge";
+import { DownloadReportButton, dateColumn, listColumn } from "@/components/admin/DownloadReportButton";
 
 const TYPES: ResourceType[] = [
   "guide","standard","template","report","case_study","training_module","toolkit","dataset","presentation","other",
@@ -105,7 +106,28 @@ export default function AdminResources() {
             Library entries shown on /resources. Provide a file_url (Storage) or an external_url.
           </p>
         </div>
-        <Button onClick={startCreate}><Plus className="h-4 w-4 mr-1" /> New resource</Button>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={data ?? []}
+            columns={[
+              { key: "title", label: "Title" },
+              { key: "resource_type", label: "Type" },
+              listColumn("audience", "Audience"),
+              { key: "description", label: "Description" },
+              { key: "file_url", label: "File URL" },
+              { key: "external_url", label: "External URL" },
+              { key: "view_count", label: "Views" },
+              { key: "download_count", label: "Downloads" },
+              { key: "is_published", label: "Published" },
+              { key: "requires_signin", label: "Sign-in Required" },
+              listColumn("tags", "Tags"),
+              dateColumn("published_at", "Published On"),
+            ]}
+            title="Resources"
+            filename="resources"
+          />
+          <Button onClick={startCreate}><Plus className="h-4 w-4 mr-1" /> New resource</Button>
+        </div>
       </div>
 
       {isLoading ? (

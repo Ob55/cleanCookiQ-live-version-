@@ -7,6 +7,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "sonner";
 import { Users, Check, X, Loader2, Trash2, MailWarning, Send } from "lucide-react";
 import { sendEmail, emailAccountApproved, emailAccountRejected } from "@/lib/emailService";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 export default function UserManagement() {
   const queryClient = useQueryClient();
@@ -72,9 +73,25 @@ export default function UserManagement() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold">User Management</h1>
-        <p className="text-sm text-muted-foreground">Manage user accounts and approval status</p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold">User Management</h1>
+          <p className="text-sm text-muted-foreground">Manage user accounts and approval status</p>
+        </div>
+        <DownloadReportButton
+          rows={profiles ?? []}
+          columns={[
+            { key: "full_name", label: "Full Name" },
+            { key: "email", label: "Email" },
+            { key: "phone", label: "Phone" },
+            { key: "org_type", label: "Organisation Type" },
+            { key: "org_name", label: "Organisation" },
+            { key: "approval_status", label: "Approval Status" },
+            dateColumn("created_at", "Joined"),
+          ]}
+          title="User Management"
+          filename="users"
+        />
       </div>
 
       <UnverifiedRegistrationsPanel />

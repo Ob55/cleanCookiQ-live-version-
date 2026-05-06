@@ -14,6 +14,7 @@ import { Factory, Check, X, Loader2, Plus, Search, Star, Eye, FileText, Pencil, 
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { DownloadReportButton, dateColumn, listColumn } from "@/components/admin/DownloadReportButton";
 
 const categoryLabels: Record<string, string> = {
   equipment_provider: "Equipment Provider",
@@ -135,15 +136,38 @@ export default function ProviderManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-2xl font-display font-bold">Provider Management</h1>
           <p className="text-sm text-muted-foreground">Manage providers, vetting queue, NDA/MoU compliance</p>
         </div>
-        <Dialog open={showAdd} onOpenChange={setShowAdd}>
-          <DialogTrigger asChild>
-            <Button><Plus className="h-4 w-4 mr-2" /> Add Provider</Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={filtered}
+            columns={[
+              { key: "name", label: "Provider" },
+              { key: "provider_category", label: "Category" },
+              { key: "contact_person", label: "Contact" },
+              { key: "contact_email", label: "Email" },
+              { key: "contact_phone", label: "Phone" },
+              { key: "website", label: "Website" },
+              listColumn("services", "Services"),
+              listColumn("technology_types", "Technologies"),
+              listColumn("counties_served", "Counties Served"),
+              { key: "verified", label: "Verified" },
+              { key: "rating", label: "Rating" },
+              dateColumn("nda_signed_at", "NDA Signed"),
+              dateColumn("mou_signed_at", "MoU Signed"),
+              dateColumn("created_at", "Created"),
+            ]}
+            title="Providers"
+            filename="providers"
+            subtitle={`Filters — verified: ${filterVerified}, category: ${filterCategory}`}
+          />
+          <Dialog open={showAdd} onOpenChange={setShowAdd}>
+            <DialogTrigger asChild>
+              <Button><Plus className="h-4 w-4 mr-2" /> Add Provider</Button>
+            </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader><DialogTitle>Add New Provider</DialogTitle></DialogHeader>
             <div className="space-y-4">
@@ -221,7 +245,8 @@ export default function ProviderManagement() {
               </Button>
             </div>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <div className="flex gap-3 flex-wrap">

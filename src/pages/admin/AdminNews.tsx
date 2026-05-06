@@ -13,6 +13,7 @@ import { useNews } from "@/hooks/useKnowledge";
 import { useDeleteContent, useUpsertContent } from "@/hooks/useContentMutations";
 import { marketplaceSlug } from "@/lib/marketplace";
 import type { NewsArticle } from "@/lib/knowledge";
+import { DownloadReportButton, dateColumn, listColumn } from "@/components/admin/DownloadReportButton";
 
 type FormState = {
   id?: string;
@@ -93,7 +94,23 @@ export default function AdminNews() {
             Editorial content shown on the public /news page when status = published.
           </p>
         </div>
-        <Button onClick={startCreate}><Plus className="h-4 w-4 mr-1" /> New article</Button>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={data ?? []}
+            columns={[
+              { key: "title", label: "Title" },
+              { key: "summary", label: "Summary" },
+              { key: "author_name", label: "Author" },
+              { key: "status", label: "Status" },
+              dateColumn("published_at", "Published"),
+              { key: "view_count", label: "Views" },
+              listColumn("tags", "Tags"),
+            ]}
+            title="News Articles"
+            filename="news-articles"
+          />
+          <Button onClick={startCreate}><Plus className="h-4 w-4 mr-1" /> New article</Button>
+        </div>
       </div>
 
       {isLoading ? (

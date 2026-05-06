@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { sbAny as supabase } from "@/lib/sbAny";
+import { DownloadReportButton, dateColumn, listColumn } from "@/components/admin/DownloadReportButton";
 
 type Crew = {
   id: string;
@@ -161,7 +162,28 @@ export default function AdminInstallationCrews() {
             Registered installer teams with certifications, coverage, and capacity. Used for delivery assignment.
           </p>
         </div>
-        <Button onClick={() => { setForm(EMPTY); setOpen(true); }}><Plus className="h-4 w-4 mr-1" /> New crew</Button>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={data ?? []}
+            columns={[
+              { key: "name", label: "Crew Name" },
+              { key: "providers", label: "Provider", format: (r: any) => r.providers?.name ?? "" },
+              { key: "lead_name", label: "Lead" },
+              { key: "contact_phone", label: "Phone" },
+              { key: "contact_email", label: "Email" },
+              listColumn("certifications", "Certifications"),
+              dateColumn("insurance_valid_until", "Insurance Valid Until"),
+              listColumn("counties_served", "Counties Served"),
+              listColumn("technology_types", "Technologies"),
+              { key: "active_jobs_capacity", label: "Capacity" },
+              { key: "rating", label: "Rating" },
+              { key: "is_active", label: "Active" },
+            ]}
+            title="Installation Crews"
+            filename="installation-crews"
+          />
+          <Button onClick={() => { setForm(EMPTY); setOpen(true); }}><Plus className="h-4 w-4 mr-1" /> New crew</Button>
+        </div>
       </div>
 
       {isLoading ? <Skeleton className="h-32 w-full" /> : (data ?? []).length === 0 ? (

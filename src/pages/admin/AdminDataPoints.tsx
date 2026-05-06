@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { sbAny as supabase } from "@/lib/sbAny";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 type DataPoint = {
   id: string;
@@ -153,7 +154,26 @@ export default function AdminDataPoints() {
             Substantiable metrics (fuel costs, emissions factors, benchmarks) — every value must cite a source.
           </p>
         </div>
-        <Button onClick={() => { setForm(EMPTY); setOpen(true); }}><Plus className="h-4 w-4 mr-1" /> New data point</Button>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={data ?? []}
+            columns={[
+              { key: "metric_key", label: "Metric Key" },
+              { key: "value_numeric", label: "Numeric Value" },
+              { key: "value_text", label: "Text Value" },
+              { key: "unit", label: "Unit" },
+              { key: "fuel_type", label: "Fuel Type" },
+              { key: "counties", label: "County", format: (r: any) => r.counties?.name ?? "" },
+              { key: "data_sources", label: "Source", format: (r: any) => r.data_sources?.title ?? "" },
+              dateColumn("valid_from", "Valid From"),
+              dateColumn("valid_until", "Valid Until"),
+              { key: "notes", label: "Notes" },
+            ]}
+            title="Data Points"
+            filename="data-points"
+          />
+          <Button onClick={() => { setForm(EMPTY); setOpen(true); }}><Plus className="h-4 w-4 mr-1" /> New data point</Button>
+        </div>
       </div>
 
       {isLoading ? <Skeleton className="h-32 w-full" /> : (data ?? []).length === 0 ? (

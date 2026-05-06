@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCarbonSummary } from "@/hooks/useRisk";
 import { formatTco2e } from "@/lib/risk";
+import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 
 const STATUS_COLORS: Record<string, string> = {
   design: "bg-slate-100 text-slate-700",
@@ -28,13 +29,34 @@ export default function AdminCarbon() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-          <Leaf className="h-6 w-6 text-primary" /> Carbon Ledger
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Carbon projects per institution, with forecast vs. third-party verified tonnes.
-        </p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold flex items-center gap-2">
+            <Leaf className="h-6 w-6 text-primary" /> Carbon Ledger
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Carbon projects per institution, with forecast vs. third-party verified tonnes.
+          </p>
+        </div>
+        <DownloadReportButton
+          rows={data ?? []}
+          columns={[
+            { key: "project_title", label: "Project" },
+            { key: "institution_name", label: "Institution" },
+            { key: "institution_county", label: "County" },
+            { key: "methodology", label: "Methodology" },
+            { key: "registry", label: "Registry" },
+            { key: "registry_project_id", label: "Registry ID" },
+            { key: "status", label: "Status" },
+            { key: "estimated_annual_credits", label: "Annual Forecast (tCO₂e)" },
+            { key: "total_estimated_tco2e", label: "Total Estimated (tCO₂e)" },
+            { key: "total_verified_tco2e", label: "Total Verified (tCO₂e)" },
+            { key: "baseline_emissions_tco2e", label: "Baseline (tCO₂e)" },
+            { key: "project_emissions_tco2e", label: "Project (tCO₂e)" },
+          ]}
+          title="Carbon Ledger"
+          filename="carbon-ledger"
+        />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

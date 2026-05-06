@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Loader2, Ticket, Send, MessageSquare, AlertTriangle, CheckCircle } from "lucide-react";
 import { sendEmail, emailTicketResolved } from "@/lib/emailService";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 const statusColors: Record<string, string> = {
   open: "bg-amber-100 text-amber-700",
@@ -107,11 +108,28 @@ export default function AdminTickets() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-          <Ticket className="h-6 w-6 text-primary" /> Support Tickets
-        </h1>
-        <p className="text-sm text-muted-foreground">Manage and respond to user support requests</p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold flex items-center gap-2">
+            <Ticket className="h-6 w-6 text-primary" /> Support Tickets
+          </h1>
+          <p className="text-sm text-muted-foreground">Manage and respond to user support requests</p>
+        </div>
+        <DownloadReportButton
+          rows={tickets ?? []}
+          columns={[
+            { key: "title", label: "Title" },
+            { key: "description", label: "Description" },
+            { key: "priority", label: "Priority" },
+            { key: "status", label: "Status" },
+            { key: "raised_by", label: "Raised By (User ID)" },
+            { key: "admin_reply", label: "Admin Reply" },
+            dateColumn("created_at", "Created"),
+            dateColumn("resolved_at", "Resolved"),
+          ]}
+          title="Support Tickets"
+          filename="support-tickets"
+        />
       </div>
 
       {isLoading ? (
