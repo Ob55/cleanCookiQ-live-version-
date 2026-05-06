@@ -31,3 +31,9 @@ supabase/.temp/
 
 # Claude Code local user settings
 .claude/settings.local.json
+
+# Local-only artifacts (not part of the platform)
+cleancookIQ-data-methodologies.docx
+~$*.docx
+scripts/generate_methodology_doc.py
+instraction
