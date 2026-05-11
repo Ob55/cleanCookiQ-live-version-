@@ -145,6 +145,7 @@ export default function ProviderManagement() {
           <DownloadReportButton
             rows={filtered}
             columns={[
+              { key: "provider_code", label: "Code" },
               { key: "name", label: "Provider" },
               { key: "provider_category", label: "Category" },
               { key: "contact_person", label: "Contact" },
@@ -280,6 +281,7 @@ export default function ProviderManagement() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border bg-muted/50">
+                <th className="text-left text-xs font-medium text-muted-foreground p-3">Code</th>
                 <th className="text-left text-xs font-medium text-muted-foreground p-3">Provider</th>
                 <th className="text-left text-xs font-medium text-muted-foreground p-3">Category</th>
                 <th className="text-left text-xs font-medium text-muted-foreground p-3">Technologies</th>
@@ -292,6 +294,9 @@ export default function ProviderManagement() {
             <tbody>
               {filtered?.map(p => (
                 <tr key={p.id} className="border-b border-border/50 hover:bg-muted/30 cursor-pointer" onClick={() => navigate(`/admin/providers/${p.id}`)}>
+                  <td className="p-3">
+                    <span className="font-mono text-xs text-muted-foreground">{(p as any).provider_code ?? "—"}</span>
+                  </td>
                   <td className="p-3">
                     <div className="flex items-center gap-3">
                       <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">

@@ -90,40 +90,170 @@ const FUEL_DISPLAY: Record<string, string> = {
   other: "biomass pellets",
 };
 
-export function emailInstitutionWelcome(name: string, institutionName: string, currentFuel?: string): string {
+/**
+ * Shared "Your {label} code" callout box. Returns "" when no code is supplied
+ * so the welcome email gracefully degrades for older flows or pre-trigger rows.
+ */
+function codeCallout(label: string, code?: string | null): string {
+  if (!code) return "";
+  return `
+    <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:16px;margin:20px 0;">
+      <p style="color:#1a3c2e;margin:0 0 4px 0;font-size:13px;font-weight:600;">Your ${label} code</p>
+      <p style="color:#1a3c2e;margin:0;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:18px;font-weight:700;letter-spacing:0.5px;">${code}</p>
+      <p style="color:#4b5563;margin:8px 0 0 0;font-size:12px;">Quote this code in any email or support ticket so we can find your record instantly.</p>
+    </div>`;
+}
+
+const APP_URL = () => import.meta.env.VITE_APP_URL || "https://cleancookiq.com";
+const CONTACT_FOOTER = `
+    <p style="color:#6b7280;font-size:13px;margin-top:24px;">
+      Reply to this email or contact us at
+      <a href="mailto:info@ignis-innovation.com" style="color:#2d6a4f;">info@ignis-innovation.com</a> to get started.
+    </p>`;
+
+export function emailInstitutionWelcome(
+  name: string,
+  institutionName: string,
+  currentFuel?: string,
+  institutionCode?: string | null,
+): string {
   const fuelLabel = currentFuel ? (FUEL_DISPLAY[currentFuel] || currentFuel) : "current fuel";
   return layout(`
     <h2 style="color:#1a3c2e;margin-top:0;">Welcome to cleancookIQ</h2>
     <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
     <p style="color:#374151;line-height:1.6;">
-      We see you registered on cleancookIQ. Your <strong>${fuelLabel}</strong> usage suggests
+      We see you registered <strong>${institutionName}</strong> on cleancookIQ. Your <strong>${fuelLabel}</strong> usage suggests
       real opportunities to cut fuel costs per meal and reduce CO₂ emissions.
       We help institutions move from registration to financed installation.
     </p>
+    ${codeCallout("institution", institutionCode)}
     <p style="color:#374151;line-height:1.6;font-style:italic;">
       May we walk you through your least-cost pathway?
     </p>
     <p style="text-align:center;">
-      <a href="${import.meta.env.VITE_APP_URL || "https://cleancookiq.com"}/institution/dashboard" style="${BTN_STYLE}">View Your Dashboard</a>
+      <a href="${APP_URL()}/institution/dashboard" style="${BTN_STYLE}">View Your Dashboard</a>
     </p>
-    <p style="color:#6b7280;font-size:13px;margin-top:24px;">
-      Reply to this email or contact us at
-      <a href="mailto:info@ignis-innovation.com" style="color:#2d6a4f;">info@ignis-innovation.com</a> to get started.
-    </p>
+    ${CONTACT_FOOTER}
   `);
 }
 
-export function emailSupplierWelcome(name: string, companyName: string): string {
+export function emailSupplierWelcome(
+  name: string,
+  companyName: string,
+  providerCode?: string | null,
+): string {
   return layout(`
     <h2 style="color:#1a3c2e;margin-top:0;">Welcome to cleancookIQ</h2>
     <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
     <p style="color:#374151;line-height:1.6;">
-      Your company <strong>${companyName}</strong> has been registered as a supplier on cleancookIQ.
-      You can now browse institution opportunities and submit proposals.
+      <strong>${companyName}</strong> has been registered as a supplier. Once your
+      Clean Stove Compliance Checklist (CSCC) is complete you'll appear in the marketplace
+      and can submit proposals against open institution opportunities.
+    </p>
+    ${codeCallout("supplier", providerCode)}
+    <p style="color:#374151;line-height:1.6;font-style:italic;">
+      Complete your CSCC and product catalogue to start receiving leads.
     </p>
     <p style="text-align:center;">
-      <a href="${import.meta.env.VITE_APP_URL || "https://cleancookiq.com"}/supplier/dashboard" style="${BTN_STYLE}">View Dashboard</a>
+      <a href="${APP_URL()}/supplier/dashboard" style="${BTN_STYLE}">View Dashboard</a>
     </p>
+    ${CONTACT_FOOTER}
+  `);
+}
+
+export function emailFunderWelcome(
+  name: string,
+  orgName: string,
+  orgCode?: string | null,
+): string {
+  return layout(`
+    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to cleancookIQ</h2>
+    <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
+    <p style="color:#374151;line-height:1.6;">
+      <strong>${orgName}</strong> is now set up as a funder on the platform. You can browse
+      curated deals matched to your preferences, track your committed and disbursed capital,
+      and see attributable impact on your portfolio dashboard.
+    </p>
+    ${codeCallout("funder", orgCode)}
+    <p style="color:#374151;line-height:1.6;font-style:italic;">
+      Tell us your ticket size and preferred counties — we'll surface the best-fit deals first.
+    </p>
+    <p style="text-align:center;">
+      <a href="${APP_URL()}/funder/dashboard" style="${BTN_STYLE}">View Your Dashboard</a>
+    </p>
+    ${CONTACT_FOOTER}
+  `);
+}
+
+export function emailCSRWelcome(
+  name: string,
+  orgName: string,
+  orgCode?: string | null,
+): string {
+  return layout(`
+    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to cleancookIQ</h2>
+    <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
+    <p style="color:#374151;line-height:1.6;">
+      <strong>${orgName}</strong> is now set up as a CSR partner. You can sponsor
+      institution transitions, track your contribution, and receive a quarterly impact
+      attribution report.
+    </p>
+    ${codeCallout("CSR partner", orgCode)}
+    <p style="color:#374151;line-height:1.6;font-style:italic;">
+      Browse the institutions seeking CSR sponsorship in your preferred counties.
+    </p>
+    <p style="text-align:center;">
+      <a href="${APP_URL()}/csr/dashboard" style="${BTN_STYLE}">View Your Dashboard</a>
+    </p>
+    ${CONTACT_FOOTER}
+  `);
+}
+
+export function emailResearcherWelcome(
+  name: string,
+  orgName: string,
+  orgCode?: string | null,
+): string {
+  return layout(`
+    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to cleancookIQ</h2>
+    <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
+    <p style="color:#374151;line-height:1.6;">
+      <strong>${orgName}</strong> has been registered as a research partner. You have access
+      to the public data layer — county metrics, fuel prices, supplier compliance tiers,
+      and aggregated impact figures — with citations preserved at every step.
+    </p>
+    ${codeCallout("researcher", orgCode)}
+    <p style="color:#374151;line-height:1.6;font-style:italic;">
+      Sourced badges next to every number link straight to the original publisher.
+    </p>
+    <p style="text-align:center;">
+      <a href="${APP_URL()}/researcher/dashboard" style="${BTN_STYLE}">View Your Dashboard</a>
+    </p>
+    ${CONTACT_FOOTER}
+  `);
+}
+
+export function emailTAProviderWelcome(
+  name: string,
+  orgName: string,
+  taProviderCode?: string | null,
+): string {
+  return layout(`
+    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to cleancookIQ</h2>
+    <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
+    <p style="color:#374151;line-height:1.6;">
+      <strong>${orgName}</strong> is now listed as a TA provider. Institutions can request
+      technical assistance in their onboarding flow and will be matched to your TA types
+      and resource windows.
+    </p>
+    ${codeCallout("TA provider", taProviderCode)}
+    <p style="color:#374151;line-height:1.6;font-style:italic;">
+      Keep your TA types and availability windows current — that's what drives matches.
+    </p>
+    <p style="text-align:center;">
+      <a href="${APP_URL()}/ta/dashboard" style="${BTN_STYLE}">View Your Dashboard</a>
+    </p>
+    ${CONTACT_FOOTER}
   `);
 }
 

@@ -126,7 +126,12 @@ export default function InstitutionDashboard() {
           <h1 className="text-2xl font-display font-bold">
             Welcome back, {institution.name}
           </h1>
-          <div className="flex items-center gap-2 mt-2">
+          <div className="flex items-center gap-2 mt-2 flex-wrap">
+            {(institution as any).institution_code && (
+              <Badge variant="outline" className="font-mono text-xs">
+                {(institution as any).institution_code}
+              </Badge>
+            )}
             <Badge variant="secondary">{institution.county}</Badge>
             {institution.ownership_type && (
               <Badge variant="outline" className="capitalize">{institution.ownership_type}</Badge>
@@ -136,6 +141,7 @@ export default function InstitutionDashboard() {
         <DownloadReportButton
           rows={[institution]}
           columns={[
+            { key: "institution_code", label: "Code" },
             { key: "name", label: "Institution" },
             { key: "institution_type", label: "Type" },
             { key: "ownership_type", label: "Ownership" },

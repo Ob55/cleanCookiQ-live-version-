@@ -93,6 +93,7 @@ export default function InstitutionManagement() {
           <DownloadReportButton
             rows={filtered}
             columns={[
+              { key: "institution_code", label: "Code" },
               { key: "name", label: "Institution" },
               { key: "institution_type", label: "Type" },
               { key: "county", label: "County" },
@@ -174,6 +175,7 @@ export default function InstitutionManagement() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border bg-muted/50">
+                  <th className="text-left text-xs font-medium text-muted-foreground p-3">Code</th>
                   <th className="text-left text-xs font-medium text-muted-foreground p-3">Name</th>
                   <th className="text-left text-xs font-medium text-muted-foreground p-3">Type</th>
                   <th className="text-left text-xs font-medium text-muted-foreground p-3">County</th>
@@ -187,6 +189,9 @@ export default function InstitutionManagement() {
               <tbody>
                 {filtered.map(inst => (
                   <tr key={inst.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                    <td className="p-3">
+                      <span className="font-mono text-xs text-muted-foreground">{inst.institution_code ?? "—"}</span>
+                    </td>
                     <td className="p-3">
                       <div className="flex items-center gap-3">
                         <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -333,12 +338,36 @@ function InstitutionForm({ onSuccess, initial }: { onSuccess: () => void; initia
       contact_email: form.contact_email || null,
       notes: form.notes || null,
     };
-    const { error } = isEdit
-      ? await supabase.from("institutions").update(payload).eq("id", initial.id)
-      : await supabase.from("institutions").insert(payload);
+    let assignedCode: string | null = null;
+    let errorMsg: string | null = null;
+    if (isEdit) {
+      const { error } = await supabase.from("institutions").update(payload).eq("id", initial.id);
+      if (error) errorMsg = error.message;
+    } else {
+      const { data, error } = await supabase
+        .from("institutions")
+        .insert(payload)
+        .select("institution_code")
+        .single();
+      if (error) errorMsg = error.message;
+      else assignedCode = data?.institution_code ?? null;
+    }
     setLoading(false);
-    if (error) toast.error(error.message);
-    else { toast.success(isEdit ? "Institution updated" : "Institution added"); onSuccess(); }
+    if (errorMsg) {
+      toast.error(errorMsg);
+      return;
+    }
+    if (isEdit) {
+      toast.success("Institution updated");
+    } else if (assignedCode) {
+      toast.success(`Institution added — code ${assignedCode}`, {
+        description: "The code is auto-assigned and immutable. Use it in tickets and reports.",
+        duration: 8000,
+      });
+    } else {
+      toast.success("Institution added");
+    }
+    onSuccess();
   };
 
   const set = (key: string, val: string) => setForm(prev => ({ ...prev, [key]: val }));

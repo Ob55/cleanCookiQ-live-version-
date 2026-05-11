@@ -11,7 +11,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { Building2, Pencil, Save, X, Loader2, Users, UserCheck, Clock, Camera, Banknote, ChefHat, Landmark, CreditCard } from "lucide-react";
 import { toast } from "sonner";
-import { calculateAssessmentScore } from "@/lib/assessmentScoring";
+import { calculateAssessmentScore, loadReadinessWeights } from "@/lib/assessmentScoring";
+import { deriveStoredImpact } from "@/lib/institutionDerived";
 import TransitionNeedsSection from "@/components/institution/TransitionNeedsSection";
 
 const FUEL_LABELS: Record<string, string> = {
@@ -168,7 +169,8 @@ export default function InstitutionProfile() {
 
       const kitchenBool = hasDedicatedKitchen === "yes" ? true : hasDedicatedKitchen === "no" ? false : null;
 
-      // Recalculate assessment score
+      // Recalculate assessment score using the live admin-configured weights.
+      const weights = await loadReadinessWeights();
       const { score, category } = calculateAssessmentScore({
         current_fuel: institution.current_fuel,
         consumption_per_term: institution.consumption_per_term,
@@ -178,6 +180,12 @@ export default function InstitutionProfile() {
         number_of_students: numStudents ? parseInt(numStudents) : null,
         monthly_fuel_spend: monthlyFuelSpend ? parseFloat(monthlyFuelSpend) : null,
         financial_decision_maker: financialDecisionMaker || null,
+      }, weights);
+
+      const derived = deriveStoredImpact({
+        current_fuel: institution.current_fuel,
+        monthly_fuel_spend: monthlyFuelSpend ? parseFloat(monthlyFuelSpend) : null,
+        consumption_per_term: institution.consumption_per_term,
       });
 
       const updateData = {
@@ -196,6 +204,9 @@ export default function InstitutionProfile() {
         transition_needs: transitionNeeds || null,
         assessment_score: score,
         assessment_category: category,
+        annual_savings_ksh: derived.annual_savings_ksh,
+        co2_reduction_tonnes_pa: derived.co2_reduction_tonnes_pa,
+        recommended_solution: derived.recommended_solution,
       };
 
       const { error } = await supabase

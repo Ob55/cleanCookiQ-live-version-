@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, Flame, Users, Building2, GraduationCap, Stethoscope, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { useOnboardingGate } from "@/hooks/useOnboardingGate";
+import { useMyActorCode } from "@/hooks/useMyActorCode";
 import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 
 const FUEL_LABELS: Record<string, string> = {
@@ -114,6 +115,7 @@ export default function FunderDashboard() {
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-2xl font-display font-bold">Funder Dashboard</h1>
+          <FunderCodeChip />
           <p className="text-sm text-muted-foreground">
             Institution overview across Kenya — ready for clean cooking transition.
           </p>
@@ -288,5 +290,15 @@ export default function FunderDashboard() {
         </div>
       )}
     </div>
+  );
+}
+
+function FunderCodeChip() {
+  const { data: code } = useMyActorCode();
+  if (!code) return null;
+  return (
+    <Badge variant="outline" className="font-mono text-xs mt-1" title="Your funder code">
+      {code}
+    </Badge>
   );
 }

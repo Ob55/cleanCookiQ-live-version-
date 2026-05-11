@@ -573,6 +573,7 @@ export type Database = {
           grid_connected: boolean | null
           has_dedicated_kitchen: boolean | null
           id: string
+          institution_code: string | null
           institution_type: Database["public"]["Enums"]["institution_type"]
           kitchen_condition: string | null
           kitchen_photo_url: string | null
@@ -628,6 +629,7 @@ export type Database = {
           grid_connected?: boolean | null
           has_dedicated_kitchen?: boolean | null
           id?: string
+          institution_code?: string | null
           institution_type?: Database["public"]["Enums"]["institution_type"]
           kitchen_condition?: string | null
           kitchen_photo_url?: string | null
@@ -683,6 +685,7 @@ export type Database = {
           grid_connected?: boolean | null
           has_dedicated_kitchen?: boolean | null
           id?: string
+          institution_code?: string | null
           institution_type?: Database["public"]["Enums"]["institution_type"]
           kitchen_condition?: string | null
           kitchen_photo_url?: string | null
@@ -936,6 +939,7 @@ export type Database = {
           id: string
           logo_url: string | null
           name: string
+          org_code: string | null
           org_type: Database["public"]["Enums"]["org_type"]
           updated_at: string
         }
@@ -948,6 +952,7 @@ export type Database = {
           id?: string
           logo_url?: string | null
           name: string
+          org_code?: string | null
           org_type: Database["public"]["Enums"]["org_type"]
           updated_at?: string
         }
@@ -960,6 +965,7 @@ export type Database = {
           id?: string
           logo_url?: string | null
           name?: string
+          org_code?: string | null
           org_type?: Database["public"]["Enums"]["org_type"]
           updated_at?: string
         }
@@ -1353,6 +1359,7 @@ export type Database = {
           provider_category:
             | Database["public"]["Enums"]["provider_category"]
             | null
+          provider_code: string | null
           rating: number | null
           services: string[] | null
           technology_types: string[] | null
@@ -1374,6 +1381,7 @@ export type Database = {
           provider_category?:
             | Database["public"]["Enums"]["provider_category"]
             | null
+          provider_code?: string | null
           rating?: number | null
           services?: string[] | null
           technology_types?: string[] | null
@@ -1395,6 +1403,7 @@ export type Database = {
           provider_category?:
             | Database["public"]["Enums"]["provider_category"]
             | null
+          provider_code?: string | null
           rating?: number | null
           services?: string[] | null
           technology_types?: string[] | null
@@ -1672,6 +1681,7 @@ export type Database = {
           expertise_areas: string[] | null
           id: string
           organisation_id: string | null
+          ta_provider_code: string | null
           updated_at: string
           user_id: string
         }
@@ -1682,6 +1692,7 @@ export type Database = {
           expertise_areas?: string[] | null
           id?: string
           organisation_id?: string | null
+          ta_provider_code?: string | null
           updated_at?: string
           user_id: string
         }
@@ -1692,6 +1703,7 @@ export type Database = {
           expertise_areas?: string[] | null
           id?: string
           organisation_id?: string | null
+          ta_provider_code?: string | null
           updated_at?: string
           user_id?: string
         }

@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Package, Wrench, FileCheck, Bell, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
+import { useMyActorCode } from "@/hooks/useMyActorCode";
 
 interface InstitutionNeed {
   id: string;
@@ -87,6 +88,7 @@ export default function SupplierDashboard() {
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-2xl font-display font-bold">Supplier Dashboard</h1>
+          <SupplierCodeChip />
           <p className="text-muted-foreground text-sm mt-1">Overview of your products, services, and opportunities</p>
         </div>
         <DownloadReportButton
@@ -188,5 +190,15 @@ export default function SupplierDashboard() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function SupplierCodeChip() {
+  const { data: code } = useMyActorCode();
+  if (!code) return null;
+  return (
+    <Badge variant="outline" className="font-mono text-xs mt-1" title="Your supplier code">
+      {code}
+    </Badge>
   );
 }

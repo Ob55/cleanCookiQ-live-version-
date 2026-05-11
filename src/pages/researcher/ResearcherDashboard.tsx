@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
+import { useMyActorCode } from "@/hooks/useMyActorCode";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood",
@@ -157,6 +158,7 @@ export default function ResearcherDashboard() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-display font-bold">Research Dashboard</h1>
+          <ResearcherCodeChip />
           <p className="text-sm text-muted-foreground">
             {hasPrimeAccess
               ? "Browse institutions across Kenya ready for clean cooking transition."
@@ -374,5 +376,15 @@ export default function ResearcherDashboard() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function ResearcherCodeChip() {
+  const { data: code } = useMyActorCode();
+  if (!code) return null;
+  return (
+    <Badge variant="outline" className="font-mono text-xs mt-1" title="Your researcher code">
+      {code}
+    </Badge>
   );
 }

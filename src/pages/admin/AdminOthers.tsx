@@ -4,15 +4,27 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { HelpCircle, Building2, Factory, Banknote, Loader2, Mail, Phone, FileText } from "lucide-react";
-import { sendEmail, emailRoleAssigned } from "@/lib/emailService";
+import { HelpCircle, Building2, Factory, Banknote, FlaskConical, Heart, Loader2, Mail, Phone, FileText } from "lucide-react";
+import {
+  sendEmail,
+  emailRoleAssigned,
+  emailFunderWelcome,
+  emailCSRWelcome,
+  emailResearcherWelcome,
+} from "@/lib/emailService";
 import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 const ROLE_OPTIONS = [
   { label: "Institution", value: "institution", role: "institution_admin", icon: Building2, color: "text-blue-600", setupUrl: "/institution/setup" },
   { label: "Provider / Supplier", value: "supplier", role: "ta_provider", icon: Factory, color: "text-orange-600", setupUrl: "/supplier/setup" },
   { label: "Funder", value: "funder", role: "financing_partner", icon: Banknote, color: "text-green-600", setupUrl: "/funder/dashboard" },
+  { label: "CSR Partner", value: "csr", role: "viewer", icon: Heart, color: "text-rose-600", setupUrl: "/csr/dashboard" },
+  { label: "Researcher", value: "researcher", role: "viewer", icon: FlaskConical, color: "text-indigo-600", setupUrl: "/researcher/dashboard" },
 ] as const;
+
+// Org types that live in the `organisations` table — they need an org row
+// created so the DB trigger assigns an org_code.
+const ORG_BACKED_TYPES = new Set(["funder", "csr", "researcher"]);
 
 type OtherProfile = {
   id: string;
@@ -51,6 +63,26 @@ export default function AdminOthers() {
       label: string;
       setupUrl: string;
     }) => {
+      // For org-backed types, create the organisations row so the DB trigger
+      // assigns an org_code. The code is then quoted in the welcome email.
+      let assignedOrgCode: string | null = null;
+      if (ORG_BACKED_TYPES.has(newOrgType)) {
+        const { data: org } = await supabase
+          .from("organisations")
+          .insert({
+            name: profile.org_name || profile.full_name || "Unnamed organisation",
+            org_type: newOrgType as any,
+            contact_email: profile.email,
+            contact_phone: profile.phone || null,
+          })
+          .select("id, org_code")
+          .single();
+        if (org?.id) {
+          assignedOrgCode = (org as { org_code?: string | null }).org_code ?? null;
+          await supabase.from("profiles").update({ organisation_id: org.id }).eq("user_id", profile.user_id);
+        }
+      }
+
       // Update org_type and approval_status
       const { error: profileErr } = await supabase
         .from("profiles")
@@ -61,18 +93,38 @@ export default function AdminOthers() {
       // Add role
       await supabase.from("user_roles").upsert({ user_id: profile.user_id, role: role as any }, { onConflict: "user_id,role", ignoreDuplicates: true });
 
-      // Send approval email
+      // Send role-specific welcome with code if available, else the generic approval email.
+      const name = profile.full_name || profile.org_name || "there";
+      const orgName = profile.org_name || profile.full_name || "your organisation";
       const dashboardUrl = `${import.meta.env.VITE_APP_URL || "https://cleancookiq.com"}${setupUrl}`;
       if (profile.email) {
-        await sendEmail({
-          to: profile.email,
-          subject: `Your cleancookIQ account has been approved as ${label}`,
-          html: emailRoleAssigned(profile.full_name || profile.org_name || "there", label, dashboardUrl),
-        });
+        let subject = `Your cleancookIQ account has been approved as ${label}`;
+        let html = emailRoleAssigned(name, label, dashboardUrl);
+        if (newOrgType === "funder") {
+          subject = "Welcome to cleancookIQ as a Funder";
+          html = emailFunderWelcome(name, orgName, assignedOrgCode);
+        } else if (newOrgType === "csr") {
+          subject = "Welcome to cleancookIQ as a CSR Partner";
+          html = emailCSRWelcome(name, orgName, assignedOrgCode);
+        } else if (newOrgType === "researcher") {
+          subject = "Welcome to cleancookIQ as a Research Partner";
+          html = emailResearcherWelcome(name, orgName, assignedOrgCode);
+        }
+        await sendEmail({ to: profile.email, subject, html });
       }
+
+      return assignedOrgCode;
     },
-    onSuccess: (_, vars) => {
-      toast.success(`${vars.profile.org_name || vars.profile.full_name} assigned as ${vars.label}`);
+    onSuccess: (code, vars) => {
+      const who = vars.profile.org_name || vars.profile.full_name;
+      if (code) {
+        toast.success(`${who} assigned as ${vars.label} — code ${code}`, {
+          description: "We've sent the code in the welcome email.",
+          duration: 8000,
+        });
+      } else {
+        toast.success(`${who} assigned as ${vars.label}`);
+      }
       queryClient.invalidateQueries({ queryKey: ["admin-others"] });
       setAssigning(null);
     },

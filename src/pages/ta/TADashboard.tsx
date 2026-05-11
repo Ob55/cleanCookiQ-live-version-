@@ -94,6 +94,11 @@ export default function TADashboard() {
           <h1 className="text-2xl font-display font-bold flex items-center gap-2">
             <GraduationCap className="h-6 w-6 text-primary" /> TA Provider Dashboard
           </h1>
+          {(taProfile as any)?.ta_provider_code && (
+            <Badge variant="outline" className="font-mono text-xs mt-1" title="Your TA provider code">
+              {(taProfile as any).ta_provider_code}
+            </Badge>
+          )}
           <p className="text-sm text-muted-foreground">Institutions needing Technical Assistance, matched to your expertise and location.</p>
         </div>
         <DownloadReportButton

@@ -39,6 +39,7 @@ export default function FunderDealFlow() {
             risk_band: deal.max_open_risk_score > 0 ? riskBand(deal.max_open_risk_score) : "",
           }))}
           columns={[
+            { key: "institution_code", label: "Institution Code" },
             { key: "project_title", label: "Project" },
             { key: "institution_name", label: "Institution" },
             { key: "county", label: "County" },
@@ -107,6 +108,9 @@ function DealCard({ deal, score }: { deal: DealRow; score: number | null }) {
             <div>
               <CardTitle className="text-base">{deal.project_title}</CardTitle>
               <p className="text-xs text-muted-foreground">
+                {deal.institution_code && (
+                  <span className="font-mono mr-2">{deal.institution_code}</span>
+                )}
                 {deal.institution_name}{deal.county ? ` · ${deal.county}` : ""}
                 {deal.institution_type ? ` · ${deal.institution_type.replace("_", " ")}` : ""}
               </p>

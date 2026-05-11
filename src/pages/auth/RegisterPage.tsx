@@ -8,7 +8,13 @@ import { Building2, Factory, Banknote, FlaskConical, HelpCircle, ArrowLeft, Load
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
-import { sendEmail, emailOtherInterest } from "@/lib/emailService";
+import {
+  sendEmail,
+  emailOtherInterest,
+  emailFunderWelcome,
+  emailCSRWelcome,
+  emailResearcherWelcome,
+} from "@/lib/emailService";
 import AuthBackButton from "@/components/auth/AuthBackButton";
 import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
 
@@ -93,6 +99,30 @@ export default function RegisterPage() {
       // Store email, org_name, description in profiles
       await supabase.from("profiles").update({ email, org_name: orgName, description: description || null }).eq("user_id", signUpData.user.id);
 
+      // For org types that live in the `organisations` table (funder / CSR /
+      // researcher), create the org row at signup so the DB trigger assigns
+      // an org_code we can quote in the welcome email. Institutions and
+      // suppliers create their own rows in their setup flows; "other"
+      // intentionally stays unassigned until admin approval.
+      const orgBackedTypes = new Set(["funder", "csr", "researcher"]);
+      let assignedOrgCode: string | null = null;
+      if (orgBackedTypes.has(orgType)) {
+        const { data: org } = await supabase
+          .from("organisations")
+          .insert({
+            name: orgName,
+            org_type: orgType as any,
+            contact_email: email,
+            contact_phone: phone || null,
+          })
+          .select("id, org_code")
+          .single();
+        if (org?.id) {
+          assignedOrgCode = (org as { org_code?: string | null }).org_code ?? null;
+          await supabase.from("profiles").update({ organisation_id: org.id }).eq("user_id", signUpData.user.id);
+        }
+      }
+
       // If funder, create funder_profiles record
       if (isFunder) {
         await supabase.from("funder_profiles").insert({
@@ -105,12 +135,37 @@ export default function RegisterPage() {
         });
       }
 
-      // If other, send interest email
-      if (isOther) {
+      // Send role-specific welcome with the assigned code.
+      if (isFunder) {
+        await sendEmail({
+          to: email,
+          subject: "Welcome to cleancookIQ as a Funder",
+          html: emailFunderWelcome(fullName, orgName, assignedOrgCode),
+        });
+      } else if (orgType === "csr") {
+        await sendEmail({
+          to: email,
+          subject: "Welcome to cleancookIQ as a CSR Partner",
+          html: emailCSRWelcome(fullName, orgName, assignedOrgCode),
+        });
+      } else if (orgType === "researcher") {
+        await sendEmail({
+          to: email,
+          subject: "Welcome to cleancookIQ as a Research Partner",
+          html: emailResearcherWelcome(fullName, orgName, assignedOrgCode),
+        });
+      } else if (isOther) {
         await sendEmail({
           to: email,
           subject: "Thank you for your interest in cleancookIQ",
           html: emailOtherInterest(fullName, orgName),
+        });
+      }
+
+      if (assignedOrgCode) {
+        toast.success(`Account created — your code is ${assignedOrgCode}`, {
+          description: "Save this code — we've also sent it in your welcome email.",
+          duration: 10000,
         });
       }
     }
