@@ -117,6 +117,12 @@ const AdminResearchers = lazy(() => import("@/pages/admin/AdminResearchers"));
 const AdminOthers = lazy(() => import("@/pages/admin/AdminOthers"));
 const AdminMOUIPA = lazy(() => import("@/pages/admin/AdminMOUIPA"));
 
+const CSRLayout = lazy(() => import("@/components/layouts/CSRLayout"));
+const CSRDashboard = lazy(() => import("@/pages/csr/CSRDashboard"));
+const CSROpportunities = lazy(() => import("@/pages/csr/CSROpportunities"));
+const CSRSponsorships = lazy(() => import("@/pages/csr/CSRSponsorships"));
+const CSRImpactReport = lazy(() => import("@/pages/csr/CSRImpactReport"));
+
 const TicketsPage = lazy(() => import("@/pages/shared/TicketsPage"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 
@@ -255,6 +261,21 @@ const App = () => (
                 <Route path="/researcher/institution/:id" element={<ResearcherInstitutionDetail />} />
                 <Route path="/researcher/support" element={<TicketsPage />} />
                 <Route path="/researcher/account/organisation" element={<OrganisationProfilePage />} />
+              </Route>
+
+              {/* CSR pages (with sidebar) */}
+              <Route element={
+                <ProtectedRoute allowedOrgTypes={["csr"]}>
+                  <CSRLayout />
+                </ProtectedRoute>
+              }>
+                <Route path="/csr/dashboard" element={<CSRDashboard />} />
+                <Route path="/csr/opportunities" element={<CSROpportunities />} />
+                <Route path="/csr/sponsorships" element={<CSRSponsorships />} />
+                <Route path="/csr/impact" element={<CSRImpactReport />} />
+                <Route path="/csr/documents" element={<FunderDocuments />} />
+                <Route path="/csr/support" element={<TicketsPage />} />
+                <Route path="/csr/account/organisation" element={<OrganisationProfilePage />} />
               </Route>
 
               {/* Admin pages (protected) */}
