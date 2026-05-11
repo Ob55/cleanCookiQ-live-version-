@@ -74,6 +74,28 @@ export default function AdminCreditVerifications() {
     },
   });
 
+  // Live monitoring rollup — sum of avoided tCO₂e from recorded readings.
+  // Surfaces the "actuals" alongside the stored estimates and verifications
+  // so the forecast totals are visibly grounded in field data.
+  const { data: monitoringRollup } = useQuery({
+    queryKey: ["v_carbon_project_monitoring_rollup"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("v_carbon_project_monitoring_rollup")
+        .select("*");
+      return (data ?? []) as Array<{
+        carbon_project_id: string;
+        reading_count: number;
+        baseline_tco2e: number;
+        project_tco2e: number;
+        avoided_tco2e: number;
+        first_period_start: string | null;
+        last_period_end: string | null;
+      }>;
+    },
+  });
+
+
   const upsert = useMutation({
     mutationFn: async (values: FormState) => {
       if (new Date(values.vintage_end) < new Date(values.vintage_start)) {
@@ -178,6 +200,46 @@ export default function AdminCreditVerifications() {
           <Button onClick={() => { setForm(EMPTY); setOpen(true); }}><Plus className="h-4 w-4 mr-1" /> Record verification</Button>
         </div>
       </div>
+
+      {(monitoringRollup ?? []).length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Live monitoring rollup (per carbon project)</CardTitle>
+            <p className="text-xs text-muted-foreground">
+              Avoided tCO₂e implied by the field-recorded fuel-use readings, before VVB verification. Verified credits in the table below remain the authoritative figure for issued credits.
+            </p>
+          </CardHeader>
+          <CardContent className="overflow-x-auto p-0">
+            <table className="w-full text-sm">
+              <thead className="text-xs text-muted-foreground border-b">
+                <tr>
+                  <th className="text-left py-2 px-3">Carbon project</th>
+                  <th className="text-right py-2 px-3">Readings</th>
+                  <th className="text-left py-2 px-3">Coverage</th>
+                  <th className="text-right py-2 px-3">Baseline</th>
+                  <th className="text-right py-2 px-3">Project</th>
+                  <th className="text-right py-2 px-3">Avoided</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(monitoringRollup ?? []).map((r) => {
+                  const proj = (projects ?? []).find((p) => p.id === r.carbon_project_id);
+                  return (
+                    <tr key={r.carbon_project_id} className="border-b last:border-0">
+                      <td className="py-2 px-3 text-xs">{proj?.methodology ?? "—"} · {proj?.registry ?? "—"}</td>
+                      <td className="py-2 px-3 text-right">{r.reading_count}</td>
+                      <td className="py-2 px-3 text-xs">{r.first_period_start ?? "—"} → {r.last_period_end ?? "—"}</td>
+                      <td className="py-2 px-3 text-right font-mono text-muted-foreground">{Number(r.baseline_tco2e ?? 0).toFixed(1)}</td>
+                      <td className="py-2 px-3 text-right font-mono text-muted-foreground">{Number(r.project_tco2e ?? 0).toFixed(1)}</td>
+                      <td className="py-2 px-3 text-right font-mono font-medium">{Number(r.avoided_tco2e ?? 0).toFixed(1)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </CardContent>
+        </Card>
+      )}
 
       {isLoading ? <Skeleton className="h-32 w-full" /> : (data ?? []).length === 0 ? (
         <Card><CardContent className="py-12 text-center text-muted-foreground">No verifications recorded yet.</CardContent></Card>

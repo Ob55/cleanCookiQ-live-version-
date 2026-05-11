@@ -33,7 +33,10 @@ supabase/.temp/
 .claude/settings.local.json
 
 # Local-only artifacts (not part of the platform)
-cleancookIQ-data-methodologies.docx
+cleancookIQ-data-methodologies*.docx
 ~$*.docx
 scripts/generate_methodology_doc.py
+scripts/update_methodology_doc.py
+scripts/expand_methodology_doc.py
+scripts/rewrite_gaps_section.py
 instraction
