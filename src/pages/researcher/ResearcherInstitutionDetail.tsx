@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Loader2, ArrowLeft, MapPin, Flame, Users, UtensilsCrossed, Building2, Send } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
+import { institutionLabel } from "@/lib/institutionDisplay";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood", charcoal: "Charcoal", lpg: "LPG",
@@ -115,7 +116,9 @@ export default function ResearcherInstitutionDetail() {
 
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-display font-bold">{inst.name}</h1>
+          <h1 className="text-2xl font-display font-bold font-mono">
+            {institutionLabel({ institution_code: inst.institution_code, name: inst.name })}
+          </h1>
           <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
             <MapPin className="h-4 w-4" />
             {inst.county}{inst.sub_county ? `, ${inst.sub_county}` : ""}

@@ -201,7 +201,7 @@ export default function HomePage() {
         <div className="container relative z-10">
           <div className="text-center mb-14">
             <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 text-primary-foreground">Closing the Gaps in Institutional Clean Cooking</h2>
-            <p className="text-primary-foreground/80 max-w-2xl mx-auto">The clean cooking sector for institutions has real gaps. cleancookIQ fills them.</p>
+            <p className="text-primary-foreground/80 max-w-2xl mx-auto">The clean cooking sector for institutions has real gaps. CleanCookIQ fills them.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 rounded-2xl overflow-hidden shadow-elevated border border-border">
             {/* Left — Failures */}
@@ -309,7 +309,7 @@ export default function HomePage() {
       <section className="py-20 bg-gradient-hero text-primary-foreground">
         <div className="container text-center">
           <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Ready to Join the Transition?</h2>
-          <p className="text-primary-foreground/80 max-w-xl mx-auto mb-8">Whether you are an institution, provider, funder, or researcher, there is a place for you on cleancookIQ.</p>
+          <p className="text-primary-foreground/80 max-w-xl mx-auto mb-8">Whether you are an institution, provider, funder, or researcher, there is a place for you on CleanCookIQ.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link to="/auth/register">
               <Button size="lg" className="bg-accent text-accent-foreground hover:bg-amber-light font-semibold">

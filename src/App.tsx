@@ -7,7 +7,13 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import BrandedLoader from "@/components/BrandedLoader";
 import IdleLogoutGuard from "@/components/IdleLogoutGuard";
+import { usePageTracking } from "@/hooks/usePageTracking";
 import { lazy, Suspense } from "react";
+
+function PageTracker() {
+  usePageTracking();
+  return null;
+}
 
 const PageLoader = () => <BrandedLoader />;
 
@@ -79,6 +85,7 @@ const AdminCommissioningTemplates = lazy(() => import("@/pages/admin/AdminCommis
 const AdminInstallationCrews = lazy(() => import("@/pages/admin/AdminInstallationCrews"));
 const AdminProductCategories = lazy(() => import("@/pages/admin/AdminProductCategories"));
 const AdminCreditVerifications = lazy(() => import("@/pages/admin/AdminCreditVerifications"));
+const AdminEngagement = lazy(() => import("@/pages/admin/AdminEngagement"));
 const AssessmentEditor = lazy(() => import("@/pages/admin/AssessmentEditor"));
 const SupplierQuotes = lazy(() => import("@/pages/supplier/SupplierQuotes"));
 
@@ -126,7 +133,20 @@ const CSRImpactReport = lazy(() => import("@/pages/csr/CSRImpactReport"));
 const TicketsPage = lazy(() => import("@/pages/shared/TicketsPage"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 
-const queryClient = new QueryClient();
+// Sensible cache defaults: with these, navigating away and back within
+// 30s reuses the cached data, and entries linger 5 min after last use
+// before garbage collection. refetchOnWindowFocus off — too noisy for
+// dashboards where users tab in/out frequently.
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      gcTime: 5 * 60_000,
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -136,6 +156,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <IdleLogoutGuard />
+          <PageTracker />
           <Suspense fallback={<PageLoader />}>
             <Routes>
               {/* Public pages */}
@@ -315,6 +336,7 @@ const App = () => (
                 <Route path="/admin/reference/product-categories" element={<AdminProductCategories />} />
                 <Route path="/admin/installation-crews" element={<AdminInstallationCrews />} />
                 <Route path="/admin/credit-verifications" element={<AdminCreditVerifications />} />
+                <Route path="/admin/engagement" element={<AdminEngagement />} />
                 <Route path="/admin/account/organisation" element={<OrganisationProfilePage />} />
               </Route>
 

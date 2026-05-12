@@ -30,7 +30,7 @@ export interface ReportOptions {
   subtitle?: string;
 }
 
-const BRAND_NAME = "cleancookIQ";
+const BRAND_NAME = "CleanCookIQ";
 const BRAND_GREEN: [number, number, number] = [26, 60, 46]; // #1a3c2e
 
 function todayStamp(): string {

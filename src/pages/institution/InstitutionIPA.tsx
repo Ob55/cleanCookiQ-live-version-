@@ -10,6 +10,7 @@ import { useInstitutionId } from "@/hooks/useInstitution";
 import { Download, Upload, Loader2, CheckCircle2, Clock, FileText, Eye, X, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import mammoth from "mammoth";
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
 
 interface IpaRecord {
   id: string;
@@ -55,7 +56,7 @@ export default function InstitutionIPA() {
       const res = await fetch(TEMPLATE_PATH);
       const arrayBuffer = await res.arrayBuffer();
       const result = await mammoth.convertToHtml({ arrayBuffer });
-      setDocHtml(result.value);
+      setDocHtml(sanitizeHtml(result.value));
     } catch {
       setDocHtml("<p style='color:red'>Failed to load document.</p>");
     } finally {
@@ -220,7 +221,7 @@ export default function InstitutionIPA() {
           </CardHeader>
           <CardContent className="pt-4 space-y-3">
             <p className="text-sm text-muted-foreground leading-relaxed">
-              This agreement formalises the partnership between your institution and cleancookIQ / Ignis Innovation for clean cooking transition support and financing facilitation.
+              This agreement formalises the partnership between your institution and CleanCookIQ / Ignis Innovation for clean cooking transition support and financing facilitation.
             </p>
             <div className="flex items-center gap-2 flex-wrap">
               <a href={TEMPLATE_PATH} download={TEMPLATE_DOWNLOAD_NAME}>

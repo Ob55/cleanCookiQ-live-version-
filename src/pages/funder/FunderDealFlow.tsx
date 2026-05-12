@@ -11,6 +11,7 @@ import {
   type DealRow, type FunderPreferences,
 } from "@/lib/funder";
 import { riskBand, riskBandColorClass } from "@/lib/risk";
+import { institutionLabel } from "@/lib/institutionDisplay";
 import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 
 export default function FunderDealFlow() {
@@ -41,7 +42,6 @@ export default function FunderDealFlow() {
           columns={[
             { key: "institution_code", label: "Institution Code" },
             { key: "project_title", label: "Project" },
-            { key: "institution_name", label: "Institution" },
             { key: "county", label: "County" },
             { key: "institution_type", label: "Type" },
             { key: "baseline_fuel", label: "Baseline Fuel" },
@@ -108,10 +108,10 @@ function DealCard({ deal, score }: { deal: DealRow; score: number | null }) {
             <div>
               <CardTitle className="text-base">{deal.project_title}</CardTitle>
               <p className="text-xs text-muted-foreground">
-                {deal.institution_code && (
-                  <span className="font-mono mr-2">{deal.institution_code}</span>
-                )}
-                {deal.institution_name}{deal.county ? ` · ${deal.county}` : ""}
+                <span className="font-mono mr-2">
+                  {deal.institution_code || institutionLabel(deal)}
+                </span>
+                {deal.county ? `· ${deal.county}` : ""}
                 {deal.institution_type ? ` · ${deal.institution_type.replace("_", " ")}` : ""}
               </p>
             </div>

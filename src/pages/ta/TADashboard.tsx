@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { GraduationCap, Loader2, Search, Building2, MapPin, Calendar, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { DownloadReportButton, listColumn, dateColumn } from "@/components/admin/DownloadReportButton";
+import { institutionLabel } from "@/lib/institutionDisplay";
 
 const expertiseLabels: Record<string, string> = {
   capacity_building: "Capacity Building",
@@ -67,7 +68,12 @@ export default function TADashboard() {
   });
 
   const filtered = institutions?.filter(inst => {
-    if (search && !inst.name.toLowerCase().includes(search.toLowerCase()) && !inst.county.toLowerCase().includes(search.toLowerCase())) return false;
+    if (search) {
+      const s = search.toLowerCase();
+      const code = (inst as any).institution_code as string | null;
+      // TA providers search by the abstracted institution_code or county.
+      if (!code?.toLowerCase().includes(s) && !inst.county?.toLowerCase().includes(s)) return false;
+    }
     const taTypes = (inst as any).ta_type_needed as string[] | null;
     if (expertiseFilter !== "all" && (!taTypes || !taTypes.includes(expertiseFilter))) return false;
     return true;
@@ -184,7 +190,9 @@ export default function TADashboard() {
                     <td className="p-3">
                       <div className="flex items-center gap-2">
                         <Building2 className="h-4 w-4 text-primary shrink-0" />
-                        <span className="text-sm font-medium">{inst.name}</span>
+                        <span className="text-sm font-mono">
+                          {institutionLabel({ institution_code: (inst as any).institution_code, name: inst.name })}
+                        </span>
                       </div>
                     </td>
                     <td className="p-3">

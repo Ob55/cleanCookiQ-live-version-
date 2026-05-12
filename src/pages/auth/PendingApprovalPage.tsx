@@ -19,7 +19,7 @@ export default function PendingApprovalPage() {
         </h1>
         <p className="text-muted-foreground mb-6">
           {isOther
-            ? "Thank you for showing interest in cleancookIQ. Our team is preparing your account."
+            ? "Thank you for showing interest in CleanCookIQ. Our team is preparing your account."
             : "Your account has been created and is awaiting admin verification. You'll receive an email once approved."}
         </p>
         <div className="bg-card border border-border rounded-xl p-6 shadow-card text-left">

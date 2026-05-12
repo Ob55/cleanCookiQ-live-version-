@@ -13,6 +13,7 @@ import {
 import { useFunderPortfolio, useFunderPortfolioSummary, useFunderDealFlow } from "@/hooks/useFunder";
 import { useMyActorCode } from "@/hooks/useMyActorCode";
 import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
+import { institutionLabel } from "@/lib/institutionDisplay";
 
 const ksh = (v: number | null | undefined) =>
   v == null ? "—" : `KSh ${Math.round(v).toLocaleString()}`;
@@ -130,7 +131,6 @@ export default function CSRDashboard() {
               <DownloadReportButton
                 rows={sponsored.map(({ portfolio, deal }) => ({
                   institution_code: deal?.institution_code ?? "",
-                  institution_name: deal?.institution_name ?? "",
                   county: deal?.county ?? "",
                   capital_amount: portfolio.capital_amount,
                   status: portfolio.status,
@@ -139,7 +139,6 @@ export default function CSRDashboard() {
                 }))}
                 columns={[
                   { key: "institution_code", label: "Institution Code" },
-                  { key: "institution_name", label: "Institution" },
                   { key: "county", label: "County" },
                   { key: "capital_amount", label: "Contribution (KSh)" },
                   { key: "status", label: "Status" },
@@ -189,12 +188,7 @@ export default function CSRDashboard() {
                   {sponsored.slice(0, 6).map(({ portfolio, deal }) => (
                     <tr key={portfolio.id} className="border-b last:border-0 hover:bg-muted/30">
                       <td className="py-2 px-3">
-                        <div className="flex items-center gap-2">
-                          {deal?.institution_code && (
-                            <span className="font-mono text-[10px] text-muted-foreground">{deal.institution_code}</span>
-                          )}
-                          <span className="font-medium">{deal?.institution_name ?? "—"}</span>
-                        </div>
+                        <span className="font-mono text-sm">{institutionLabel(deal)}</span>
                       </td>
                       <td className="py-2 px-3 text-muted-foreground">
                         {deal?.county ? (
@@ -300,12 +294,7 @@ function OpportunityCard({ deal }: { deal: any }) {
         <CardContent className="py-3 px-4">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                {deal.institution_code && (
-                  <span className="font-mono text-[10px] text-muted-foreground">{deal.institution_code}</span>
-                )}
-                <p className="text-sm font-medium truncate">{deal.institution_name}</p>
-              </div>
+              <p className="text-sm font-mono font-medium truncate">{institutionLabel(deal)}</p>
               <p className="text-xs text-muted-foreground mt-0.5">
                 {deal.county ?? ""}
                 {deal.institution_type ? ` · ${deal.institution_type.replace("_", " ")}` : ""}

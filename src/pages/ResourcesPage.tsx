@@ -29,10 +29,15 @@ export default function ResourcesPage() {
 
   const filtered = useMemo(
     () =>
-      applyResourceFilters(data ?? [], {
-        type: type || null,
-        search: search || null,
-      }),
+      applyResourceFilters(
+        // The 'value-proposition' resource is owned by the /about page —
+        // keep it out of the public resource library so it doesn't double-list.
+        (data ?? []).filter((r) => r.slug !== "value-proposition"),
+        {
+          type: type || null,
+          search: search || null,
+        },
+      ),
     [data, type, search],
   );
 

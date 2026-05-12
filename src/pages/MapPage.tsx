@@ -1,17 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import {
   MapPin, Loader2, Filter, RotateCcw,
-  GraduationCap, Stethoscope, Building2, Lock,
+  GraduationCap, Stethoscope, Building2,
 } from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import heroBg from "@/assets/hero-bg.jpg";
-import { useAuth } from "@/contexts/AuthContext";
 
 const pipelineStages = [
   "identified", "contacted", "assessed", "scored", "least_cost_path_assigned",
@@ -138,9 +136,6 @@ export default function MapPage() {
   const [stageFilter, setStageFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [quickFilter, setQuickFilter] = useState<"all" | "school" | "hospital" | "other">("all");
-  const { user } = useAuth();
-  // Names are only shown to signed-in users whose email is verified.
-  const canSeeInstitutionNames = !!user && !!(user.email_confirmed_at || user.confirmed_at);
 
   // Fetch institutions
   const { data: institutions, isLoading } = useQuery({
@@ -200,18 +195,15 @@ export default function MapPage() {
         const annualSavings = inst.annual_savings_ksh || 0;
         const co2Reduction = inst.co2_reduction_tonnes_pa || 0;
 
-        // Hide real names from anonymous + unverified visitors. Show a
-        // generic placeholder ("School in Kasarani", "Hospital in Bungoma")
-        // and a sign-in nudge instead.
+        // Institution names are never shown on the public map — surface
+        // the anonymised institution_code instead. Fall back to a generic
+        // "<Type> in <Locality>" placeholder if a row predates the code
+        // backfill.
         const typeLabel = institutionTypeLabels[inst.institution_type] || "Institution";
         const locality = inst.sub_county || inst.county || "Kenya";
-        const displayName = canSeeInstitutionNames
-          ? inst.name
+        const displayName = inst.institution_code
+          ? inst.institution_code
           : `${typeLabel} in ${locality}`;
-        const lockedNotice = canSeeInstitutionNames ? "" : `
-          <div style="margin-top:8px;padding:6px 8px;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;font-size:11px;color:#92400e;">
-            🔒 Sign in and verify your email to see institution names.
-          </div>`;
 
         marker.bindPopup(`
           <div style="font-family: system-ui; min-width: 220px; line-height: 1.6;">
@@ -227,7 +219,6 @@ export default function MapPage() {
               <div><strong>Savings:</strong> KSh ${Number(annualSavings).toLocaleString()}/yr</div>
               <div><strong>CO₂ Cut:</strong> ${Number(co2Reduction).toLocaleString()} t/yr</div>
             </div>
-            ${lockedNotice}
           </div>
         `);
         markersRef.current!.addLayer(marker);
@@ -243,7 +234,7 @@ export default function MapPage() {
         // unless they have county info (we could geocode but for now just show institutions)
       });
     }
-  }, [geoFiltered, organisations, typeFilter, quickFilter, canSeeInstitutionNames]);
+  }, [geoFiltered, organisations, typeFilter, quickFilter]);
 
   const counties = [...new Set(institutions?.map(i => i.county) ?? [])].sort();
 
@@ -266,21 +257,6 @@ export default function MapPage() {
           </p>
         </div>
       </section>
-
-      {!canSeeInstitutionNames && (
-        <div className="bg-amber-50 border-b border-amber-200 px-4 py-2.5">
-          <div className="container flex items-center justify-center sm:justify-between gap-3 flex-wrap text-amber-900 text-xs">
-            <div className="flex items-center gap-2">
-              <Lock className="h-3.5 w-3.5" />
-              <span>Institution names are hidden until you sign in and verify your email.</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Link to="/auth/login"><Button size="sm" variant="ghost" className="h-7 text-xs">Log in</Button></Link>
-              <Link to="/auth/register"><Button size="sm" className="h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white">Create account</Button></Link>
-            </div>
-          </div>
-        </div>
-      )}
 
       <div className="bg-card border-b border-border p-4">
         <div className="container flex items-center justify-between flex-wrap gap-3">

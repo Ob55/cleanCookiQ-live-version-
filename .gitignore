@@ -39,4 +39,5 @@ scripts/generate_methodology_doc.py
 scripts/update_methodology_doc.py
 scripts/expand_methodology_doc.py
 scripts/rewrite_gaps_section.py
+memory.md
 instraction

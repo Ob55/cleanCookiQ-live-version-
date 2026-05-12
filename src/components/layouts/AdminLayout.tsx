@@ -64,6 +64,9 @@ const adminNav = [
 
   { section: "Support" },
   { label: "Tickets", href: "/admin/tickets", icon: Ticket },
+
+  { section: "Analytics" },
+  { label: "Engagement", href: "/admin/engagement", icon: Activity },
 ] as const;
 
 // Hoisted out of AdminLayout so it isn't a *new* component instance on
@@ -83,8 +86,8 @@ function SidebarContent({
     <div className="flex flex-col h-full">
       <div className="p-5 border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-2">
-          <img src={cleancookIqLogo} alt="cleancookIQ logo" className="h-8 w-8 rounded-lg object-contain" />
-          <span className="font-display font-bold text-lg text-sidebar-foreground">cleancookIQ</span>
+          <img src={cleancookIqLogo} alt="CleanCookIQ logo" className="h-8 w-8 rounded-lg object-contain" />
+          <span className="font-display font-bold text-lg text-sidebar-foreground">CleanCookIQ</span>
         </Link>
         <p className="text-xs text-sidebar-foreground/60 mt-1">Admin Console</p>
       </div>

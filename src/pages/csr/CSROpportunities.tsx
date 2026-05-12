@@ -9,6 +9,7 @@ import { Sparkles, Search, MapPin, Flame, Users } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFunderDealFlow, useFunderPortfolio } from "@/hooks/useFunder";
 import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
+import { institutionLabel } from "@/lib/institutionDisplay";
 
 const FUELS = ["firewood", "charcoal", "lpg", "biogas", "electric", "other"] as const;
 
@@ -44,8 +45,8 @@ export default function CSROpportunities() {
       if (fuelFilter !== "all" && d.baseline_fuel !== fuelFilter) return false;
       if (search) {
         const s = search.toLowerCase();
+        // Searches by abstracted institution_code or county only — names are not surfaced to CSR.
         if (
-          !d.institution_name.toLowerCase().includes(s) &&
           !(d.institution_code ?? "").toLowerCase().includes(s) &&
           !(d.county ?? "").toLowerCase().includes(s)
         ) return false;
@@ -69,7 +70,6 @@ export default function CSROpportunities() {
           rows={filtered}
           columns={[
             { key: "institution_code", label: "Institution Code" },
-            { key: "institution_name", label: "Institution" },
             { key: "county", label: "County" },
             { key: "institution_type", label: "Type" },
             { key: "baseline_fuel", label: "Baseline Fuel" },
@@ -128,11 +128,8 @@ export default function CSROpportunities() {
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between gap-2 flex-wrap">
                     <div className="flex-1 min-w-0">
-                      <CardTitle className="text-sm flex items-center gap-2 flex-wrap">
-                        {deal.institution_code && (
-                          <span className="font-mono text-[10px] text-muted-foreground">{deal.institution_code}</span>
-                        )}
-                        <span className="truncate">{deal.institution_name}</span>
+                      <CardTitle className="text-sm font-mono truncate">
+                        {institutionLabel(deal)}
                       </CardTitle>
                       <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1 flex-wrap">
                         <MapPin className="h-3 w-3" /> {deal.county ?? "—"}

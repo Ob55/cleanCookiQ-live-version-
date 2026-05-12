@@ -36,8 +36,8 @@ export default function CSRSponsorships() {
       .filter((row) => {
         if (!search) return true;
         const s = search.toLowerCase();
+        // Search by institution_code or county only — names are abstracted.
         return (
-          (row.deal?.institution_name ?? "").toLowerCase().includes(s) ||
           (row.deal?.institution_code ?? "").toLowerCase().includes(s) ||
           (row.deal?.county ?? "").toLowerCase().includes(s)
         );
@@ -70,7 +70,6 @@ export default function CSRSponsorships() {
         <DownloadReportButton
           rows={rows.map(({ portfolio, deal }) => ({
             institution_code: deal?.institution_code ?? "",
-            institution_name: deal?.institution_name ?? "",
             county: deal?.county ?? "",
             capital_amount: portfolio.capital_amount,
             capital_currency: portfolio.capital_currency,
@@ -81,7 +80,6 @@ export default function CSRSponsorships() {
           }))}
           columns={[
             { key: "institution_code", label: "Institution Code" },
-            { key: "institution_name", label: "Institution" },
             { key: "county", label: "County" },
             { key: "capital_amount", label: "Contribution (KSh)" },
             { key: "capital_currency", label: "Currency" },
@@ -158,12 +156,7 @@ export default function CSRSponsorships() {
                 {rows.map(({ portfolio, deal }) => (
                   <tr key={portfolio.id} className="border-b last:border-0 hover:bg-muted/30">
                     <td className="py-2 px-3">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        {deal?.institution_code && (
-                          <span className="font-mono text-[10px] text-muted-foreground">{deal.institution_code}</span>
-                        )}
-                        <span className="font-medium">{deal?.institution_name ?? "—"}</span>
-                      </div>
+                      <span className="font-mono">{deal?.institution_code || "—"}</span>
                     </td>
                     <td className="py-2 px-3 text-muted-foreground">
                       {deal?.county ? (

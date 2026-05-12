@@ -123,8 +123,8 @@ export default function PublicLayout() {
       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-lg">
         <div className="container flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <img src={cleancookIqLogo} alt="cleancookIQ logo" className="h-8 w-8 rounded-lg object-contain" />
-            <span className="font-display font-bold text-lg text-foreground">cleancookIQ</span>
+            <img src={cleancookIqLogo} alt="CleanCookIQ logo" className="h-8 w-8 rounded-lg object-contain" />
+            <span className="font-display font-bold text-lg text-foreground">CleanCookIQ</span>
           </Link>
 
           {/* Desktop nav — each group is its own Popover so dropdowns
@@ -245,8 +245,8 @@ export default function PublicLayout() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <img src={cleancookIqLogo} alt="cleancookIQ logo" className="h-8 w-8 rounded-lg object-contain" />
-                <span className="font-display font-bold text-lg">cleancookIQ</span>
+                <img src={cleancookIqLogo} alt="CleanCookIQ logo" className="h-8 w-8 rounded-lg object-contain" />
+                <span className="font-display font-bold text-lg">CleanCookIQ</span>
               </div>
               <p className="text-sm text-primary-foreground/60">Orchestrating Kenya's transition to clean institutional cooking.</p>
             </div>
@@ -278,7 +278,7 @@ export default function PublicLayout() {
             </div>
           </div>
           <div className="mt-8 pt-6 border-t border-primary-foreground/20 text-center text-xs text-primary-foreground/60">
-            © {new Date().getFullYear()} cleancookIQ. All rights reserved.
+            © {new Date().getFullYear()} CleanCookIQ. All rights reserved.
           </div>
         </div>
       </footer>

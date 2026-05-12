@@ -31,13 +31,13 @@ export default function UserManagement() {
       if (status === "approved") {
         await sendEmail({
           userId,
-          subject: "Your cleancookIQ Account Has Been Approved",
+          subject: "Your CleanCookIQ Account Has Been Approved",
           html: emailAccountApproved(name, appUrl),
         });
       } else if (status === "rejected") {
         await sendEmail({
           userId,
-          subject: "cleancookIQ Account Application Update",
+          subject: "CleanCookIQ Account Application Update",
           html: emailAccountRejected(name),
         });
       }

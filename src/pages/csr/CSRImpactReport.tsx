@@ -47,7 +47,6 @@ export default function CSRImpactReport() {
       return {
         portfolioId: p.id,
         institution_code: deal?.institution_code ?? "",
-        institution_name: deal?.institution_name ?? "",
         county: deal?.county ?? "",
         capital_amount: p.capital_amount ?? 0,
         sharePct,
@@ -80,7 +79,6 @@ export default function CSRImpactReport() {
           rows={attribution}
           columns={[
             { key: "institution_code", label: "Institution Code" },
-            { key: "institution_name", label: "Institution" },
             { key: "county", label: "County" },
             { key: "capital_amount", label: "Your Contribution (KSh)" },
             {
@@ -172,12 +170,7 @@ export default function CSRImpactReport() {
                 {attribution.map((row) => (
                   <tr key={row.portfolioId} className="border-b last:border-0 hover:bg-muted/30">
                     <td className="py-2 px-3">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        {row.institution_code && (
-                          <span className="font-mono text-[10px] text-muted-foreground">{row.institution_code}</span>
-                        )}
-                        <span className="font-medium">{row.institution_name || "—"}</span>
-                      </div>
+                      <span className="font-mono">{row.institution_code || "—"}</span>
                     </td>
                     <td className="py-2 px-3 text-muted-foreground">{row.county || "—"}</td>
                     <td className="py-2 px-3 text-right font-mono">{ksh(row.capital_amount)}</td>
