@@ -69,12 +69,35 @@ export default function FunderOnboarding() {
   });
 
   const handleFinish = async (final: FunderOnboardingData) => {
-    if (!user || !profile?.organisation_id) {
-      toast.error("You must be signed in as a funder organisation to complete onboarding.");
+    if (!user) {
+      toast.error("You must be signed in to complete onboarding.");
       return;
     }
+
+    let orgId = profile?.organisation_id;
+
+    // Auto-create organisation if one doesn't exist yet
+    if (!orgId) {
+      const { data: newOrg, error: orgErr } = await supabase
+        .from("organisations")
+        .insert({
+          name: final.name || profile?.full_name || "Funder Organisation",
+          org_type: "funder" as any,
+          contact_email: user.email || "",
+        })
+        .select("id")
+        .single();
+      if (orgErr || !newOrg) {
+        toast.error("Could not create organisation. " + (orgErr?.message || ""));
+        return;
+      }
+      orgId = newOrg.id;
+      // Link profile
+      await supabase.from("profiles").update({ organisation_id: orgId }).eq("user_id", user.id);
+    }
+
     const payload = {
-      organisation_id: profile.organisation_id,
+      organisation_id: orgId,
       name: final.name,
       ticket_size_min: final.ticketSizeMin,
       ticket_size_max: final.ticketSizeMax,

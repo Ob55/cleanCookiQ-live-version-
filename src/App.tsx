@@ -22,6 +22,7 @@ const InstitutionLayout = lazy(() => import("@/components/layouts/InstitutionLay
 const SupplierLayout = lazy(() => import("@/components/layouts/SupplierLayout"));
 const FunderLayout = lazy(() => import("@/components/layouts/FunderLayout"));
 const ResearcherLayout = lazy(() => import("@/components/layouts/ResearcherLayout"));
+const KPLCLayout = lazy(() => import("@/components/layouts/KPLCLayout"));
 
 // Lazy loaded public pages
 const MapPage = lazy(() => import("@/pages/MapPage"));
@@ -111,8 +112,13 @@ const OrganisationProfilePage = lazy(() => import("@/pages/OrganisationProfilePa
 const FunderImpactReport = lazy(() => import("@/pages/funder/FunderImpactReport"));
 const FunderOnboarding = lazy(() => import("@/pages/funder/FunderOnboarding"));
 
+const KPLCSetup = lazy(() => import("@/pages/kplc/KPLCSetup"));
+const KPLCDashboard = lazy(() => import("@/pages/kplc/KPLCDashboard"));
+const KPLCInstitutions = lazy(() => import("@/pages/kplc/KPLCInstitutions"));
+
 const ResearcherDashboard = lazy(() => import("@/pages/researcher/ResearcherDashboard"));
 const ResearcherInstitutionDetail = lazy(() => import("@/pages/researcher/ResearcherInstitutionDetail"));
+const AdminKPLCDepots = lazy(() => import("@/pages/admin/AdminKPLCDepots"));
 const AdminResearchers = lazy(() => import("@/pages/admin/AdminResearchers"));
 const AdminOthers = lazy(() => import("@/pages/admin/AdminOthers"));
 const AdminMOUIPA = lazy(() => import("@/pages/admin/AdminMOUIPA"));
@@ -245,6 +251,24 @@ const App = () => (
                 <Route path="/funder/account/organisation" element={<OrganisationProfilePage />} />
               </Route>
 
+              {/* KPLC Setup (no sidebar) */}
+              <Route path="/kplc/setup" element={
+                <ProtectedRoute allowedRoles={["kplc_depot_admin"]} allowedOrgTypes={["kplc_depot"]}>
+                  <KPLCSetup />
+                </ProtectedRoute>
+              } />
+
+              {/* KPLC pages (with sidebar) */}
+              <Route element={
+                <ProtectedRoute allowedRoles={["kplc_depot_admin"]} allowedOrgTypes={["kplc_depot"]}>
+                  <KPLCLayout />
+                </ProtectedRoute>
+              }>
+                <Route path="/kplc/dashboard" element={<KPLCDashboard />} />
+                <Route path="/kplc/institutions" element={<KPLCInstitutions />} />
+                <Route path="/kplc/support" element={<TicketsPage />} />
+              </Route>
+
               {/* Researcher pages (with sidebar) */}
               <Route element={
                 <ProtectedRoute allowedOrgTypes={["researcher"]}>
@@ -281,6 +305,7 @@ const App = () => (
                 <Route path="/admin/content/resources" element={<AdminResources />} />
                 <Route path="/admin/portfolio" element={<PortfolioManagement />} />
                 <Route path="/admin/portfolio-aggregation" element={<PortfolioAggregation />} />
+                <Route path="/admin/kplc-depots" element={<AdminKPLCDepots />} />
                 <Route path="/admin/researchers" element={<AdminResearchers />} />
                 <Route path="/admin/others" element={<AdminOthers />} />
                 <Route path="/admin/mou-ipa" element={<AdminMOUIPA />} />

@@ -9,6 +9,7 @@ import { Loader2, Eye, EyeOff } from "lucide-react";
 import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
 import BrandedLoader from "@/components/BrandedLoader";
 import AuthBackButton from "@/components/auth/AuthBackButton";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -48,15 +49,17 @@ export default function LoginPage() {
     const isSupplier = roles.some((r: string) => r === "ta_provider") || orgType === "supplier";
     const isFunder = roles.some((r: string) => r === "financing_partner") || orgType === "funder";
     const isResearcher = orgType === "researcher";
+    const isKplc = roles.some((r: string) => r === "kplc_depot_admin") || orgType === "kplc_depot";
 
     setRedirecting(true);
     if (isInstitution) {
-      // Use profile.organisation_id as the source of truth — it's set only after setup completes
       navigate(profileData?.organisation_id ? "/institution/dashboard" : "/institution/setup");
     } else if (isSupplier) {
       navigate(profileData?.organisation_id ? "/supplier/dashboard" : "/supplier/setup");
     } else if (isFunder) {
-      navigate("/funder/dashboard");
+      navigate(profileData?.organisation_id ? "/funder/dashboard" : "/funder/onboarding");
+    } else if (isKplc) {
+      navigate(profileData?.organisation_id ? "/kplc/dashboard" : "/kplc/setup");
     } else if (isResearcher) {
       navigate("/researcher/dashboard");
     } else {
@@ -66,6 +69,13 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const rl = checkRateLimit("login");
+    if (!rl.allowed) {
+      toast.error(`Too many login attempts. Try again in ${Math.ceil(rl.retryAfterMs / 1000)}s.`);
+      return;
+    }
+
     setLoading(true);
 
     const { data: authData, error } = await supabase.auth.signInWithPassword({ email, password });

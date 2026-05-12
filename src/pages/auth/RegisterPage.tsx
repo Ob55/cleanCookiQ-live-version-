@@ -4,12 +4,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { Building2, Factory, Banknote, FlaskConical, HelpCircle, ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react";
+import { Building2, Factory, Banknote, FlaskConical, HelpCircle, ArrowLeft, Loader2, Eye, EyeOff, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { sendEmail, emailOtherInterest } from "@/lib/emailService";
 import AuthBackButton from "@/components/auth/AuthBackButton";
+import { checkRateLimit } from "@/lib/rateLimit";
 import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
 
 const orgTypes = [
@@ -17,6 +18,7 @@ const orgTypes = [
   { value: "supplier", label: "Supplier / Provider", desc: "Equipment, installation, maintenance", icon: Factory },
   { value: "funder", label: "Funder / Financing Partner", desc: "Finance partner or investor", icon: Banknote },
   { value: "researcher", label: "Researcher", desc: "Academic or independent researcher", icon: FlaskConical },
+  { value: "kplc_depot", label: "KPLC Depot", desc: "Regional office, service depot, or substation", icon: Zap },
   { value: "other", label: "Other Organisation", desc: "Other organisations interested in the platform", icon: HelpCircle },
 ];
 
@@ -42,21 +44,30 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const [depotType, setDepotType] = useState("");
+  const [kplcLicenseNumber, setKplcLicenseNumber] = useState("");
+  const [branchManagerName, setBranchManagerName] = useState("");
+
   const isSupplier = orgType === "supplier";
   const isFunder = orgType === "funder";
   const isOther = orgType === "other";
+  const isKplc = orgType === "kplc_depot";
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    const rl = checkRateLimit("register");
+    if (!rl.allowed) { toast.error(`Too many attempts. Try again in ${Math.ceil(rl.retryAfterMs / 1000)}s.`); return; }
     if (password.length < 8) { toast.error("Password must be at least 8 characters"); return; }
     if (isSupplier && !termsAccepted) { toast.error("You must accept the terms"); return; }
     if (isFunder && !fundingType) { toast.error("Please select your funding type"); return; }
+    if (isKplc && (!depotType || !kplcLicenseNumber || !branchManagerName)) { toast.error("Please fill in all KPLC fields"); return; }
     setLoading(true);
 
     const roleMap: Record<string, string> = {
       institution: "institution_admin",
       supplier: "ta_provider",
       funder: "financing_partner",
+      kplc_depot: "kplc_depot_admin",
       csr: "viewer",
       researcher: "viewer",
       other: "viewer",
@@ -73,6 +84,7 @@ export default function RegisterPage() {
           org_name: orgName,
           phone,
           requested_role: roleMap[orgType] || "viewer",
+          ...(isKplc ? { depot_type: depotType, kplc_license_number: kplcLicenseNumber, branch_manager_name: branchManagerName } : {}),
         },
       },
     });
@@ -90,8 +102,10 @@ export default function RegisterPage() {
     }
 
     if (signUpData.user) {
-      // Store email, org_name, description in profiles
-      await supabase.from("profiles").update({ email, org_name: orgName, description: description || null }).eq("user_id", signUpData.user.id);
+      // Store email, org_name, description in profiles; KPLC requires admin approval
+      const profileUpdate: Record<string, any> = { email, org_name: orgName, description: description || null };
+      if (isKplc) profileUpdate.approval_status = "pending";
+      await supabase.from("profiles").update(profileUpdate).eq("user_id", signUpData.user.id);
 
       // If funder, create funder_profiles record
       if (isFunder) {
@@ -116,7 +130,7 @@ export default function RegisterPage() {
     }
 
     setLoading(false);
-    navigate(isOther ? "/auth/pending" : "/auth/verify-email");
+    navigate(isOther || isKplc ? "/auth/pending" : "/auth/verify-email");
   };
 
   return (
@@ -234,6 +248,34 @@ export default function RegisterPage() {
                 </div>
               )}
 
+              {isKplc && (
+                <>
+                  <div>
+                    <Label htmlFor="depotType">Depot Type *</Label>
+                    <select
+                      id="depotType"
+                      value={depotType}
+                      onChange={e => setDepotType(e.target.value)}
+                      className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      required
+                    >
+                      <option value="">Select depot type</option>
+                      <option value="regional_office">Regional Office</option>
+                      <option value="service_depot">Service Depot</option>
+                      <option value="substation">Substation</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label htmlFor="kplcLicense">KPLC Registration / License Number *</Label>
+                    <Input id="kplcLicense" value={kplcLicenseNumber} onChange={e => setKplcLicenseNumber(e.target.value)} placeholder="e.g. KPLC-WS-2024-001" className="mt-1" required />
+                  </div>
+                  <div>
+                    <Label htmlFor="branchManager">Branch Manager Name *</Label>
+                    <Input id="branchManager" value={branchManagerName} onChange={e => setBranchManagerName(e.target.value)} placeholder="Full name of the branch manager" className="mt-1" required />
+                  </div>
+                </>
+              )}
+
               {isSupplier && (
                 <div className="p-4 rounded-lg border border-border bg-muted/30">
                   <p className="text-xs text-muted-foreground mb-3">
@@ -252,7 +294,7 @@ export default function RegisterPage() {
                 </div>
               )}
 
-              <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={loading || (isSupplier && !termsAccepted) || (isFunder && !fundingType) || (isOther && !description)}>
+              <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={loading || (isSupplier && !termsAccepted) || (isFunder && !fundingType) || (isOther && !description) || (isKplc && (!depotType || !kplcLicenseNumber || !branchManagerName))}>
                 {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                 Create Account
               </Button>

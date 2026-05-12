@@ -549,6 +549,65 @@ export type Database = {
           },
         ]
       }
+      kplc_depots: {
+        Row: {
+          id: string
+          organisation_id: string | null
+          depot_name: string
+          depot_type: string
+          kplc_license_number: string
+          branch_manager_name: string
+          county: string
+          sub_county: string | null
+          latitude: number | null
+          longitude: number | null
+          setup_completed: boolean | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          organisation_id?: string | null
+          depot_name: string
+          depot_type: string
+          kplc_license_number: string
+          branch_manager_name: string
+          county: string
+          sub_county?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          setup_completed?: boolean | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          organisation_id?: string | null
+          depot_name?: string
+          depot_type?: string
+          kplc_license_number?: string
+          branch_manager_name?: string
+          county?: string
+          sub_county?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          setup_completed?: boolean | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kplc_depots_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       institutions: {
         Row: {
           annual_savings_ksh: number | null
@@ -1748,6 +1807,7 @@ export type Database = {
         | "dmrv_verifier"
         | "institution_admin"
         | "institution_user"
+        | "kplc_depot_admin"
       approval_status: "pending" | "approved" | "rejected"
       assessment_status: "draft" | "submitted" | "reviewed" | "approved"
       contract_status: "active" | "expiring_soon" | "expired" | "terminated"
@@ -1781,7 +1841,7 @@ export type Database = {
         | "restaurant"
         | "faith_based"
         | "other"
-      org_type: "institution" | "supplier" | "funder" | "csr" | "researcher" | "other"
+      org_type: "institution" | "supplier" | "funder" | "csr" | "researcher" | "other" | "kplc_depot"
       pipeline_stage:
         | "identified"
         | "assessed"
@@ -1950,6 +2010,7 @@ export const Constants = {
         "dmrv_verifier",
         "institution_admin",
         "institution_user",
+        "kplc_depot_admin",
       ],
       approval_status: ["pending", "approved", "rejected"],
       assessment_status: ["draft", "submitted", "reviewed", "approved"],
@@ -1981,7 +2042,7 @@ export const Constants = {
         "faith_based",
         "other",
       ],
-      org_type: ["institution", "supplier", "funder", "csr", "researcher"],
+      org_type: ["institution", "supplier", "funder", "csr", "researcher", "other", "kplc_depot"],
       pipeline_stage: [
         "identified",
         "assessed",

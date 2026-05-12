@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import AuthBackButton from "@/components/auth/AuthBackButton";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -15,6 +16,8 @@ export default function ForgotPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const rl = checkRateLimit("forgot-password");
+    if (!rl.allowed) { toast.error(`Too many attempts. Try again in ${Math.ceil(rl.retryAfterMs / 1000)}s.`); return; }
     setLoading(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${import.meta.env.VITE_APP_URL || window.location.origin}/auth/reset-password`,

@@ -5,7 +5,7 @@ import {
   Briefcase, Ticket, FlaskConical, Upload, HelpCircle, ScrollText,
   Calculator, Truck, ShieldAlert, Activity, Leaf,
   Calendar, Newspaper, Library, Database, Banknote, ClipboardList,
-  Wrench, Tag, ShieldCheck,
+  Wrench, Tag, ShieldCheck, Zap,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ const adminNav = [
   { label: "Institutions", href: "/admin/institutions", icon: Building2 },
   { label: "Import Institutions", href: "/admin/institutions/import", icon: Upload },
   { label: "Providers", href: "/admin/providers", icon: Factory },
+  { label: "KPLC Depots", href: "/admin/kplc-depots", icon: Zap },
 
   { section: "Delivery" },
   { label: "Deliveries", href: "/admin/deliveries", icon: Truck },
