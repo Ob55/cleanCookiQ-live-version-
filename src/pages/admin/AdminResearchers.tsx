@@ -9,6 +9,7 @@ import { Loader2, CheckCircle, XCircle, Trash2, Eye, FileText, FlaskConical } fr
 import { toast } from "sonner";
 import { useState } from "react";
 import { format } from "date-fns";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 export default function AdminResearchers() {
   const queryClient = useQueryClient();
@@ -115,9 +116,24 @@ export default function AdminResearchers() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold">Researchers</h1>
-        <p className="text-sm text-muted-foreground">Manage researcher accounts and access permissions.</p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold">Researchers</h1>
+          <p className="text-sm text-muted-foreground">Manage researcher accounts and access permissions.</p>
+        </div>
+        <DownloadReportButton
+          rows={researchers ?? []}
+          columns={[
+            { key: "full_name", label: "Name" },
+            { key: "email", label: "Email" },
+            { key: "org_name", label: "Organisation" },
+            { key: "phone", label: "Phone" },
+            { key: "approval_status", label: "Access Status" },
+            dateColumn("created_at", "Joined"),
+          ]}
+          title="Researchers"
+          filename="researchers"
+        />
       </div>
 
       {/* Pending access requests banner */}

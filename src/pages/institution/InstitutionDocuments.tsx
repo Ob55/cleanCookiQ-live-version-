@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Plus, FileCheck, Loader2, Upload, Image, ExternalLink, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useInstitutionId } from "@/hooks/useInstitution";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 interface Doc {
   id: string;
@@ -79,15 +80,26 @@ export default function InstitutionDocuments() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-2xl font-display font-bold">Documents</h1>
           <p className="text-muted-foreground text-sm mt-1">Upload and manage your institution documents</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button><Plus className="h-4 w-4 mr-2" /> Upload Document</Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={docs}
+            columns={[
+              { key: "title", label: "Title" },
+              { key: "file_url", label: "URL" },
+              dateColumn("created_at", "Uploaded"),
+            ]}
+            title="Institution Documents"
+            filename="institution-documents"
+          />
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button><Plus className="h-4 w-4 mr-2" /> Upload Document</Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>Upload Document</DialogTitle></DialogHeader>
             <div className="space-y-4">
@@ -105,7 +117,8 @@ export default function InstitutionDocuments() {
               </Button>
             </div>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       {docs.length === 0 ? (

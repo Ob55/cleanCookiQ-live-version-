@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Plus, Package, Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 
 interface Product {
   id: string;
@@ -92,15 +93,27 @@ export default function SupplierProducts() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-2xl font-display font-bold">Products</h1>
           <p className="text-muted-foreground text-sm mt-1">Manage your product listings</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button><Plus className="h-4 w-4 mr-2" /> Add Product</Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={products}
+            columns={[
+              { key: "name", label: "Product" },
+              { key: "description", label: "Description" },
+              { key: "price", label: "Price (KSh)" },
+              { key: "image_url", label: "Image URL" },
+            ]}
+            title="Supplier Products"
+            filename="supplier-products"
+          />
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button><Plus className="h-4 w-4 mr-2" /> Add Product</Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Add New Product</DialogTitle>
@@ -128,7 +141,8 @@ export default function SupplierProducts() {
               </Button>
             </div>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       {products.length === 0 ? (

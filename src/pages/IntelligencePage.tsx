@@ -18,6 +18,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
+import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 
 type Row = {
   county: string | null;
@@ -214,14 +215,38 @@ export default function IntelligencePage() {
               </p>
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => { setCountyFilter("all"); setTypeFilter("all"); setFuelFilter("all"); }}
-            disabled={countyFilter === "all" && typeFilter === "all" && fuelFilter === "all"}
-          >
-            Reset filters
-          </Button>
+          <div className="flex gap-2">
+            <DownloadReportButton
+              rows={filtered}
+              columns={[
+                { key: "county", label: "County" },
+                { key: "institution_type", label: "Type" },
+                { key: "ownership_type", label: "Ownership" },
+                { key: "current_fuel", label: "Current Fuel" },
+                { key: "fuel_sourcing", label: "Fuel Sourcing" },
+                { key: "pipeline_stage", label: "Pipeline Stage" },
+                { key: "meals_per_day", label: "Meals/Day" },
+                { key: "number_of_students", label: "Students" },
+                { key: "number_of_staff", label: "Staff" },
+                { key: "monthly_fuel_spend", label: "Monthly Fuel Spend (KSh)" },
+                { key: "annual_savings_ksh", label: "Annual Savings (KSh)" },
+                { key: "co2_reduction_tonnes_pa", label: "CO₂ Reduction (t/yr)" },
+                { key: "has_dedicated_kitchen", label: "Dedicated Kitchen" },
+                { key: "grid_connected", label: "Grid Connected" },
+              ]}
+              title="Clean Cooking Intelligence"
+              filename="intelligence"
+              subtitle={`Filters — county: ${countyFilter}, type: ${typeFilter}, fuel: ${fuelFilter}`}
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => { setCountyFilter("all"); setTypeFilter("all"); setFuelFilter("all"); }}
+              disabled={countyFilter === "all" && typeFilter === "all" && fuelFilter === "all"}
+            >
+              Reset filters
+            </Button>
+          </div>
         </div>
 
         {isLoading ? (

@@ -3,19 +3,35 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNews } from "@/hooks/useKnowledge";
+import { DownloadReportButton, dateColumn, listColumn } from "@/components/admin/DownloadReportButton";
 
 export default function NewsPage() {
   const { data, isLoading, error } = useNews();
 
   return (
     <div className="container py-10 space-y-6">
-      <div>
-        <h1 className="text-3xl font-display font-bold flex items-center gap-2">
-          <Newspaper className="h-7 w-7 text-primary" /> News
-        </h1>
-        <p className="text-muted-foreground mt-2 max-w-2xl">
-          Sector developments, partner announcements, and stories from the field.
-        </p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-3xl font-display font-bold flex items-center gap-2">
+            <Newspaper className="h-7 w-7 text-primary" /> News
+          </h1>
+          <p className="text-muted-foreground mt-2 max-w-2xl">
+            Sector developments, partner announcements, and stories from the field.
+          </p>
+        </div>
+        <DownloadReportButton
+          rows={data ?? []}
+          columns={[
+            { key: "title", label: "Title" },
+            { key: "summary", label: "Summary" },
+            { key: "author_name", label: "Author" },
+            dateColumn("published_at", "Published"),
+            { key: "view_count", label: "Views" },
+            listColumn("tags", "Tags"),
+          ]}
+          title="News Articles"
+          filename="news"
+        />
       </div>
 
       {error && (

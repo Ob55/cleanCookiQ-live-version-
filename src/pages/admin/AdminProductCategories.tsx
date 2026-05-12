@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { sbAny as supabase } from "@/lib/sbAny";
+import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 
 type Category = {
   id: string;
@@ -119,7 +120,22 @@ export default function AdminProductCategories() {
             Marketplace taxonomy (Biogas, LPG, Electric, Solar, Improved Biomass) with optional sub-categories.
           </p>
         </div>
-        <Button onClick={() => { setForm(EMPTY); setOpen(true); }}><Plus className="h-4 w-4 mr-1" /> New category</Button>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={data ?? []}
+            columns={[
+              { key: "name", label: "Name" },
+              { key: "slug", label: "Slug" },
+              { key: "parent_id", label: "Parent", format: (r) => parentName(r.parent_id) ?? "" },
+              { key: "description", label: "Description" },
+              { key: "display_order", label: "Order" },
+              { key: "is_active", label: "Active" },
+            ]}
+            title="Product Categories"
+            filename="product-categories"
+          />
+          <Button onClick={() => { setForm(EMPTY); setOpen(true); }}><Plus className="h-4 w-4 mr-1" /> New category</Button>
+        </div>
       </div>
 
       {isLoading ? <Skeleton className="h-32 w-full" /> : (data ?? []).length === 0 ? (

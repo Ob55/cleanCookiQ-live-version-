@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MapPin, Building2, Users, Search, X } from "lucide-react";
+import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 
 export default function CountiesIndexPage() {
   const { data, isLoading, error } = useCountyIntelligence();
@@ -44,13 +45,36 @@ export default function CountiesIndexPage() {
 
   return (
     <div className="container py-12 space-y-8">
-      <div>
-        <h1 className="text-3xl font-display font-bold">County Intelligence</h1>
-        <p className="text-muted-foreground mt-2 max-w-2xl">
-          Each of Kenya's 47 counties has a different fuel mix, tariff structure, biomass
-          deficit, and policy environment. Browse county profiles to see institution counts,
-          dominant fuels, and the suppliers serving each area.
-        </p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-3xl font-display font-bold">County Intelligence</h1>
+          <p className="text-muted-foreground mt-2 max-w-2xl">
+            Each of Kenya's 47 counties has a different fuel mix, tariff structure, biomass
+            deficit, and policy environment. Browse county profiles to see institution counts,
+            dominant fuels, and the suppliers serving each area.
+          </p>
+        </div>
+        <DownloadReportButton
+          rows={filtered}
+          columns={[
+            { key: "county_name", label: "County" },
+            { key: "county_code", label: "Code" },
+            { key: "region", label: "Region" },
+            { key: "capital", label: "Capital" },
+            { key: "institutions_count", label: "Institutions Tracked" },
+            { key: "assessed_count", label: "Assessed" },
+            { key: "transitioned_count", label: "Transitioned" },
+            { key: "dominant_fuel", label: "Dominant Fuel" },
+            { key: "total_meals_per_day", label: "Total Meals/Day" },
+            { key: "total_students", label: "Total Students" },
+            { key: "providers_serving_count", label: "Providers Serving" },
+            { key: "policy_count", label: "Active Policies" },
+            { key: "fuel_price_count", label: "Fuel Prices on File" },
+          ]}
+          title="County Intelligence"
+          filename="counties"
+          subtitle={`Filters — region: ${region || "all"}, fuel: ${fuel || "any"}, search: "${search || "—"}"`}
+        />
       </div>
 
       {error && (

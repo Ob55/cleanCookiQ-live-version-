@@ -13,6 +13,7 @@ import { useEvents } from "@/hooks/useKnowledge";
 import { useDeleteContent, useUpsertContent } from "@/hooks/useContentMutations";
 import { marketplaceSlug } from "@/lib/marketplace";
 import type { EventSummary } from "@/lib/knowledge";
+import { DownloadReportButton, dateColumn, listColumn } from "@/components/admin/DownloadReportButton";
 
 type FormState = {
   id?: string;
@@ -128,7 +129,31 @@ export default function AdminEvents() {
             Create and manage summits, webinars, workshops, and trainings.
           </p>
         </div>
-        <Button onClick={startCreate}><Plus className="h-4 w-4 mr-1" /> New event</Button>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={sorted}
+            columns={[
+              { key: "title", label: "Title" },
+              { key: "event_type", label: "Type" },
+              { key: "status", label: "Status" },
+              { key: "location_type", label: "Location Type" },
+              { key: "venue_name", label: "Venue" },
+              { key: "county_name", label: "County" },
+              dateColumn("start_at", "Start"),
+              dateColumn("end_at", "End"),
+              { key: "capacity", label: "Capacity" },
+              { key: "registration_count", label: "Registered" },
+              { key: "seats_remaining", label: "Seats Remaining" },
+              { key: "organiser", label: "Organiser" },
+              { key: "contact_email", label: "Contact Email" },
+              { key: "is_published", label: "Published" },
+              listColumn("tags", "Tags"),
+            ]}
+            title="Events"
+            filename="events"
+          />
+          <Button onClick={startCreate}><Plus className="h-4 w-4 mr-1" /> New event</Button>
+        </div>
       </div>
 
       {isLoading ? (

@@ -8,6 +8,7 @@ import {
   riskBandColorClass, riskTypeLabel,
   type RiskBand, type RiskRow,
 } from "@/lib/risk";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 const BANDS: Array<{ band: RiskBand; icon: React.ElementType; label: string }> = [
   { band: "critical", icon: ShieldAlert, label: "Critical" },
@@ -30,15 +31,39 @@ export default function AdminRiskRegister() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-          <ShieldAlert className="h-6 w-6 text-primary" /> Risk Register
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Open risks across the portfolio, ordered by score (severity × likelihood).
-          Behavioural-relapse risks are auto-opened when a project's clean-fuel share
-          falls below 50% for two consecutive readings.
-        </p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold flex items-center gap-2">
+            <ShieldAlert className="h-6 w-6 text-primary" /> Risk Register
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Open risks across the portfolio, ordered by score (severity × likelihood).
+            Behavioural-relapse risks are auto-opened when a project's clean-fuel share
+            falls below 50% for two consecutive readings.
+          </p>
+        </div>
+        <DownloadReportButton
+          rows={filtered}
+          columns={[
+            { key: "risk_type", label: "Risk Type", format: (r) => riskTypeLabel(r.risk_type) },
+            { key: "project_title", label: "Project" },
+            { key: "institution_name", label: "Institution" },
+            { key: "institution_county", label: "County" },
+            { key: "bearer", label: "Bearer" },
+            { key: "severity", label: "Severity" },
+            { key: "likelihood", label: "Likelihood" },
+            { key: "risk_score", label: "Score" },
+            { key: "risk_band", label: "Band" },
+            { key: "status", label: "Status" },
+            { key: "description", label: "Description" },
+            { key: "mitigation", label: "Mitigation" },
+            dateColumn("next_review_at", "Next Review"),
+            dateColumn("created_at", "Opened"),
+          ]}
+          title="Risk Register"
+          filename="risk-register"
+          subtitle={bandFilter ? `Filter: ${bandFilter} band only` : "All risk bands"}
+        />
       </div>
 
       {/* Band counts */}

@@ -317,6 +317,28 @@ export const STANDARD_SENSITIVITY_KNOBS: SensitivityKnob[] = [
     delta: 0.05,
     apply: (i, sign) => ({ ...i, discountRate: Math.max(0, (i.discountRate ?? 0.12) + sign * 0.05) }),
   },
+  {
+    label: "Capital cost",
+    delta: 0.20,
+    apply: (i, sign) => ({ ...i, capex: Math.max(0, i.capex * (1 + sign * 0.20)) }),
+  },
+  {
+    label: "Baseline fuel cost",
+    delta: 0.20,
+    apply: (i, sign) => ({
+      ...i,
+      baselineYear1Cost: Math.max(0, (i.baselineYear1Cost ?? 0) * (1 + sign * 0.20)),
+    }),
+  },
+  {
+    label: "Fuel-price escalation",
+    delta: 0.03,
+    apply: (i, sign) => ({
+      ...i,
+      baselineEscalation: Math.max(0, (i.baselineEscalation ?? 0.07) + sign * 0.03),
+      opexEscalation: Math.max(0, (i.opexEscalation ?? 0.05) + sign * 0.03),
+    }),
+  },
 ];
 
 export function sensitivityTable(

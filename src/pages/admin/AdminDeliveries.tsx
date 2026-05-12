@@ -9,6 +9,7 @@ import {
   DELIVERY_STAGES, deliveryProgress, stageLabel,
   type DeliveryStage, type DeliverySummary,
 } from "@/lib/delivery";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 const STAGE_COLORS: Record<string, string> = {
   manufacturing: "bg-slate-100 text-slate-700",
@@ -40,14 +41,46 @@ export default function AdminDeliveries() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-          <Truck className="h-6 w-6 text-primary" /> Deliveries & Installations
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Track every contracted project from manufacturing through commissioning,
-          handover, and the 30-day acceptance window.
-        </p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold flex items-center gap-2">
+            <Truck className="h-6 w-6 text-primary" /> Deliveries & Installations
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Track every contracted project from manufacturing through commissioning,
+            handover, and the 30-day acceptance window.
+          </p>
+        </div>
+        <DownloadReportButton
+          rows={filtered}
+          columns={[
+            { key: "project_title", label: "Project" },
+            { key: "institution_name", label: "Institution" },
+            { key: "institution_county", label: "County" },
+            { key: "provider_name", label: "Provider" },
+            { key: "crew_name", label: "Install Crew" },
+            { key: "stage", label: "Stage", format: (r) => stageLabel(r.stage) },
+            { key: "carrier", label: "Carrier" },
+            { key: "tracking_ref", label: "Tracking Ref" },
+            { key: "delivery_address", label: "Delivery Address" },
+            dateColumn("planned_dispatch_at", "Planned Dispatch"),
+            dateColumn("actual_dispatch_at", "Actual Dispatch"),
+            dateColumn("planned_arrival_at", "Planned Arrival"),
+            dateColumn("actual_arrival_at", "Actual Arrival"),
+            dateColumn("planned_install_at", "Planned Install"),
+            dateColumn("actual_install_at", "Actual Install"),
+            dateColumn("commissioned_at", "Commissioned"),
+            dateColumn("acceptance_due_at", "Acceptance Due"),
+            { key: "commissioning_complete", label: "Commissioning Complete" },
+            { key: "completed_items", label: "Items Completed" },
+            { key: "total_items", label: "Items Total" },
+            { key: "signed_off", label: "Signed Off" },
+            dateColumn("signed_off_at", "Signed Off At"),
+          ]}
+          title="Deliveries & Installations"
+          filename="deliveries"
+          subtitle={stageFilter ? `Filter: ${stageLabel(stageFilter)}` : "All stages"}
+        />
       </div>
 
       {error && (

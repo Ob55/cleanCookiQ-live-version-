@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { ClipboardCheck, Loader2, Eye, Check, Pencil, Plus } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 export default function AssessmentQueue() {
   const queryClient = useQueryClient();
@@ -133,14 +134,33 @@ export default function AssessmentQueue() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-2xl font-display font-bold">Assessment Review Queue</h1>
           <p className="text-sm text-muted-foreground">Review and approve institution assessments</p>
         </div>
-        <Link to="/admin/assessments/new/edit">
-          <Button><Plus className="h-4 w-4 mr-1" /> New assessment</Button>
-        </Link>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={filtered}
+            columns={[
+              { key: "name", label: "Institution" },
+              { key: "county", label: "County" },
+              { key: "institution_type", label: "Type" },
+              { key: "source", label: "Source" },
+              { key: "status", label: "Status" },
+              { key: "pipeline_stage", label: "Pipeline Stage" },
+              { key: "assessment_score", label: "Score" },
+              { key: "reviewer_notes", label: "Reviewer Notes" },
+              dateColumn("submitted_at", "Submitted"),
+            ]}
+            title="Assessment Queue"
+            filename="assessments"
+            subtitle={`Status filter: ${filterStatus}`}
+          />
+          <Link to="/admin/assessments/new/edit">
+            <Button><Plus className="h-4 w-4 mr-1" /> New assessment</Button>
+          </Link>
+        </div>
       </div>
 
       {/* Stats */}

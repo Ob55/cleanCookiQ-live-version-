@@ -21,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { sendEmail, emailSignAgreement } from "@/lib/emailService";
 import { Loader2, ExternalLink, Mail, Filter, ClipboardCheck, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 interface CsccRow {
   id: string;
@@ -224,19 +225,36 @@ export default function AdminMOUIPA() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-2xl font-display font-bold">MOU &amp; IPA</h1>
           <p className="text-muted-foreground text-sm mt-1">
             Manage Memoranda of Understanding and Institution Partnership Agreements
           </p>
         </div>
-        <Dialog open={requestOpen} onOpenChange={setRequestOpen}>
-          <DialogTrigger asChild>
-            <Button className="gap-2">
-              <Mail className="h-4 w-4" />
-              Request Signature
-            </Button>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={filtered}
+            columns={[
+              { key: "organisation_name", label: "Organisation" },
+              { key: "org_type", label: "Org Type" },
+              { key: "document_type", label: "Document" },
+              { key: "status", label: "Status" },
+              { key: "signed_file_url", label: "Signed File URL" },
+              dateColumn("sign_requested_at", "Requested"),
+              dateColumn("signed_at", "Signed"),
+              dateColumn("created_at", "Created"),
+            ]}
+            title="MOU & IPA"
+            filename="mou-ipa"
+            subtitle={`Filter: ${filter}`}
+          />
+          <Dialog open={requestOpen} onOpenChange={setRequestOpen}>
+            <DialogTrigger asChild>
+              <Button className="gap-2">
+                <Mail className="h-4 w-4" />
+                Request Signature
+              </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -291,7 +309,8 @@ export default function AdminMOUIPA() {
               </Button>
             </div>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">

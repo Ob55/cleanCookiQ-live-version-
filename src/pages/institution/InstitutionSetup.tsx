@@ -11,7 +11,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { calculateAssessmentScore } from "@/lib/assessmentScoring";
+import { calculateAssessmentScore, loadReadinessWeights } from "@/lib/assessmentScoring";
+import { deriveStoredImpact } from "@/lib/institutionDerived";
 import { sendEmail, emailInstitutionWelcome } from "@/lib/emailService";
 import CountyCombobox from "@/components/CountyCombobox";
 
@@ -131,7 +132,14 @@ export default function InstitutionSetup() {
         monthly_fuel_spend: monthlyFuelSpend ? parseFloat(monthlyFuelSpend) : null,
         financial_decision_maker: financialDecisionMaker || null,
       };
-      const { score, category } = calculateAssessmentScore(scoringInput);
+      const weights = await loadReadinessWeights();
+      const { score, category } = calculateAssessmentScore(scoringInput, weights);
+
+      const derived = deriveStoredImpact({
+        current_fuel: fuelType || null,
+        monthly_fuel_spend: monthlyFuelSpend ? parseFloat(monthlyFuelSpend) : null,
+        consumption_per_term: consumption ? parseFloat(consumption) : null,
+      });
 
       const institutionData = {
         name: name.trim(),
@@ -157,13 +165,25 @@ export default function InstitutionSetup() {
         transition_needs: transitionNeeds || null,
         assessment_score: score,
         assessment_category: category,
+        annual_savings_ksh: derived.annual_savings_ksh,
+        co2_reduction_tonnes_pa: derived.co2_reduction_tonnes_pa,
+        recommended_solution: derived.recommended_solution,
         setup_completed: true,
         created_by: user.id,
       };
 
+      // The DB trigger assigns institution_code on INSERT. We read it back so
+      // we can show it to the user (toast) and include it in the welcome email.
+      let assignedCode: string | null = null;
       if (institutionId) {
-        const { error: updateErr } = await supabase.from("institutions").update(institutionData).eq("id", institutionId);
+        const { data: updated, error: updateErr } = await supabase
+          .from("institutions")
+          .update(institutionData)
+          .eq("id", institutionId)
+          .select("institution_code")
+          .single();
         if (updateErr) throw new Error(updateErr.message);
+        assignedCode = updated?.institution_code ?? null;
         // Ensure profile is linked
         if (!profile?.organisation_id) {
           await supabase.from("profiles").update({ organisation_id: institutionId }).eq("user_id", user.id);
@@ -176,9 +196,10 @@ export default function InstitutionSetup() {
         const { data: newInst, error: insertErr } = await supabase
           .from("institutions")
           .insert({ ...institutionData, institution_type: instType as any })
-          .select("id")
+          .select("id, institution_code")
           .single();
         if (insertErr) throw new Error(insertErr.message);
+        assignedCode = newInst?.institution_code ?? null;
         // Link profile to this institution so dashboard can always find it
         if (newInst?.id) {
           await supabase.from("profiles").update({ organisation_id: newInst.id }).eq("user_id", user.id);
@@ -197,11 +218,19 @@ export default function InstitutionSetup() {
             user.user_metadata?.full_name || contactPerson || "",
             name.trim(),
             fuelType,
+            assignedCode,
           ),
         });
       }
 
-      toast.success("Institution setup complete!");
+      if (assignedCode) {
+        toast.success(`Institution setup complete! Your code: ${assignedCode}`, {
+          description: "Save this code — quote it in any email or support ticket so we can find your record instantly.",
+          duration: 10000,
+        });
+      } else {
+        toast.success("Institution setup complete!");
+      }
       setTimeout(() => navigate("/institution/dashboard"), 100);
     } catch (err: any) {
       toast.error(err.message || "Failed to save");

@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFunderPortfolio, useFunderPortfolioSummary } from "@/hooks/useFunder";
 import { formatBigNumber } from "@/lib/funder";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 export default function FunderImpactReport() {
   const { profile } = useAuth();
@@ -22,9 +23,26 @@ export default function FunderImpactReport() {
             Auto-generated from your portfolio + attribution ledger. Use Print to save as PDF.
           </p>
         </div>
-        <Button onClick={() => window.print()} size="sm">
-          <Printer className="h-4 w-4 mr-1" /> Print / Save PDF
-        </Button>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={portfolio ?? []}
+            columns={[
+              { key: "project_id", label: "Project ID" },
+              { key: "capital_amount", label: "Capital (KSh)" },
+              { key: "capital_currency", label: "Currency" },
+              { key: "capital_share_pct", label: "Share %", format: (r) => r.capital_share_pct == null ? "" : `${(r.capital_share_pct * 100).toFixed(1)}%` },
+              { key: "status", label: "Status" },
+              dateColumn("committed_at", "Committed"),
+              dateColumn("disbursed_at", "Disbursed"),
+            ]}
+            title="Quarterly Impact Report"
+            filename="impact-report"
+            subtitle={`${summary?.project_count ?? 0} projects · ${formatBigNumber(summary?.lifetime_tco2e)} tCO₂e attributed`}
+          />
+          <Button onClick={() => window.print()} size="sm" variant="outline">
+            <Printer className="h-4 w-4 mr-1" /> Print
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (

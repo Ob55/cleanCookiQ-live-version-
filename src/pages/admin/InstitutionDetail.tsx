@@ -156,7 +156,14 @@ export default function InstitutionDetail() {
             <Building2 className="h-7 w-7 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-display font-bold">{inst.name}</h1>
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-2xl font-display font-bold">{inst.name}</h1>
+              {inst.institution_code && (
+                <span className="font-mono text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground border border-border" title="Auto-assigned institution code: CCQ-{county}-{type}-{sequence}">
+                  {inst.institution_code}
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
               <span className="capitalize">{inst.institution_type}</span>
               <span>•</span>

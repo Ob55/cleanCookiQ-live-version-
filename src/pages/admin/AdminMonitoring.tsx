@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMonitoringLatest } from "@/hooks/useRisk";
 import { type MonitoringLatest } from "@/lib/risk";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 export default function AdminMonitoring() {
   const { data, isLoading } = useMonitoringLatest();
@@ -22,9 +23,32 @@ export default function AdminMonitoring() {
             behavioural-relapse risk and a refresher-training ticket automatically.
           </p>
         </div>
-        <Link to="/admin/monitoring/new">
-          <Button><Plus className="h-4 w-4 mr-1" /> Record reading</Button>
-        </Link>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={data ?? []}
+            columns={[
+              { key: "project_title", label: "Project" },
+              { key: "institution_name", label: "Institution" },
+              { key: "institution_county", label: "County" },
+              dateColumn("period_start", "Period Start"),
+              dateColumn("period_end", "Period End"),
+              { key: "clean_fuel_units", label: "Clean Fuel Used" },
+              { key: "clean_fuel_unit", label: "Clean Fuel Unit" },
+              { key: "baseline_fuel_units", label: "Baseline Fuel Used" },
+              { key: "baseline_fuel_unit", label: "Baseline Fuel Unit" },
+              { key: "clean_fuel_share", label: "Clean Fuel Share", format: (r) => r.clean_fuel_share == null ? "" : `${Math.round(r.clean_fuel_share * 100)}%` },
+              { key: "meals_served", label: "Meals Served" },
+              { key: "hours_operated", label: "Hours Operated" },
+              { key: "downtime_hours", label: "Downtime (hrs)" },
+              { key: "cook_satisfaction_1to5", label: "Cook Satisfaction (1-5)" },
+            ]}
+            title="Monitoring — Latest Readings"
+            filename="monitoring-readings"
+          />
+          <Link to="/admin/monitoring/new">
+            <Button><Plus className="h-4 w-4 mr-1" /> Record reading</Button>
+          </Link>
+        </div>
       </div>
 
       {isLoading ? (

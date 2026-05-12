@@ -4,11 +4,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { Building2, Factory, Banknote, FlaskConical, HelpCircle, ArrowLeft, Loader2, Eye, EyeOff, Zap } from "lucide-react";
+import { Building2, Factory, Banknote, FlaskConical, HelpCircle, ArrowLeft, Loader2, Eye, EyeOff, Zap, MailCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
-import { sendEmail, emailOtherInterest } from "@/lib/emailService";
+import {
+  sendEmail,
+  emailOtherInterest,
+  emailFunderWelcome,
+  emailCSRWelcome,
+  emailResearcherWelcome,
+} from "@/lib/emailService";
 import AuthBackButton from "@/components/auth/AuthBackButton";
 import { checkRateLimit } from "@/lib/rateLimit";
 import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
@@ -107,6 +113,30 @@ export default function RegisterPage() {
       if (isKplc) profileUpdate.approval_status = "pending";
       await supabase.from("profiles").update(profileUpdate).eq("user_id", signUpData.user.id);
 
+      // For org types that live in the `organisations` table (funder / CSR /
+      // researcher), create the org row at signup so the DB trigger assigns
+      // an org_code we can quote in the welcome email. Institutions and
+      // suppliers create their own rows in their setup flows; "other"
+      // intentionally stays unassigned until admin approval.
+      const orgBackedTypes = new Set(["funder", "csr", "researcher"]);
+      let assignedOrgCode: string | null = null;
+      if (orgBackedTypes.has(orgType)) {
+        const { data: org } = await supabase
+          .from("organisations")
+          .insert({
+            name: orgName,
+            org_type: orgType as any,
+            contact_email: email,
+            contact_phone: phone || null,
+          })
+          .select("id, org_code")
+          .single();
+        if (org?.id) {
+          assignedOrgCode = (org as { org_code?: string | null }).org_code ?? null;
+          await supabase.from("profiles").update({ organisation_id: org.id }).eq("user_id", signUpData.user.id);
+        }
+      }
+
       // If funder, create funder_profiles record
       if (isFunder) {
         await supabase.from("funder_profiles").insert({
@@ -119,12 +149,37 @@ export default function RegisterPage() {
         });
       }
 
-      // If other, send interest email
-      if (isOther) {
+      // Send role-specific welcome with the assigned code.
+      if (isFunder) {
+        await sendEmail({
+          to: email,
+          subject: "Welcome to cleancookIQ as a Funder",
+          html: emailFunderWelcome(fullName, orgName, assignedOrgCode),
+        });
+      } else if (orgType === "csr") {
+        await sendEmail({
+          to: email,
+          subject: "Welcome to cleancookIQ as a CSR Partner",
+          html: emailCSRWelcome(fullName, orgName, assignedOrgCode),
+        });
+      } else if (orgType === "researcher") {
+        await sendEmail({
+          to: email,
+          subject: "Welcome to cleancookIQ as a Research Partner",
+          html: emailResearcherWelcome(fullName, orgName, assignedOrgCode),
+        });
+      } else if (isOther) {
         await sendEmail({
           to: email,
           subject: "Thank you for your interest in cleancookIQ",
           html: emailOtherInterest(fullName, orgName),
+        });
+      }
+
+      if (assignedOrgCode) {
+        toast.success(`Account created — your code is ${assignedOrgCode}`, {
+          description: "Save this code — we've also sent it in your welcome email.",
+          duration: 10000,
         });
       }
     }
@@ -306,7 +361,80 @@ export default function RegisterPage() {
           Already have an account?{" "}
           <Link to="/auth/login" className="text-primary font-medium hover:underline">Log in</Link>
         </p>
+
+        <ResendVerificationCard />
       </div>
+    </div>
+  );
+}
+
+function ResendVerificationCard() {
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [sending, setSending] = useState(false);
+
+  const handleResend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) {
+      toast.error("Enter the email you registered with");
+      return;
+    }
+    setSending(true);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email: email.trim().toLowerCase(),
+      options: {
+        emailRedirectTo: `${import.meta.env.VITE_APP_URL || window.location.origin}/auth/login`,
+      },
+    });
+    setSending(false);
+    if (error) {
+      toast.error(error.message || "Could not resend the verification email");
+    } else {
+      toast.success("Verification email sent — check your inbox (and spam folder)");
+      setEmail("");
+      setOpen(false);
+    }
+  };
+
+  return (
+    <div className="mt-4 text-center">
+      {!open ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary"
+        >
+          <MailCheck className="h-3.5 w-3.5" />
+          Already registered but didn't receive the verification email? Resend it
+        </button>
+      ) : (
+        <form onSubmit={handleResend} className="bg-card border border-border rounded-xl p-4 shadow-card text-left space-y-3">
+          <div className="flex items-center gap-2">
+            <MailCheck className="h-4 w-4 text-primary" />
+            <p className="text-sm font-semibold">Resend verification email</p>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Enter the email address you registered with. We'll resend the link to verify your account.
+          </p>
+          <Input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@organisation.co.ke"
+            required
+          />
+          <div className="flex gap-2">
+            <Button type="submit" disabled={sending} className="flex-1 bg-primary text-primary-foreground">
+              {sending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Resend email
+            </Button>
+            <Button type="button" variant="ghost" onClick={() => setOpen(false)} disabled={sending}>
+              Cancel
+            </Button>
+          </div>
+        </form>
+      )}
     </div>
   );
 }

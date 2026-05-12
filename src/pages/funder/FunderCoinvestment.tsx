@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { sbAny as supabase } from "@/lib/sbAny";
 import { useAuth } from "@/contexts/AuthContext";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 type IntroStatus = "pending" | "accepted" | "declined" | "withdrawn";
 
@@ -186,9 +187,25 @@ export default function FunderCoinvestment() {
             Receive and send introductions to other funders for co-investing in pipeline projects.
           </p>
         </div>
-        <Button onClick={() => { setCompose(EMPTY); setComposeOpen(true); }}>
-          <Plus className="h-4 w-4 mr-1" /> New intro
-        </Button>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={list ?? []}
+            columns={[
+              { key: "requester_org", label: "From", format: (r) => r.requester_org?.name ?? "" },
+              { key: "target_org", label: "To", format: (r) => r.target_org?.name ?? "" },
+              { key: "project_id", label: "Project ID" },
+              { key: "message", label: "Message" },
+              { key: "status", label: "Status" },
+              dateColumn("created_at", "Sent"),
+              dateColumn("responded_at", "Responded"),
+            ]}
+            title={`Co-investment ${tab === "inbox" ? "Inbox" : "Sent"}`}
+            filename={`coinvestment-${tab}`}
+          />
+          <Button onClick={() => { setCompose(EMPTY); setComposeOpen(true); }}>
+            <Plus className="h-4 w-4 mr-1" /> New intro
+          </Button>
+        </div>
       </div>
 
       <div className="flex gap-2 border-b border-border">

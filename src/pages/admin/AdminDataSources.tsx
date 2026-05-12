@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { sbAny as supabase } from "@/lib/sbAny";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 type DataSource = {
   id: string;
@@ -151,7 +152,28 @@ export default function AdminDataSources() {
             Citable references (EPRA, IPCC, FAO, CCA benchmarks) backing every data point on the platform.
           </p>
         </div>
-        <Button onClick={startCreate}><Plus className="h-4 w-4 mr-1" /> New source</Button>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={data ?? []}
+            columns={[
+              { key: "title", label: "Title" },
+              { key: "slug", label: "Slug" },
+              { key: "publisher", label: "Publisher" },
+              { key: "authors", label: "Authors" },
+              { key: "confidence_level", label: "Confidence" },
+              { key: "geographic_scope", label: "Scope" },
+              dateColumn("published_date", "Published"),
+              dateColumn("accessed_date", "Accessed"),
+              dateColumn("validity_until", "Valid Until"),
+              { key: "url", label: "URL" },
+              { key: "document_url", label: "Document URL" },
+              { key: "is_active", label: "Active" },
+            ]}
+            title="Data Sources"
+            filename="data-sources"
+          />
+          <Button onClick={startCreate}><Plus className="h-4 w-4 mr-1" /> New source</Button>
+        </div>
       </div>
 
       {isLoading ? (

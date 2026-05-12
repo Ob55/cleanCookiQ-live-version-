@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, TrendingUp, MapPin, Users, Factory, DollarSign } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 
 export default function BDDashboard() {
   const { data: institutions, isLoading: loadingInst } = useQuery({
@@ -73,9 +74,21 @@ export default function BDDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold">Business Development Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Commercial opportunity intelligence and market analysis</p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold">Business Development Dashboard</h1>
+          <p className="text-sm text-muted-foreground">Commercial opportunity intelligence and market analysis</p>
+        </div>
+        <DownloadReportButton
+          rows={countyData}
+          columns={[
+            { key: "county", label: "County" },
+            { key: "count", label: "Institutions" },
+          ]}
+          title="BD Dashboard — Top Counties"
+          filename="bd-dashboard-counties"
+          subtitle={`Pipeline value KSh ${(pipelineValue / 1_000_000).toFixed(1)}M · ${institutions?.length ?? 0} institutions · ${readyNow.length} Ready Now`}
+        />
       </div>
 
       {/* KPI Strip */}

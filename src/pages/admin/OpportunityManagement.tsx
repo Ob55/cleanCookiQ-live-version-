@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { FileText, Plus, Loader2, Search, DollarSign, Calendar } from "lucide-react";
 import { useState } from "react";
 import { notifyInstitutionOwner, notifyFunders } from "@/lib/notifications";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 export default function OpportunityManagement() {
   const { profile } = useAuth();
@@ -112,15 +113,33 @@ export default function OpportunityManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-2xl font-display font-bold">Opportunity Management</h1>
           <p className="text-sm text-muted-foreground">Create and manage project opportunities</p>
         </div>
-        <Dialog open={showAdd} onOpenChange={setShowAdd}>
-          <DialogTrigger asChild>
-            <Button><Plus className="h-4 w-4 mr-2" /> Create Opportunity</Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={filtered}
+            columns={[
+              { key: "title", label: "Title" },
+              { key: "description", label: "Description" },
+              { key: "technology_required", label: "Technology" },
+              { key: "estimated_value", label: "Estimated Value (KSh)" },
+              { key: "status", label: "Status" },
+              { key: "institutions", label: "Institution", format: (r: any) => r.institutions?.name ?? "" },
+              { key: "institutions", label: "County", format: (r: any) => r.institutions?.county ?? "" },
+              dateColumn("deadline", "Deadline"),
+              dateColumn("created_at", "Created"),
+            ]}
+            title="Opportunities"
+            filename="opportunities"
+            subtitle={`Status filter: ${filterStatus}`}
+          />
+          <Dialog open={showAdd} onOpenChange={setShowAdd}>
+            <DialogTrigger asChild>
+              <Button><Plus className="h-4 w-4 mr-2" /> Create Opportunity</Button>
+            </DialogTrigger>
           <DialogContent className="max-w-lg">
             <DialogHeader><DialogTitle>Create New Opportunity</DialogTitle></DialogHeader>
             <div className="space-y-3">
@@ -151,7 +170,8 @@ export default function OpportunityManagement() {
               </Button>
             </div>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       {/* KPI Cards */}

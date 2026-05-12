@@ -5,12 +5,25 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Mail, User, CheckCircle, TrendingUp, BarChart3, PieChart } from "lucide-react";
+import { useCountyIntelligence } from "@/hooks/useCounties";
+
+const MARKET_GROWTH_SOURCE = {
+  // Published projection — keep this in sync with the cited report.
+  // If the figure is updated, also update §11 of the methodology doc.
+  text: "Kenya's institutional clean cooking market is projected to grow 340% by 2030, pushed by government policy and carbon finance.",
+  citation: "MoEP Kenya National Cooking Transition Strategy 2024–2028 (published 2024).",
+};
 
 export default function MarketingAnalysis() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const { data: counties } = useCountyIntelligence();
+  const totalInstitutions = counties?.reduce((sum, c) => sum + (c.institutions_count ?? 0), 0) ?? 0;
+  const countiesCovered = counties?.filter((c) => (c.institutions_count ?? 0) > 0).length ?? 0;
+  const totalCounties = counties?.length ?? 47;
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,14 +70,17 @@ export default function MarketingAnalysis() {
               <CardContent className="pt-8 pb-6">
                 <TrendingUp className="h-10 w-10 text-primary mx-auto mb-4" />
                 <h3 className="font-display font-bold text-lg mb-2">Market Growth</h3>
-                <p className="text-sm text-muted-foreground">Kenya's institutional clean cooking market is set to grow 340% by 2030, pushed by government policy and carbon finance.</p>
+                <p className="text-sm text-muted-foreground">{MARKET_GROWTH_SOURCE.text}</p>
+                <p className="text-[10px] text-muted-foreground/70 mt-2 italic">Source: {MARKET_GROWTH_SOURCE.citation}</p>
               </CardContent>
             </Card>
             <Card className="text-center">
               <CardContent className="pt-8 pb-6">
                 <BarChart3 className="h-10 w-10 text-primary mx-auto mb-4" />
                 <h3 className="font-display font-bold text-lg mb-2">Pipeline Analytics</h3>
-                <p className="text-sm text-muted-foreground">Live data on 2,847+ institutions across 47 counties, covering fuel usage, readiness to switch, and financing needs.</p>
+                <p className="text-sm text-muted-foreground">
+                  Live data on {totalInstitutions.toLocaleString()} institution{totalInstitutions === 1 ? "" : "s"} across {countiesCovered} of {totalCounties} counties, covering fuel usage, readiness to switch, and financing needs.
+                </p>
               </CardContent>
             </Card>
             <Card className="text-center">

@@ -6,6 +6,7 @@
  * stated preferences (county, fuel, ticket size, risk, IRR floor).
  * The dashboard sorts deals by this score to surface best fits first.
  */
+import { tcoModel, type TcoInput } from "./tco";
 
 export interface FunderPreferences {
   organisation_id: string;
@@ -31,6 +32,7 @@ export interface DealRow {
   start_date: string | null;
   target_completion: string | null;
   institution_id: string;
+  institution_code?: string | null;
   institution_name: string;
   county: string | null;
   institution_type: string | null;
@@ -43,6 +45,10 @@ export interface DealRow {
   open_risk_count: number;
   already_committed_capital: number;
   funding_gap: number | null;
+  /** Monthly status-quo fuel spend on the institution. Drives baseline savings. */
+  monthly_fuel_spend?: number | null;
+  /** Stored annual savings figure on the institution (KSh). */
+  annual_savings_ksh?: number | null;
 }
 
 export interface PortfolioRow {
@@ -134,11 +140,22 @@ export function dealMatchScore(deal: DealRow, prefs: FunderPreferences): DealSco
     }
   }
 
-  // IRR fit: we don't have project-level IRR here yet, so this is a stub
-  // that always returns 1 unless the funder has set an explicit floor and
-  // the project doesn't yet have a forecast — in which case we mark it
-  // as 0.5 (uncertain).
-  const irrFit = prefs.min_irr === null ? 1 : 0.5;
+  // IRR fit: when the funder sets a floor, compute the project's forecast IRR
+  // from a TCO model built from the deal inputs and compare. If we can't build
+  // a model (missing inputs), fall back to 0.5 (uncertain).
+  let irrFit = 1;
+  if (prefs.min_irr !== null) {
+    const projectIrr = forecastIrr(deal);
+    if (projectIrr === null) {
+      irrFit = 0.5;
+    } else if (projectIrr >= prefs.min_irr) {
+      irrFit = 1;
+    } else {
+      // Linear taper from 1 at the floor down to 0 when IRR is at or below 0.
+      irrFit = clamp(projectIrr / prefs.min_irr, 0, 1);
+      if (irrFit < 0.25) hardFails.push("irr");
+    }
+  }
 
   // Weighted sum (countyMatch and fuelMatch get higher weights since
   // they're the most common hard preferences).
@@ -169,6 +186,35 @@ export function attributionAllocate<T extends { organisation_id: string; capital
     out[c.organisation_id] = (out[c.organisation_id] ?? 0) + outcomeAmount * (c.capital_amount / total);
   }
   return out;
+}
+
+/**
+ * Build a TCO input from a deal row and return the forecast IRR.
+ * Returns null when the deal lacks the inputs needed for an honest model
+ * (no budget, or no baseline fuel spend to compare against).
+ *
+ * Conventions match the rest of the platform:
+ *   - clean cooking opex is ~40% of the firewood/charcoal cost
+ *   - default lifetime 10 years, install 10% of capex
+ *   - escalations: opex 5%/yr, baseline 7%/yr (same as tcoModel defaults)
+ */
+export function forecastIrr(deal: DealRow): number | null {
+  const capex = deal.total_budget ?? 0;
+  const baselineAnnual =
+    (deal.monthly_fuel_spend ?? 0) > 0
+      ? (deal.monthly_fuel_spend as number) * 12
+      : (deal.annual_savings_ksh ?? 0) > 0
+        ? (deal.annual_savings_ksh as number) / 0.6  // savings ≈ 60% of baseline cost
+        : 0;
+  if (capex <= 0 || baselineAnnual <= 0) return null;
+
+  const input: TcoInput = {
+    capex,
+    opexYear1: baselineAnnual * 0.4, // clean-cost multiplier from §3
+    lifetimeYears: 10,
+    baselineYear1Cost: baselineAnnual,
+  };
+  return tcoModel(input).irr;
 }
 
 function clamp(v: number, lo: number, hi: number): number {

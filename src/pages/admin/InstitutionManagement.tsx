@@ -12,6 +12,7 @@ import { Building2, Plus, Search, Filter, MapPin, Loader2, Eye, Pencil, Trash2, 
 import { Link } from "react-router-dom";
 import { TRANSITION_TARGET_LABELS } from "@/components/institution/TransitionTarget";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 const counties = ["Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret", "Nyeri", "Machakos", "Kiambu", "Uasin Gishu", "Kakamega", "Bungoma", "Kilifi", "Garissa", "Turkana", "Marsabit"];
 const institutionTypes = ["school", "hospital", "prison", "factory", "hotel", "restaurant", "other"];
@@ -83,24 +84,52 @@ export default function InstitutionManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-2xl font-display font-bold">Institutions</h1>
           <p className="text-sm text-muted-foreground">{filtered.length} institutions in pipeline</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-primary text-primary-foreground">
-              <Plus className="h-4 w-4 mr-2" /> Add Institution
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={filtered}
+            columns={[
+              { key: "institution_code", label: "Code" },
+              { key: "name", label: "Institution" },
+              { key: "institution_type", label: "Type" },
+              { key: "county", label: "County" },
+              { key: "sub_county", label: "Sub-County" },
+              { key: "current_fuel", label: "Current Fuel" },
+              { key: "number_of_students", label: "Students" },
+              { key: "meals_per_day", label: "Meals/Day" },
+              { key: "monthly_fuel_spend", label: "Monthly Fuel Spend (KSh)" },
+              { key: "pipeline_stage", label: "Pipeline Stage" },
+              { key: "assessment_score", label: "Readiness Score" },
+              { key: "annual_savings_ksh", label: "Annual Savings (KSh)" },
+              { key: "co2_reduction_tonnes_pa", label: "CO₂ Reduction (t/yr)" },
+              { key: "recommended_solution", label: "Recommended Solution" },
+              { key: "contact_person", label: "Contact" },
+              { key: "contact_phone", label: "Phone" },
+              { key: "contact_email", label: "Email" },
+              dateColumn("created_at", "Created"),
+            ]}
+            title="Institutions"
+            filename="institutions"
+            subtitle={`Filters — county: ${countyFilter}, type: ${typeFilter}, stage: ${stageFilter}`}
+          />
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-primary text-primary-foreground">
+                <Plus className="h-4 w-4 mr-2" /> Add Institution
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="font-display">Add New Institution</DialogTitle>
             </DialogHeader>
             <InstitutionForm onSuccess={() => { setDialogOpen(false); queryClient.invalidateQueries({ queryKey: ["institutions"] }); }} />
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       {/* Filters */}
@@ -146,6 +175,7 @@ export default function InstitutionManagement() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border bg-muted/50">
+                  <th className="text-left text-xs font-medium text-muted-foreground p-3">Code</th>
                   <th className="text-left text-xs font-medium text-muted-foreground p-3">Name</th>
                   <th className="text-left text-xs font-medium text-muted-foreground p-3">Type</th>
                   <th className="text-left text-xs font-medium text-muted-foreground p-3">County</th>
@@ -159,6 +189,9 @@ export default function InstitutionManagement() {
               <tbody>
                 {filtered.map(inst => (
                   <tr key={inst.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                    <td className="p-3">
+                      <span className="font-mono text-xs text-muted-foreground">{inst.institution_code ?? "—"}</span>
+                    </td>
                     <td className="p-3">
                       <div className="flex items-center gap-3">
                         <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -305,12 +338,36 @@ function InstitutionForm({ onSuccess, initial }: { onSuccess: () => void; initia
       contact_email: form.contact_email || null,
       notes: form.notes || null,
     };
-    const { error } = isEdit
-      ? await supabase.from("institutions").update(payload).eq("id", initial.id)
-      : await supabase.from("institutions").insert(payload);
+    let assignedCode: string | null = null;
+    let errorMsg: string | null = null;
+    if (isEdit) {
+      const { error } = await supabase.from("institutions").update(payload).eq("id", initial.id);
+      if (error) errorMsg = error.message;
+    } else {
+      const { data, error } = await supabase
+        .from("institutions")
+        .insert(payload)
+        .select("institution_code")
+        .single();
+      if (error) errorMsg = error.message;
+      else assignedCode = data?.institution_code ?? null;
+    }
     setLoading(false);
-    if (error) toast.error(error.message);
-    else { toast.success(isEdit ? "Institution updated" : "Institution added"); onSuccess(); }
+    if (errorMsg) {
+      toast.error(errorMsg);
+      return;
+    }
+    if (isEdit) {
+      toast.success("Institution updated");
+    } else if (assignedCode) {
+      toast.success(`Institution added — code ${assignedCode}`, {
+        description: "The code is auto-assigned and immutable. Use it in tickets and reports.",
+        duration: 8000,
+      });
+    } else {
+      toast.success("Institution added");
+    }
+    onSuccess();
   };
 
   const set = (key: string, val: string) => setForm(prev => ({ ...prev, [key]: val }));

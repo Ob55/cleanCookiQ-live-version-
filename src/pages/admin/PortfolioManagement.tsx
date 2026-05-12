@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Briefcase } from "lucide-react";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 const dmrvStatusColors: Record<string, string> = {
   pending: "bg-amber-100 text-amber-700",
@@ -26,11 +27,27 @@ export default function PortfolioManagement() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-          <Briefcase className="h-6 w-6 text-primary" /> Portfolio Management
-        </h1>
-        <p className="text-sm text-muted-foreground">Monitor active projects and dMRV records</p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold flex items-center gap-2">
+            <Briefcase className="h-6 w-6 text-primary" /> Portfolio Management
+          </h1>
+          <p className="text-sm text-muted-foreground">Monitor active projects and dMRV records</p>
+        </div>
+        <DownloadReportButton
+          rows={dmrvRecords ?? []}
+          columns={[
+            { key: "projects", label: "Project", format: (r: any) => r.projects?.title ?? "" },
+            { key: "projects", label: "Institution", format: (r: any) => r.projects?.institutions?.name ?? "" },
+            dateColumn("recorded_at", "Recorded"),
+            { key: "meals_verified", label: "Meals Verified" },
+            { key: "co2_verified_tonnes", label: "CO₂ Verified (t)" },
+            { key: "verification_method", label: "Method" },
+            { key: "status", label: "Status" },
+          ]}
+          title="Portfolio dMRV Records"
+          filename="dmrv-portfolio"
+        />
       </div>
 
       <div className="grid grid-cols-3 gap-4">

@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useMarketplaceProducts, useProductCategories } from "@/hooks/useMarketplace";
 import { useCounties } from "@/hooks/useCounties";
 import { applyMarketplaceFilters, type MarketplaceFilters, type MarketplaceProduct } from "@/lib/marketplace";
+import { DownloadReportButton, listColumn } from "@/components/admin/DownloadReportButton";
 
 export default function MarketplacePage() {
   const { data: products, isLoading: productsLoading } = useMarketplaceProducts();
@@ -22,14 +23,37 @@ export default function MarketplacePage() {
 
   return (
     <div className="container py-10 space-y-6">
-      <div>
-        <h1 className="text-3xl font-display font-bold flex items-center gap-2">
-          <ShoppingBag className="h-7 w-7 text-primary" /> Marketplace
-        </h1>
-        <p className="text-muted-foreground mt-2 max-w-2xl">
-          Browse certified clean-cooking products from verified Kenyan suppliers.
-          Filter by technology, county served, and request a quote when you find a fit.
-        </p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-3xl font-display font-bold flex items-center gap-2">
+            <ShoppingBag className="h-7 w-7 text-primary" /> Marketplace
+          </h1>
+          <p className="text-muted-foreground mt-2 max-w-2xl">
+            Browse certified clean-cooking products from verified Kenyan suppliers.
+            Filter by technology, county served, and request a quote when you find a fit.
+          </p>
+        </div>
+        <DownloadReportButton
+          rows={filtered}
+          columns={[
+            { key: "name", label: "Product" },
+            { key: "category_name", label: "Category" },
+            { key: "provider_name", label: "Provider" },
+            { key: "price", label: "Price" },
+            { key: "price_currency", label: "Currency" },
+            { key: "sku", label: "SKU" },
+            { key: "warranty_months", label: "Warranty (months)" },
+            { key: "in_stock", label: "In Stock" },
+            { key: "avg_rating", label: "Avg Rating" },
+            { key: "review_count", label: "Reviews" },
+            listColumn("certifications", "Certifications"),
+            listColumn("provider_counties", "Provider Counties"),
+            { key: "datasheet_url", label: "Datasheet URL" },
+          ]}
+          title="Marketplace Products"
+          filename="marketplace"
+          subtitle={`Filters — category: ${filters.category ?? "all"}, county: ${filters.county ?? "any"}, search: "${filters.search || "—"}"`}
+        />
       </div>
 
       {/* Filters */}

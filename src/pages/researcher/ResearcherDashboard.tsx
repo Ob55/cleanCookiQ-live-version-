@@ -15,6 +15,8 @@ import {
 import { toast } from "sonner";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
+import { useMyActorCode } from "@/hooks/useMyActorCode";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood",
@@ -156,16 +158,37 @@ export default function ResearcherDashboard() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-display font-bold">Research Dashboard</h1>
+          <ResearcherCodeChip />
           <p className="text-sm text-muted-foreground">
             {hasPrimeAccess
               ? "Browse institutions across Kenya ready for clean cooking transition."
               : "Request prime access to unlock institution data."}
           </p>
         </div>
-        <Button onClick={() => setReportOpen(true)} variant="outline" className="flex items-center gap-2 shrink-0">
-          <Send className="h-4 w-4" />
-          Send Report
-        </Button>
+        <div className="flex gap-2 shrink-0">
+          {hasPrimeAccess && (
+            <DownloadReportButton
+              rows={filtered}
+              columns={[
+                { key: "name", label: "Institution" },
+                { key: "county", label: "County" },
+                { key: "ownership_type", label: "Ownership" },
+                { key: "current_fuel", label: "Current Fuel", format: (r: any) => FUEL_LABELS[r.current_fuel] ?? r.current_fuel ?? "" },
+                { key: "number_of_students", label: "Students" },
+                { key: "meals_per_day", label: "Meals/Day" },
+                { key: "assessment_score", label: "Readiness Score" },
+                { key: "assessment_category", label: "Readiness" },
+              ]}
+              title="Researcher — Institutions"
+              filename="researcher-institutions"
+              subtitle={searchTerm ? `Search: "${searchTerm}"` : undefined}
+            />
+          )}
+          <Button onClick={() => setReportOpen(true)} variant="outline" className="flex items-center gap-2">
+            <Send className="h-4 w-4" />
+            Send Report
+          </Button>
+        </div>
       </div>
 
       {/* Researcher identity card */}
@@ -353,5 +376,15 @@ export default function ResearcherDashboard() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function ResearcherCodeChip() {
+  const { data: code } = useMyActorCode();
+  if (!code) return null;
+  return (
+    <Badge variant="outline" className="font-mono text-xs mt-1" title="Your researcher code">
+      {code}
+    </Badge>
   );
 }

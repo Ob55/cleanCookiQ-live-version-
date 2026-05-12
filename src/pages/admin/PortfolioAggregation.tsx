@@ -12,6 +12,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, Layers, Plus, Building2, Leaf, DollarSign, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 
 interface Portfolio {
   id: string;
@@ -128,16 +129,38 @@ export default function PortfolioAggregation() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-2xl font-display font-bold flex items-center gap-2">
             <Layers className="h-6 w-6 text-primary" /> Portfolio Aggregation
           </h1>
           <p className="text-sm text-muted-foreground">Group institutions into transition portfolios</p>
         </div>
-        <Button className="bg-accent text-accent-foreground hover:bg-amber-light" onClick={openCreate}>
-          <Plus className="h-4 w-4 mr-2" /> Create Portfolio
-        </Button>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={(portfolios ?? []).map(p => ({
+              name: p.name,
+              description: p.description ?? "",
+              institutions_count: p.institution_ids?.length ?? 0,
+              total_annual_savings_ksh: getPortfolioInstitutions(p.institution_ids).reduce((s, i: any) => s + (Number(i.annual_savings_ksh) || 0), 0),
+              total_co2_reduction_tonnes_pa: getPortfolioInstitutions(p.institution_ids).reduce((s, i: any) => s + (Number(i.co2_reduction_tonnes_pa) || 0), 0),
+              created_at: p.created_at,
+            }))}
+            columns={[
+              { key: "name", label: "Portfolio" },
+              { key: "description", label: "Description" },
+              { key: "institutions_count", label: "Institutions" },
+              { key: "total_annual_savings_ksh", label: "Total Annual Savings (KSh)" },
+              { key: "total_co2_reduction_tonnes_pa", label: "Total CO₂ Reduction (t/yr)" },
+              { key: "created_at", label: "Created" },
+            ]}
+            title="Portfolio Aggregation"
+            filename="portfolios"
+          />
+          <Button className="bg-accent text-accent-foreground hover:bg-amber-light" onClick={openCreate}>
+            <Plus className="h-4 w-4 mr-2" /> Create Portfolio
+          </Button>
+        </div>
       </div>
 
       {/* Create / Edit dialog */}

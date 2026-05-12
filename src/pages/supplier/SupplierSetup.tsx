@@ -44,15 +44,18 @@ export default function SupplierSetup() {
         .update({ organisation_id: org.id })
         .eq("user_id", user.id);
 
-      // Create provider record
-      const { error: provErr } = await supabase.from("providers").insert({
+      // Create provider record — the DB trigger assigns provider_code on insert.
+      const { data: newProvider, error: provErr } = await supabase.from("providers").insert({
         name: companyName.trim(),
         organisation_id: org.id,
         contact_email: contactEmail || null,
         contact_phone: contactPhone || null,
         contact_person: user.user_metadata?.full_name || null,
-      });
+      })
+        .select("provider_code")
+        .single();
       if (provErr) throw provErr;
+      const assignedCode = newProvider?.provider_code ?? null;
 
       await refreshProfile();
 
@@ -65,11 +68,19 @@ export default function SupplierSetup() {
           html: emailSupplierWelcome(
             user.user_metadata?.full_name || "",
             companyName.trim(),
+            assignedCode,
           ),
         });
       }
 
-      toast.success("Company setup complete!");
+      if (assignedCode) {
+        toast.success(`Company setup complete! Your code: ${assignedCode}`, {
+          description: "Save this code — quote it in any email or support ticket so we can find your record instantly.",
+          duration: 10000,
+        });
+      } else {
+        toast.success("Company setup complete!");
+      }
       setTimeout(() => navigate("/supplier/dashboard"), 100);
     } catch (err: any) {
       toast.error(err.message || "Failed to save");

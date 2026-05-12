@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { FolderKanban, Loader2, Plus, FileText, CheckCircle, XCircle } from "lucide-react";
 import { useState } from "react";
+import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
 
 const programmeStatusColors: Record<string, string> = {
   planning: "bg-muted text-muted-foreground",
@@ -130,15 +131,29 @@ export default function ProgramManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-2xl font-display font-bold flex items-center gap-2">
             <FolderKanban className="h-6 w-6 text-primary" /> Program Management
           </h1>
           <p className="text-sm text-muted-foreground">Manage programmes, procurement RFQs, and provider responses</p>
         </div>
-        <Dialog open={showAddProgramme} onOpenChange={setShowAddProgramme}>
-          <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-2" /> New Programme</Button></DialogTrigger>
+        <div className="flex gap-2">
+          <DownloadReportButton
+            rows={programmes ?? []}
+            columns={[
+              { key: "name", label: "Programme" },
+              { key: "description", label: "Description" },
+              { key: "status", label: "Status" },
+              { key: "target_institution_count", label: "Target Institutions" },
+              { key: "total_budget_ksh", label: "Budget (KSh)" },
+              dateColumn("created_at", "Created"),
+            ]}
+            title="Programmes"
+            filename="programmes"
+          />
+          <Dialog open={showAddProgramme} onOpenChange={setShowAddProgramme}>
+            <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-2" /> New Programme</Button></DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>Create Programme</DialogTitle></DialogHeader>
             <div className="space-y-3">
@@ -153,7 +168,8 @@ export default function ProgramManagement() {
               </Button>
             </div>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
