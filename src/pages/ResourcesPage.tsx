@@ -15,7 +15,7 @@ import {
   type ResourceType,
 } from "@/lib/knowledge";
 import { useAuth } from "@/contexts/AuthContext";
-import { DownloadReportButton, listColumn, dateColumn } from "@/components/admin/DownloadReportButton";
+import { DownloadReportButton, listColumn, dateColumn, filterSubtitle } from "@/components/admin/DownloadReportButton";
 
 const TYPES: ResourceType[] = [
   "guide", "standard", "template", "report", "case_study",
@@ -69,7 +69,7 @@ export default function ResourcesPage() {
           ]}
           title="Resource Library"
           filename="resources"
-          subtitle={`Filters — type: ${type || "all"}, search: "${search || "—"}"`}
+          subtitle={filterSubtitle({ type, search })}
         />
       </div>
 

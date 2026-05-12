@@ -36,7 +36,7 @@ const NAV_GROUPS: Array<NavItem | NavGroup> = [
     label: "Insights",
     items: [
       { label: "Intelligence", href: "/intelligence" },
-      { label: "Marketing Analysis", href: "/marketing" },
+      { label: "Market Insights", href: "/marketing" },
       { label: "Policy Library", href: "/policy" },
     ],
   },
@@ -69,9 +69,9 @@ function NavGroupDropdown({
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => setOpen(false)}
           className={cn(
-            "inline-flex items-center gap-1 h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary",
-            isActive ? "text-primary" : "text-muted-foreground",
-            open && "text-primary",
+            "inline-flex items-center gap-1 h-9 px-4 rounded-full text-sm font-medium transition-colors hover:bg-primary/5 hover:text-primary",
+            isActive ? "text-primary bg-primary/5" : "text-foreground/70",
+            open && "text-primary bg-primary/5",
           )}
         >
           {group.label}
@@ -91,8 +91,8 @@ function NavGroupDropdown({
             to={item.href ?? "#"}
             onClick={() => setOpen(false)}
             className={cn(
-              "block select-none rounded-md px-3 py-2 text-sm leading-none transition-colors hover:bg-accent hover:text-accent-foreground",
-              isActiveItem(item.href) && "bg-accent text-accent-foreground",
+              "block select-none rounded-md px-3 py-2 text-sm leading-none transition-colors hover:bg-primary/10 hover:text-primary",
+              isActiveItem(item.href) && "bg-primary/10 text-primary font-medium",
             )}
           >
             {item.label}
@@ -120,8 +120,8 @@ export default function PublicLayout() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-lg">
-        <div className="container flex h-16 items-center justify-between">
+      <header className="sticky top-3 z-50 mx-3 md:mx-6 mt-3 rounded-2xl border border-border/60 bg-background/85 backdrop-blur-lg shadow-lg shadow-foreground/5">
+        <div className="px-4 md:px-6 flex h-14 items-center justify-between gap-4">
           <Link to="/" className="flex items-center gap-2">
             <img src={cleancookIqLogo} alt="CleanCookIQ logo" className="h-8 w-8 rounded-lg object-contain" />
             <span className="font-display font-bold text-lg text-foreground">CleanCookIQ</span>
@@ -143,8 +143,8 @@ export default function PublicLayout() {
                   key={entry.label}
                   to={entry.href ?? "#"}
                   className={cn(
-                    "inline-flex items-center h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary",
-                    isActiveItem(entry.href) ? "text-primary" : "text-muted-foreground",
+                    "inline-flex items-center h-9 px-4 rounded-full text-sm font-medium transition-colors hover:bg-primary/5 hover:text-primary",
+                    isActiveItem(entry.href) ? "text-primary bg-primary/5" : "text-foreground/70",
                   )}
                 >
                   {entry.label}
@@ -155,22 +155,27 @@ export default function PublicLayout() {
 
           <div className="hidden md:flex items-center gap-2">
             <Link to="/book-demo">
-              <Button variant="ghost" size="sm">Book a Demo</Button>
+              <Button variant="ghost" size="sm" className="rounded-full">Book a Demo</Button>
             </Link>
             {user ? (
               <>
                 {isAdmin && (
                   <Link to="/admin/pipeline">
-                    <Button variant="ghost" size="sm">Admin</Button>
+                    <Button variant="ghost" size="sm" className="rounded-full">Admin</Button>
                   </Link>
                 )}
-                <Button variant="ghost" size="sm" onClick={handleSignOut}>Sign Out</Button>
+                <Button variant="ghost" size="sm" className="rounded-full" onClick={handleSignOut}>Sign Out</Button>
               </>
             ) : (
               <>
-                <Link to="/auth/login"><Button variant="ghost" size="sm">Log in</Button></Link>
+                <Link to="/auth/login"><Button variant="ghost" size="sm" className="rounded-full">Log in</Button></Link>
                 <Link to="/auth/register">
-                  <Button size="sm" className="bg-accent text-accent-foreground hover:bg-amber-light">Join the Platform</Button>
+                  <Button
+                    size="sm"
+                    className="rounded-full bg-gradient-to-r from-accent to-amber-light text-accent-foreground shadow-sm hover:from-amber-light hover:to-accent hover:shadow-md transition-all"
+                  >
+                    Join the Platform
+                  </Button>
                 </Link>
               </>
             )}
@@ -183,7 +188,7 @@ export default function PublicLayout() {
 
         {/* Mobile nav: groups become collapsible sections */}
         {mobileOpen && (
-          <div className="md:hidden border-t border-border bg-background p-4 space-y-3 max-h-[calc(100vh-4rem)] overflow-y-auto">
+          <div className="md:hidden border-t border-border/60 bg-background/95 backdrop-blur-lg rounded-b-2xl p-4 space-y-3 max-h-[calc(100vh-5rem)] overflow-y-auto">
             {NAV_GROUPS.map((entry) =>
               isGroup(entry) ? (
                 <details key={entry.label} className="group">
@@ -229,7 +234,7 @@ export default function PublicLayout() {
                 ) : (
                   <>
                     <Link to="/auth/login" className="flex-1"><Button variant="outline" size="sm" className="w-full">Log in</Button></Link>
-                    <Link to="/auth/register" className="flex-1"><Button size="sm" className="w-full bg-accent text-accent-foreground hover:bg-amber-light">Join</Button></Link>
+                    <Link to="/auth/register" className="flex-1"><Button size="sm" className="w-full rounded-full bg-gradient-to-r from-accent to-amber-light text-accent-foreground">Join</Button></Link>
                   </>
                 )}
               </div>

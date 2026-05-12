@@ -101,7 +101,7 @@ export default function HomePage() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative min-h-[85vh] flex items-center overflow-hidden">
+      <section className="relative min-h-[85vh] flex items-center overflow-hidden -mt-[68px] pt-[68px]">
         <div className="absolute inset-0">
           <img src={kitchenTransitionBg} alt="Institutional kitchen transitioning to clean cooking equipment" className="w-full h-full object-cover" width={1920} height={1080} />
           <div className="absolute inset-0 bg-gradient-to-r from-foreground/95 via-foreground/85 to-foreground/50" />

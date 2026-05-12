@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { GraduationCap, Loader2, Search, Building2, MapPin, Calendar, CheckCircle } from "lucide-react";
 import { useState } from "react";
-import { DownloadReportButton, listColumn, dateColumn } from "@/components/admin/DownloadReportButton";
+import { DownloadReportButton, listColumn, dateColumn, filterSubtitle } from "@/components/admin/DownloadReportButton";
 import { institutionLabel } from "@/lib/institutionDisplay";
 
 const expertiseLabels: Record<string, string> = {
@@ -125,7 +125,7 @@ export default function TADashboard() {
           ]}
           title="TA Dashboard"
           filename="ta-institutions"
-          subtitle={`Filters — search: "${search || "—"}", expertise: ${expertiseFilter}`}
+          subtitle={filterSubtitle({ search, expertise: expertiseFilter })}
         />
       </div>
 

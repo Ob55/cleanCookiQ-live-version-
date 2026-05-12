@@ -14,7 +14,7 @@ import { Factory, Check, X, Loader2, Plus, Search, Star, Eye, FileText, Pencil, 
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { DownloadReportButton, dateColumn, listColumn } from "@/components/admin/DownloadReportButton";
+import { DownloadReportButton, dateColumn, listColumn, filterSubtitle } from "@/components/admin/DownloadReportButton";
 
 const categoryLabels: Record<string, string> = {
   equipment_provider: "Equipment Provider",
@@ -163,7 +163,7 @@ export default function ProviderManagement() {
             ]}
             title="Providers"
             filename="providers"
-            subtitle={`Filters — verified: ${filterVerified}, category: ${filterCategory}`}
+            subtitle={filterSubtitle({ verified: filterVerified, category: filterCategory })}
           />
           <Dialog open={showAdd} onOpenChange={setShowAdd}>
             <DialogTrigger asChild>

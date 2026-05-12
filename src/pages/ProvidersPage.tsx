@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Factory, Search, CheckCircle, Star, MapPin } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DownloadReportButton, listColumn } from "@/components/admin/DownloadReportButton";
+import { DownloadReportButton, listColumn, filterSubtitle } from "@/components/admin/DownloadReportButton";
 
 export default function ProvidersPage() {
   const [search, setSearch] = useState("");
@@ -35,14 +35,17 @@ export default function ProvidersPage() {
   return (
     <div className="min-h-[80vh] bg-background py-12">
       <div className="container">
-        <div className="text-center mb-10 relative">
-          <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-            <Factory className="h-7 w-7 text-primary" />
+        <div className="flex items-start justify-between gap-3 flex-wrap mb-10">
+          <div className="flex items-center gap-3">
+            <div className="h-11 w-11 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+              <Factory className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-display font-bold">Provider Directory</h1>
+              <p className="text-muted-foreground max-w-2xl mt-1">Vetted suppliers and service providers across all clean cooking categories.</p>
+            </div>
           </div>
-          <h1 className="text-3xl font-display font-bold mb-2">Provider Directory</h1>
-          <p className="text-muted-foreground max-w-lg mx-auto">Vetted suppliers and service providers across all clean cooking categories.</p>
-          <div className="mt-4 flex justify-center">
-            <DownloadReportButton
+          <DownloadReportButton
               rows={filtered ?? []}
               columns={[
                 { key: "name", label: "Provider" },
@@ -59,9 +62,8 @@ export default function ProvidersPage() {
               ]}
               title="Provider Directory"
               filename="provider-directory"
-              subtitle={`Filters — county: ${countyFilter}, technology: ${techFilter}, search: "${search || "—"}"`}
+              subtitle={filterSubtitle({ county: countyFilter, technology: techFilter, search })}
             />
-          </div>
         </div>
 
         {/* Filters */}

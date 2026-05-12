@@ -12,7 +12,7 @@ import { Building2, Plus, Search, Filter, MapPin, Loader2, Eye, Pencil, Trash2, 
 import { Link } from "react-router-dom";
 import { TRANSITION_TARGET_LABELS } from "@/components/institution/TransitionTarget";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
+import { DownloadReportButton, dateColumn, filterSubtitle } from "@/components/admin/DownloadReportButton";
 
 const counties = ["Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret", "Nyeri", "Machakos", "Kiambu", "Uasin Gishu", "Kakamega", "Bungoma", "Kilifi", "Garissa", "Turkana", "Marsabit"];
 const institutionTypes = ["school", "hospital", "prison", "factory", "hotel", "restaurant", "other"];
@@ -114,7 +114,7 @@ export default function InstitutionManagement() {
             ]}
             title="Institutions"
             filename="institutions"
-            subtitle={`Filters — county: ${countyFilter}, type: ${typeFilter}, stage: ${stageFilter}`}
+            subtitle={filterSubtitle({ county: countyFilter, type: typeFilter, stage: stageFilter })}
           />
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>

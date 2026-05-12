@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MapPin, Building2, Users, Search, X } from "lucide-react";
-import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
+import { DownloadReportButton, filterSubtitle } from "@/components/admin/DownloadReportButton";
 
 export default function CountiesIndexPage() {
   const { data, isLoading, error } = useCountyIntelligence();
@@ -73,7 +73,7 @@ export default function CountiesIndexPage() {
           ]}
           title="County Intelligence"
           filename="counties"
-          subtitle={`Filters — region: ${region || "all"}, fuel: ${fuel || "any"}, search: "${search || "—"}"`}
+          subtitle={filterSubtitle({ region, fuel, search })}
         />
       </div>
 

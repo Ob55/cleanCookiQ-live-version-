@@ -7,7 +7,7 @@ import { Loader2, Flame, Users, Building2, GraduationCap, Stethoscope, ShieldChe
 import { useState } from "react";
 import { useOnboardingGate } from "@/hooks/useOnboardingGate";
 import { useMyActorCode } from "@/hooks/useMyActorCode";
-import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
+import { DownloadReportButton, filterSubtitle } from "@/components/admin/DownloadReportButton";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood",
@@ -133,7 +133,7 @@ export default function FunderDashboard() {
           ]}
           title="Funder Institution Overview"
           filename="funder-institutions"
-          subtitle={`Filters — fuel: ${fuelFilter}, type: ${typeFilter}`}
+          subtitle={filterSubtitle({ fuel: fuelFilter, type: typeFilter })}
         />
       </div>
 
