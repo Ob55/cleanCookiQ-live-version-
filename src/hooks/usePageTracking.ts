@@ -11,16 +11,19 @@ import { sbAny } from "@/lib/sbAny";
 
 const SESSION_KEY = "ccq_session_id";
 
+// Persisted in localStorage (not sessionStorage) so the same anonymous
+// visitor is counted as one unique person across browser sessions.
+// Random v4 UUID — no PII, opaque to anyone reading it.
 function getSessionId(): string {
   try {
-    let id = sessionStorage.getItem(SESSION_KEY);
+    let id = localStorage.getItem(SESSION_KEY);
     if (!id) {
       id = crypto.randomUUID();
-      sessionStorage.setItem(SESSION_KEY, id);
+      localStorage.setItem(SESSION_KEY, id);
     }
     return id;
   } catch {
-    // sessionStorage can throw in private mode / iframes — fall back to a per-load uuid.
+    // localStorage can throw in private mode / iframes — fall back to a per-load uuid.
     return crypto.randomUUID();
   }
 }
