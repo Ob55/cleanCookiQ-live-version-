@@ -18,7 +18,7 @@ export default function ResearcherLayout() {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate("/auth/login");
+    navigate("/");
   };
 
   // Pending researchers must wait for admin approval

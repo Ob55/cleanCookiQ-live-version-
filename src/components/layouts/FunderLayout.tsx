@@ -13,7 +13,7 @@ export default function FunderLayout() {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate("/auth/login");
+    navigate("/");
   };
 
   const initials = profile?.full_name
