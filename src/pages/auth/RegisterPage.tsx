@@ -153,25 +153,25 @@ export default function RegisterPage() {
       if (isFunder) {
         await sendEmail({
           to: email,
-          subject: "Welcome to cleancookIQ as a Funder",
+          subject: "Welcome to CleanCookIQ as a Funder",
           html: emailFunderWelcome(fullName, orgName, assignedOrgCode),
         });
       } else if (orgType === "csr") {
         await sendEmail({
           to: email,
-          subject: "Welcome to cleancookIQ as a CSR Partner",
+          subject: "Welcome to CleanCookIQ as a CSR Partner",
           html: emailCSRWelcome(fullName, orgName, assignedOrgCode),
         });
       } else if (orgType === "researcher") {
         await sendEmail({
           to: email,
-          subject: "Welcome to cleancookIQ as a Research Partner",
+          subject: "Welcome to CleanCookIQ as a Research Partner",
           html: emailResearcherWelcome(fullName, orgName, assignedOrgCode),
         });
       } else if (isOther) {
         await sendEmail({
           to: email,
-          subject: "Thank you for your interest in cleancookIQ",
+          subject: "Thank you for your interest in CleanCookIQ",
           html: emailOtherInterest(fullName, orgName),
         });
       }
@@ -194,8 +194,8 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <img src={cleancookIqLogo} alt="cleancookIQ" className="h-12 w-auto" />
-            <span className="font-display font-bold text-xl">cleancookIQ</span>
+            <img src={cleancookIqLogo} alt="CleanCookIQ" className="h-12 w-auto" />
+            <span className="font-display font-bold text-xl">CleanCookIQ</span>
           </Link>
           <h1 className="text-2xl font-display font-bold">Create your account</h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -334,7 +334,7 @@ export default function RegisterPage() {
               {isSupplier && (
                 <div className="p-4 rounded-lg border border-border bg-muted/30">
                   <p className="text-xs text-muted-foreground mb-3">
-                    By registering as a Supplier/Provider, you agree to cleancookIQ's terms of service, including compliance with quality standards, timely delivery of products and services, and adherence to our partner code of conduct. You acknowledge that your profile and product listings will be visible to institutions and administrators on the platform.
+                    By registering as a Supplier/Provider, you agree to CleanCookIQ's terms of service, including compliance with quality standards, timely delivery of products and services, and adherence to our partner code of conduct. You acknowledge that your profile and product listings will be visible to institutions and administrators on the platform.
                   </p>
                   <div className="flex items-center gap-2">
                     <Checkbox

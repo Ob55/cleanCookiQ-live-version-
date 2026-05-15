@@ -113,11 +113,11 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <img src={cleancookIqLogo} alt="cleancookIQ" className="h-12 w-auto" />
-            <span className="font-display font-bold text-xl">cleancookIQ</span>
+            <img src={cleancookIqLogo} alt="CleanCookIQ" className="h-12 w-auto" />
+            <span className="font-display font-bold text-xl">CleanCookIQ</span>
           </Link>
           <h1 className="text-2xl font-display font-bold">Welcome back</h1>
-          <p className="text-sm text-muted-foreground mt-1">Log in to your cleancookIQ account</p>
+          <p className="text-sm text-muted-foreground mt-1">Log in to your CleanCookIQ account</p>
         </div>
 
         <div className="bg-card border border-border rounded-xl p-6 shadow-card">

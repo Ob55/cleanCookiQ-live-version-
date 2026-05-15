@@ -52,11 +52,11 @@ export default function MarketingAnalysis() {
     <div>
       {/* Hero */}
       <section className="py-20 lg:py-28 bg-gradient-hero text-primary-foreground">
-        <div className="container text-center">
+        <div className="container">
           <h1 className="text-3xl md:text-5xl font-display font-bold mb-4">
             Market Insights
           </h1>
-          <p className="text-primary-foreground/80 max-w-2xl mx-auto text-lg">
+          <p className="text-primary-foreground/80 max-w-2xl text-lg">
             Clear, data-backed insights into Kenya's clean cooking sector.
           </p>
         </div>

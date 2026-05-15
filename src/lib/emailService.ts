@@ -18,6 +18,21 @@ export async function sendEmail(params: SendEmailParams): Promise<void> {
   }
 }
 
+/**
+ * Escape user-supplied text before embedding in an HTML email body.
+ * Without this a malicious profile name like `<script>...</script>`
+ * (or an admin reply containing markup) would render in the recipient's
+ * email client. Recipients receive emails via the SECURITY-hardened
+ * send-email edge function which restricts to platform users only,
+ * so this is the last line of defence for cross-user XSS.
+ */
+function esc(s: string | null | undefined): string {
+  if (s === null || s === undefined) return "";
+  return String(s).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!),
+  );
+}
+
 const BASE_STYLE = `
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   max-width: 560px; margin: 0 auto; background: #ffffff;
@@ -38,8 +53,8 @@ function layout(body: string): string {
 <div style="${BASE_STYLE}">
   <div style="${HEADER_STYLE}">
     <img src="https://bnbhattryqbterblybzw.supabase.co/storage/v1/object/public/assets/logo.png"
-      alt="cleancookIQ" height="36" style="display:inline-block;" onerror="this.style.display='none'" />
-    <h1 style="color:#ffffff;margin:8px 0 0;font-size:20px;font-weight:700;">cleancookIQ</h1>
+      alt="CleanCookIQ" height="36" style="display:inline-block;" onerror="this.style.display='none'" />
+    <h1 style="color:#ffffff;margin:8px 0 0;font-size:20px;font-weight:700;">CleanCookIQ</h1>
   </div>
   <div style="${BODY_STYLE}">${body}</div>
   <div style="${FOOTER_STYLE}">
@@ -52,9 +67,9 @@ function layout(body: string): string {
 export function emailAccountApproved(name: string, dashboardUrl: string): string {
   return layout(`
     <h2 style="color:#1a3c2e;margin-top:0;">Your Account Has Been Approved!</h2>
-    <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
+    <p style="color:#374151;line-height:1.6;">Hi ${esc(name || "there")},</p>
     <p style="color:#374151;line-height:1.6;">
-      Great news! Your cleancookIQ account has been reviewed and <strong>approved</strong>.
+      Great news! Your CleanCookIQ account has been reviewed and <strong>approved</strong>.
       You can now log in and access your dashboard to get started.
     </p>
     <p style="text-align:center;">
@@ -69,9 +84,9 @@ export function emailAccountApproved(name: string, dashboardUrl: string): string
 export function emailAccountRejected(name: string): string {
   return layout(`
     <h2 style="color:#1a3c2e;margin-top:0;">Account Application Update</h2>
-    <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
+    <p style="color:#374151;line-height:1.6;">Hi ${esc(name || "there")},</p>
     <p style="color:#374151;line-height:1.6;">
-      Thank you for your interest in cleancookIQ. After reviewing your application,
+      Thank you for your interest in CleanCookIQ. After reviewing your application,
       we're unable to approve your account at this time.
     </p>
     <p style="color:#374151;line-height:1.6;">
@@ -99,7 +114,7 @@ function codeCallout(label: string, code?: string | null): string {
   return `
     <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:16px;margin:20px 0;">
       <p style="color:#1a3c2e;margin:0 0 4px 0;font-size:13px;font-weight:600;">Your ${label} code</p>
-      <p style="color:#1a3c2e;margin:0;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:18px;font-weight:700;letter-spacing:0.5px;">${code}</p>
+      <p style="color:#1a3c2e;margin:0;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:18px;font-weight:700;letter-spacing:0.5px;">${esc(code)}</p>
       <p style="color:#4b5563;margin:8px 0 0 0;font-size:12px;">Quote this code in any email or support ticket so we can find your record instantly.</p>
     </div>`;
 }
@@ -119,10 +134,10 @@ export function emailInstitutionWelcome(
 ): string {
   const fuelLabel = currentFuel ? (FUEL_DISPLAY[currentFuel] || currentFuel) : "current fuel";
   return layout(`
-    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to cleancookIQ</h2>
-    <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
+    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to CleanCookIQ</h2>
+    <p style="color:#374151;line-height:1.6;">Hi ${esc(name || "there")},</p>
     <p style="color:#374151;line-height:1.6;">
-      We see you registered <strong>${institutionName}</strong> on cleancookIQ. Your <strong>${fuelLabel}</strong> usage suggests
+      We see you registered <strong>${esc(institutionName)}</strong> on CleanCookIQ. Your <strong>${esc(fuelLabel)}</strong> usage suggests
       real opportunities to cut fuel costs per meal and reduce CO₂ emissions.
       We help institutions move from registration to financed installation.
     </p>
@@ -143,10 +158,10 @@ export function emailSupplierWelcome(
   providerCode?: string | null,
 ): string {
   return layout(`
-    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to cleancookIQ</h2>
-    <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
+    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to CleanCookIQ</h2>
+    <p style="color:#374151;line-height:1.6;">Hi ${esc(name || "there")},</p>
     <p style="color:#374151;line-height:1.6;">
-      <strong>${companyName}</strong> has been registered as a supplier. Once your
+      <strong>${esc(companyName)}</strong> has been registered as a supplier. Once your
       Clean Stove Compliance Checklist (CSCC) is complete you'll appear in the marketplace
       and can submit proposals against open institution opportunities.
     </p>
@@ -167,10 +182,10 @@ export function emailFunderWelcome(
   orgCode?: string | null,
 ): string {
   return layout(`
-    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to cleancookIQ</h2>
-    <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
+    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to CleanCookIQ</h2>
+    <p style="color:#374151;line-height:1.6;">Hi ${esc(name || "there")},</p>
     <p style="color:#374151;line-height:1.6;">
-      <strong>${orgName}</strong> is now set up as a funder on the platform. You can browse
+      <strong>${esc(orgName)}</strong> is now set up as a funder on the platform. You can browse
       curated deals matched to your preferences, track your committed and disbursed capital,
       and see attributable impact on your portfolio dashboard.
     </p>
@@ -191,10 +206,10 @@ export function emailCSRWelcome(
   orgCode?: string | null,
 ): string {
   return layout(`
-    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to cleancookIQ</h2>
-    <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
+    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to CleanCookIQ</h2>
+    <p style="color:#374151;line-height:1.6;">Hi ${esc(name || "there")},</p>
     <p style="color:#374151;line-height:1.6;">
-      <strong>${orgName}</strong> is now set up as a CSR partner. You can sponsor
+      <strong>${esc(orgName)}</strong> is now set up as a CSR partner. You can sponsor
       institution transitions, track your contribution, and receive a quarterly impact
       attribution report.
     </p>
@@ -215,10 +230,10 @@ export function emailResearcherWelcome(
   orgCode?: string | null,
 ): string {
   return layout(`
-    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to cleancookIQ</h2>
-    <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
+    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to CleanCookIQ</h2>
+    <p style="color:#374151;line-height:1.6;">Hi ${esc(name || "there")},</p>
     <p style="color:#374151;line-height:1.6;">
-      <strong>${orgName}</strong> has been registered as a research partner. You have access
+      <strong>${esc(orgName)}</strong> has been registered as a research partner. You have access
       to the public data layer — county metrics, fuel prices, supplier compliance tiers,
       and aggregated impact figures — with citations preserved at every step.
     </p>
@@ -239,10 +254,10 @@ export function emailTAProviderWelcome(
   taProviderCode?: string | null,
 ): string {
   return layout(`
-    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to cleancookIQ</h2>
-    <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
+    <h2 style="color:#1a3c2e;margin-top:0;">Welcome to CleanCookIQ</h2>
+    <p style="color:#374151;line-height:1.6;">Hi ${esc(name || "there")},</p>
     <p style="color:#374151;line-height:1.6;">
-      <strong>${orgName}</strong> is now listed as a TA provider. Institutions can request
+      <strong>${esc(orgName)}</strong> is now listed as a TA provider. Institutions can request
       technical assistance in their onboarding flow and will be matched to your TA types
       and resource windows.
     </p>
@@ -260,9 +275,9 @@ export function emailTAProviderWelcome(
 export function emailOtherInterest(name: string, orgName: string): string {
   return layout(`
     <h2 style="color:#1a3c2e;margin-top:0;">Thank You for Your Interest!</h2>
-    <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
+    <p style="color:#374151;line-height:1.6;">Hi ${esc(name || "there")},</p>
     <p style="color:#374151;line-height:1.6;">
-      We have seen that <strong>${orgName || "your organisation"}</strong> has shown interest in cleancookIQ.
+      We have seen that <strong>${esc(orgName || "your organisation")}</strong> has shown interest in CleanCookIQ.
       Kindly be patient as we prepare a dashboard for you.
     </p>
     <p style="color:#374151;line-height:1.6;">
@@ -278,10 +293,10 @@ export function emailOtherInterest(name: string, orgName: string): string {
 export function emailRoleAssigned(name: string, roleLabel: string, dashboardUrl: string): string {
   return layout(`
     <h2 style="color:#1a3c2e;margin-top:0;">Your Account Has Been Approved!</h2>
-    <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
+    <p style="color:#374151;line-height:1.6;">Hi ${esc(name || "there")},</p>
     <p style="color:#374151;line-height:1.6;">
-      Great news! Your cleancookIQ account has been reviewed and approved as a
-      <strong>${roleLabel}</strong>.
+      Great news! Your CleanCookIQ account has been reviewed and approved as a
+      <strong>${esc(roleLabel)}</strong>.
     </p>
     <p style="color:#374151;line-height:1.6;">
       You can now log in and complete your setup to access your dashboard.
@@ -305,9 +320,9 @@ export function emailSignAgreement(orgName: string, docType: "mou" | "ipa"): str
     : `${import.meta.env.VITE_APP_URL || "https://cleancookiq.com"}/supplier/mou`;
   return layout(`
     <h2 style="color:#1a3c2e;margin-top:0;">Action Required: Please Sign Your ${docType.toUpperCase()}</h2>
-    <p style="color:#374151;line-height:1.6;">Dear ${orgName || "Partner"},</p>
+    <p style="color:#374151;line-height:1.6;">Dear ${esc(orgName || "Partner")},</p>
     <p style="color:#374151;line-height:1.6;">
-      Kindly sign your <strong>${docLabel}</strong> for further processing of your partnership with cleancookIQ.
+      Kindly sign your <strong>${docLabel}</strong> for further processing of your partnership with CleanCookIQ.
     </p>
     <p style="color:#374151;line-height:1.6;">
       Please log in to your portal, download the document, sign it, and upload the signed copy.
@@ -325,16 +340,16 @@ export function emailSignAgreement(orgName: string, docType: "mou" | "ipa"): str
 export function emailDemoConfirmation(name: string): string {
   return layout(`
     <h2 style="color:#1a3c2e;margin-top:0;">We received your demo request</h2>
-    <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
+    <p style="color:#374151;line-height:1.6;">Hi ${esc(name || "there")},</p>
     <p style="color:#374151;line-height:1.6;">
-      Thanks for your interest in cleancookIQ! We've received your demo request and someone
+      Thanks for your interest in CleanCookIQ! We've received your demo request and someone
       from our team will reach out within 24 hours to schedule a time that works for you.
     </p>
     <p style="color:#374151;line-height:1.6;">
       In the meantime, if you have any urgent questions, feel free to reply directly to this email.
     </p>
     <p style="color:#374151;line-height:1.6;margin-top:24px;">
-      Talk soon,<br/>The cleancookIQ Team
+      Talk soon,<br/>The CleanCookIQ Team
     </p>
   `);
 }
@@ -347,28 +362,28 @@ export function emailDemoNotification(
 ): string {
   return layout(`
     <h2 style="color:#1a3c2e;margin-top:0;">🔔 New demo request</h2>
-    <p style="color:#374151;line-height:1.6;">A new demo has been requested on cleancookIQ.</p>
+    <p style="color:#374151;line-height:1.6;">A new demo has been requested on CleanCookIQ.</p>
     <p style="color:#374151;line-height:1.6;"><strong>Requester details:</strong></p>
     <ul style="color:#374151;line-height:1.8;padding-left:20px;">
-      <li><strong>Name:</strong> ${name}</li>
-      <li><strong>Email:</strong> <a href="mailto:${email}" style="color:#2d6a4f;">${email}</a></li>
-      <li><strong>Phone:</strong> ${phone}</li>
-      <li><strong>Submitted:</strong> ${submittedAt}</li>
+      <li><strong>Name:</strong> ${esc(name)}</li>
+      <li><strong>Email:</strong> <a href="mailto:${encodeURIComponent(email)}" style="color:#2d6a4f;">${esc(email)}</a></li>
+      <li><strong>Phone:</strong> ${esc(phone)}</li>
+      <li><strong>Submitted:</strong> ${esc(submittedAt)}</li>
     </ul>
     <p style="color:#374151;line-height:1.6;">Please follow up within 24 hours.</p>
-    <p style="color:#6b7280;font-size:13px;margin-top:24px;">— cleancookIQ Platform</p>
+    <p style="color:#6b7280;font-size:13px;margin-top:24px;">— CleanCookIQ Platform</p>
   `);
 }
 
 export function emailTicketResolved(name: string, ticketTitle: string, reply: string): string {
   return layout(`
     <h2 style="color:#1a3c2e;margin-top:0;">Your Support Ticket Has Been Resolved</h2>
-    <p style="color:#374151;line-height:1.6;">Hi ${name || "there"},</p>
+    <p style="color:#374151;line-height:1.6;">Hi ${esc(name || "there")},</p>
     <p style="color:#374151;line-height:1.6;">
-      Your ticket <strong>"${ticketTitle}"</strong> has been resolved. Here's the response from our team:
+      Your ticket <strong>"${esc(ticketTitle)}"</strong> has been resolved. Here's the response from our team:
     </p>
     <div style="background:#f0fdf4;border-left:4px solid #2d6a4f;padding:16px;border-radius:0 6px 6px 0;
-      color:#374151;line-height:1.6;white-space:pre-wrap;">${reply}</div>
+      color:#374151;line-height:1.6;white-space:pre-wrap;">${esc(reply)}</div>
     <p style="color:#6b7280;font-size:13px;margin-top:24px;">
       If you need further assistance, please raise a new support ticket from your dashboard.
     </p>

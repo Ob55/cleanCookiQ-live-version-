@@ -178,6 +178,29 @@ export function DownloadReportButton<T>({
 }
 
 /**
+ * Helper: build the `subtitle` prop from a set of filter clauses.
+ * Skips clauses whose value is empty, null, "all", "any", or "—" so the
+ * report doesn't end up reading like `Filters — county: all, search: "—"`.
+ * Returns undefined when no clause is active, so the dialog stays clean.
+ */
+export function filterSubtitle(
+  clauses: Record<string, string | null | undefined>,
+): string | undefined {
+  const SKIP = new Set(["", "all", "any", "—", "-"]);
+  const active = Object.entries(clauses)
+    .map(([label, raw]) => {
+      const v = (raw ?? "").trim();
+      if (SKIP.has(v.toLowerCase())) return null;
+      return label.toLowerCase().includes("search")
+        ? `${label}: "${v}"`
+        : `${label}: ${v}`;
+    })
+    .filter((s): s is string => s !== null);
+  if (active.length === 0) return undefined;
+  return `Filters — ${active.join(", ")}`;
+}
+
+/**
  * Helper: a column whose value is the row directly (e.g. arrays of strings get joined).
  * Useful for tag-like columns. Returned as ReportColumn<any> so it composes
  * cleanly inside a heterogeneous column array.

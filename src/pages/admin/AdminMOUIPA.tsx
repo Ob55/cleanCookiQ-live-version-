@@ -205,7 +205,7 @@ export default function AdminMOUIPA() {
     if (contactEmail) {
       await sendEmail({
         to: contactEmail,
-        subject: `Please sign your ${reqType.toUpperCase()} — cleancookIQ`,
+        subject: `Please sign your ${reqType.toUpperCase()} — CleanCookIQ`,
         html: emailSignAgreement(orgName, reqType),
       });
     }

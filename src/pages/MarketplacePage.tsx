@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useMarketplaceProducts, useProductCategories } from "@/hooks/useMarketplace";
 import { useCounties } from "@/hooks/useCounties";
 import { applyMarketplaceFilters, type MarketplaceFilters, type MarketplaceProduct } from "@/lib/marketplace";
-import { DownloadReportButton, listColumn } from "@/components/admin/DownloadReportButton";
+import { DownloadReportButton, listColumn, filterSubtitle } from "@/components/admin/DownloadReportButton";
 
 export default function MarketplacePage() {
   const { data: products, isLoading: productsLoading } = useMarketplaceProducts();
@@ -52,7 +52,7 @@ export default function MarketplacePage() {
           ]}
           title="Marketplace Products"
           filename="marketplace"
-          subtitle={`Filters — category: ${filters.category ?? "all"}, county: ${filters.county ?? "any"}, search: "${filters.search || "—"}"`}
+          subtitle={filterSubtitle({ category: filters.category, county: filters.county, search: filters.search })}
         />
       </div>
 

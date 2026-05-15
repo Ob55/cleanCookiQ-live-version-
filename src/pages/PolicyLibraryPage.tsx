@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePolicies } from "@/hooks/useKnowledge";
 import { policyStatusLabel } from "@/lib/knowledge";
-import { DownloadReportButton, dateColumn, listColumn } from "@/components/admin/DownloadReportButton";
+import { DownloadReportButton, dateColumn, listColumn, filterSubtitle } from "@/components/admin/DownloadReportButton";
 
 export default function PolicyLibraryPage() {
   const { data, isLoading, error } = usePolicies();
@@ -58,7 +58,7 @@ export default function PolicyLibraryPage() {
           ]}
           title="Policy Library"
           filename="policies"
-          subtitle={`Filters — jurisdiction: ${jurisdiction || "all"}, search: "${search || "—"}"`}
+          subtitle={filterSubtitle({ jurisdiction, search })}
         />
       </div>
 

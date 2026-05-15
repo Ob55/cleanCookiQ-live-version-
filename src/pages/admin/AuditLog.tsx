@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Search, Shield, Clock } from "lucide-react";
 import { useState } from "react";
-import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
+import { DownloadReportButton, dateColumn, filterSubtitle } from "@/components/admin/DownloadReportButton";
 
 export default function AuditLog() {
   const [search, setSearch] = useState("");
@@ -68,7 +68,7 @@ export default function AuditLog() {
           ]}
           title="Audit Log"
           filename="audit-log"
-          subtitle={`Filters — search: "${search || "—"}", table: ${filterTable}`}
+          subtitle={filterSubtitle({ search, table: filterTable })}
         />
       </div>
 

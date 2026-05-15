@@ -12,6 +12,7 @@ import {
   CheckCircle2, XCircle, Banknote, Send, ShoppingCart
 } from "lucide-react";
 import TransitionProductSelector from "@/components/institution/TransitionProductSelector";
+import { institutionLabel } from "@/lib/institutionDisplay";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood", charcoal: "Charcoal", lpg: "LPG",
@@ -115,7 +116,9 @@ export default function FunderInstitutionDetail() {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
-          <h1 className="text-2xl font-display font-bold">{inst.name}</h1>
+          <h1 className="text-2xl font-display font-bold font-mono">
+            {institutionLabel({ institution_code: inst.institution_code, institution_name: inst.name })}
+          </h1>
           <div className="flex items-center gap-2 mt-1">
             <Badge variant="secondary">{inst.county}</Badge>
             <Badge variant="outline" className="capitalize">{inst.institution_type}</Badge>

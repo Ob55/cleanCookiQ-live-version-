@@ -18,7 +18,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
-import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
+import { DownloadReportButton, filterSubtitle } from "@/components/admin/DownloadReportButton";
 
 type Row = {
   county: string | null;
@@ -236,7 +236,7 @@ export default function IntelligencePage() {
               ]}
               title="Clean Cooking Intelligence"
               filename="intelligence"
-              subtitle={`Filters — county: ${countyFilter}, type: ${typeFilter}, fuel: ${fuelFilter}`}
+              subtitle={filterSubtitle({ county: countyFilter, type: typeFilter, fuel: fuelFilter })}
             />
             <Button
               variant="outline"

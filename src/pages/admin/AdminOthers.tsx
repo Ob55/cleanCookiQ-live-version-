@@ -98,16 +98,16 @@ export default function AdminOthers() {
       const orgName = profile.org_name || profile.full_name || "your organisation";
       const dashboardUrl = `${import.meta.env.VITE_APP_URL || "https://cleancookiq.com"}${setupUrl}`;
       if (profile.email) {
-        let subject = `Your cleancookIQ account has been approved as ${label}`;
+        let subject = `Your CleanCookIQ account has been approved as ${label}`;
         let html = emailRoleAssigned(name, label, dashboardUrl);
         if (newOrgType === "funder") {
-          subject = "Welcome to cleancookIQ as a Funder";
+          subject = "Welcome to CleanCookIQ as a Funder";
           html = emailFunderWelcome(name, orgName, assignedOrgCode);
         } else if (newOrgType === "csr") {
-          subject = "Welcome to cleancookIQ as a CSR Partner";
+          subject = "Welcome to CleanCookIQ as a CSR Partner";
           html = emailCSRWelcome(name, orgName, assignedOrgCode);
         } else if (newOrgType === "researcher") {
-          subject = "Welcome to cleancookIQ as a Research Partner";
+          subject = "Welcome to CleanCookIQ as a Research Partner";
           html = emailResearcherWelcome(name, orgName, assignedOrgCode);
         }
         await sendEmail({ to: profile.email, subject, html });

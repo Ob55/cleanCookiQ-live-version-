@@ -30,7 +30,7 @@ export default function SupplierOpportunities() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("opportunities")
-        .select("*, institutions(name, county)")
+        .select("*, institutions(institution_code, county)")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -75,7 +75,7 @@ export default function SupplierOpportunities() {
           columns={[
             { key: "title", label: "Title" },
             { key: "description", label: "Description" },
-            { key: "institutions", label: "Institution", format: (r: any) => r.institutions?.name ?? "" },
+            { key: "institutions", label: "Institution Code", format: (r: any) => r.institutions?.institution_code ?? "" },
             { key: "institutions", label: "County", format: (r: any) => r.institutions?.county ?? "" },
             { key: "technology_required", label: "Technology" },
             { key: "estimated_value", label: "Estimated Value (KSh)" },
@@ -104,7 +104,7 @@ export default function SupplierOpportunities() {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base">{opp.title}</CardTitle>
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <MapPin className="h-3 w-3" /> {(opp as any).institutions?.name}, {(opp as any).institutions?.county}
+                    <MapPin className="h-3 w-3" /> <span className="font-mono">{(opp as any).institutions?.institution_code ?? "—"}</span>, {(opp as any).institutions?.county}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -152,7 +152,7 @@ export default function SupplierOpportunities() {
                     <Badge className="bg-emerald-500/20 text-emerald-600">Taken</Badge>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <MapPin className="h-3 w-3" /> {(opp as any).institutions?.name}
+                    <MapPin className="h-3 w-3" /> <span className="font-mono">{(opp as any).institutions?.institution_code ?? "—"}</span>
                   </div>
                 </CardHeader>
                 <CardContent>

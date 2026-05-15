@@ -1,16 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { sbAny } from "@/lib/sbAny";
+import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2, Ticket, Send, MessageSquare, AlertTriangle, CheckCircle } from "lucide-react";
-import { sendEmail, emailTicketResolved } from "@/lib/emailService";
 import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
+import { formatDistanceToNow } from "date-fns";
 
 const statusColors: Record<string, string> = {
   open: "bg-amber-100 text-amber-700",
@@ -26,11 +27,21 @@ const priorityColors: Record<string, string> = {
   critical: "bg-red-100 text-red-700",
 };
 
+interface TicketMessage {
+  id: string;
+  ticket_id: string;
+  author_id: string | null;
+  author_role: "user" | "staff";
+  author_name: string | null;
+  body: string;
+  created_at: string;
+}
+
 export default function AdminTickets() {
+  const { user, profile } = useAuth();
   const queryClient = useQueryClient();
-  const [selectedTicket, setSelectedTicket] = useState<any>(null);
-  const [replyText, setReplyText] = useState("");
-  const [replyDialogOpen, setReplyDialogOpen] = useState(false);
+  const [activeTicket, setActiveTicket] = useState<any | null>(null);
+  const [reply, setReply] = useState("");
 
   const { data: tickets, isLoading } = useQuery({
     queryKey: ["admin-tickets"],
@@ -38,11 +49,41 @@ export default function AdminTickets() {
       const { data, error } = await supabase
         .from("support_tickets")
         .select("*")
-        .order("created_at", { ascending: false });
+        .order("updated_at", { ascending: false });
       if (error) throw error;
       return data;
     },
   });
+
+  const { data: messages = [] } = useQuery({
+    queryKey: ["admin-ticket-messages", activeTicket?.id],
+    queryFn: async () => {
+      const { data, error } = await sbAny
+        .from("ticket_messages")
+        .select("*")
+        .eq("ticket_id", activeTicket!.id)
+        .order("created_at");
+      if (error) throw error;
+      return (data ?? []) as TicketMessage[];
+    },
+    enabled: !!activeTicket,
+  });
+
+  // Realtime: refresh when the user replies.
+  useEffect(() => {
+    if (!activeTicket) return;
+    const channel = supabase
+      .channel(`admin-ticket-${activeTicket.id}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "ticket_messages", filter: `ticket_id=eq.${activeTicket.id}` },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["admin-ticket-messages", activeTicket.id] });
+        },
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [activeTicket, queryClient]);
 
   const updateStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
@@ -58,48 +99,29 @@ export default function AdminTickets() {
     onError: (e: any) => toast.error(e.message),
   });
 
-  const sendReply = useMutation({
-    mutationFn: async () => {
-      if (!selectedTicket) return;
-      // Update ticket with reply and mark resolved
-      const { error } = await supabase
-        .from("support_tickets")
-        .update({
-          admin_reply: replyText,
-          status: "resolved" as any,
-          resolved_at: new Date().toISOString(),
-        })
-        .eq("id", selectedTicket.id);
+  const postReply = useMutation({
+    mutationFn: async (opts: { resolve: boolean }) => {
+      if (!activeTicket || !reply.trim()) return;
+      const { error } = await sbAny.from("ticket_messages").insert({
+        ticket_id: activeTicket.id,
+        author_id: user!.id,
+        author_role: "staff",
+        author_name: profile?.full_name || "Support",
+        body: reply.trim(),
+      });
       if (error) throw error;
 
-      // Send in-app notification
-      if (selectedTicket.raised_by) {
-        await supabase.from("notifications").insert({
-          user_id: selectedTicket.raised_by,
-          title: "Ticket Resolved: " + selectedTicket.title,
-          body: replyText,
-        });
-      }
-
-      // Send email notification
-      if (selectedTicket.raised_by_email) {
-        await sendEmail({
-          to: selectedTicket.raised_by_email,
-          subject: `Support Ticket Resolved: ${selectedTicket.title}`,
-          html: emailTicketResolved(
-            selectedTicket.raised_by_name || "",
-            selectedTicket.title,
-            replyText,
-          ),
-        });
-      }
+      // Move ticket to in_progress on first staff reply, or resolved if requested.
+      const nextStatus = opts.resolve ? "resolved" : (activeTicket.status === "open" ? "in_progress" : activeTicket.status);
+      const update: any = { status: nextStatus };
+      if (opts.resolve) update.resolved_at = new Date().toISOString();
+      await supabase.from("support_tickets").update(update).eq("id", activeTicket.id);
     },
     onSuccess: () => {
-      toast.success("Reply sent and ticket resolved");
+      setReply("");
+      queryClient.invalidateQueries({ queryKey: ["admin-ticket-messages", activeTicket?.id] });
       queryClient.invalidateQueries({ queryKey: ["admin-tickets"] });
-      setReplyDialogOpen(false);
-      setReplyText("");
-      setSelectedTicket(null);
+      toast.success("Reply sent");
     },
     onError: (e: any) => toast.error(e.message),
   });
@@ -113,7 +135,7 @@ export default function AdminTickets() {
           <h1 className="text-2xl font-display font-bold flex items-center gap-2">
             <Ticket className="h-6 w-6 text-primary" /> Support Tickets
           </h1>
-          <p className="text-sm text-muted-foreground">Manage and respond to user support requests</p>
+          <p className="text-sm text-muted-foreground">Threaded conversations — replies notify users in-app</p>
         </div>
         <DownloadReportButton
           rows={tickets ?? []}
@@ -122,9 +144,10 @@ export default function AdminTickets() {
             { key: "description", label: "Description" },
             { key: "priority", label: "Priority" },
             { key: "status", label: "Status" },
-            { key: "raised_by", label: "Raised By (User ID)" },
-            { key: "admin_reply", label: "Admin Reply" },
+            { key: "raised_by_name", label: "Raised By" },
+            { key: "raised_by_role", label: "Role" },
             dateColumn("created_at", "Created"),
+            dateColumn("updated_at", "Last activity"),
             dateColumn("resolved_at", "Resolved"),
           ]}
           title="Support Tickets"
@@ -147,7 +170,11 @@ export default function AdminTickets() {
                 {status.replace(/_/g, " ")} ({ticketsByStatus(status).length})
               </h3>
               {ticketsByStatus(status).map(t => (
-                <Card key={t.id} className="shadow-card">
+                <Card
+                  key={t.id}
+                  className="shadow-card cursor-pointer hover:border-primary/40 transition-colors"
+                  onClick={() => setActiveTicket(t)}
+                >
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-sm">{t.title}</CardTitle>
@@ -161,42 +188,25 @@ export default function AdminTickets() {
                     <div className="text-xs text-muted-foreground space-y-0.5">
                       <p>From: {(t as any).raised_by_name || "Unknown"}</p>
                       <p>Role: {(t as any).raised_by_role || "—"}</p>
-                      <p>{new Date(t.created_at).toLocaleDateString()}</p>
+                      <p>{formatDistanceToNow(new Date(t.updated_at || t.created_at), { addSuffix: true })}</p>
                     </div>
-
-                    {t.admin_reply && (
-                      <div className="bg-primary/5 border border-primary/20 rounded p-2">
-                        <p className="text-xs font-medium text-primary">Reply sent:</p>
-                        <p className="text-xs text-muted-foreground">{t.admin_reply}</p>
-                      </div>
-                    )}
-
                     <div className="flex items-center gap-2 pt-1">
-                      {status !== "resolved" && (
-                        <>
-                          {status === "open" && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="text-xs h-7"
-                              onClick={() => updateStatus.mutate({ id: t.id, status: "in_progress" })}
-                            >
-                              In Progress
-                            </Button>
-                          )}
-                          <Button
-                            size="sm"
-                            className="text-xs h-7"
-                            onClick={() => {
-                              setSelectedTicket(t);
-                              setReplyText("");
-                              setReplyDialogOpen(true);
-                            }}
-                          >
-                            <MessageSquare className="h-3 w-3 mr-1" /> Reply & Resolve
-                          </Button>
-                        </>
+                      {status === "open" && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-xs h-7"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            updateStatus.mutate({ id: t.id, status: "in_progress" });
+                          }}
+                        >
+                          Mark In Progress
+                        </Button>
                       )}
+                      <Button size="sm" className="text-xs h-7" onClick={(e) => { e.stopPropagation(); setActiveTicket(t); }}>
+                        <MessageSquare className="h-3 w-3 mr-1" /> Open thread
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -211,44 +221,82 @@ export default function AdminTickets() {
         </div>
       )}
 
-      {/* Reply Dialog */}
-      <Dialog open={replyDialogOpen} onOpenChange={setReplyDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Send className="h-5 w-5 text-primary" /> Reply to Ticket
-            </DialogTitle>
-          </DialogHeader>
-          {selectedTicket && (
-            <div className="space-y-4 mt-2">
-              <div className="bg-muted/50 rounded-lg p-3">
-                <p className="text-sm font-medium">{selectedTicket.title}</p>
-                <p className="text-xs text-muted-foreground mt-1">{selectedTicket.description}</p>
-                <p className="text-xs text-muted-foreground mt-2">
-                  From: {selectedTicket.raised_by_name} ({selectedTicket.raised_by_email})
-                </p>
-              </div>
-              <div>
-                <Textarea
-                  placeholder="Write your reply to the user…"
-                  value={replyText}
-                  onChange={e => setReplyText(e.target.value)}
-                  className="min-h-[150px]"
-                />
-              </div>
-              <Button
-                className="w-full"
-                onClick={() => sendReply.mutate()}
-                disabled={!replyText.trim() || sendReply.isPending}
-              >
-                {sendReply.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+      {/* Threaded conversation drawer */}
+      <Dialog
+        open={!!activeTicket}
+        onOpenChange={(v) => { if (!v) { setActiveTicket(null); setReply(""); } }}
+      >
+        <DialogContent className="sm:max-w-2xl">
+          {activeTicket && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5 text-primary" />
+                  {activeTicket.title}
+                </DialogTitle>
+                <div className="flex items-center gap-2 pt-1 flex-wrap">
+                  <Badge className={`text-xs ${priorityColors[activeTicket.priority]}`}>{activeTicket.priority}</Badge>
+                  <Badge className={`text-xs ${statusColors[activeTicket.status]}`}>{activeTicket.status.replace(/_/g, " ")}</Badge>
+                  <span className="text-xs text-muted-foreground ml-auto">
+                    {(activeTicket as any).raised_by_name} · {(activeTicket as any).raised_by_role}
+                  </span>
+                </div>
+              </DialogHeader>
+
+              <div className="space-y-3 max-h-[55vh] overflow-y-auto pr-1 mt-2">
+                {messages.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-6">No messages yet.</p>
                 ) : (
-                  <Send className="h-4 w-4 mr-2" />
+                  messages.map((m) => (
+                    <div
+                      key={m.id}
+                      className={`rounded-lg p-3 text-sm ${
+                        m.author_role === "staff"
+                          ? "bg-primary/5 border border-primary/15 ml-6"
+                          : "bg-muted/60 mr-6"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className={`text-xs font-semibold ${m.author_role === "staff" ? "text-primary" : "text-foreground"}`}>
+                          {m.author_role === "staff" ? (m.author_name || "Support") : (m.author_name || "User")}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">
+                          {formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}
+                        </span>
+                      </div>
+                      <p className="whitespace-pre-wrap text-foreground/90">{m.body}</p>
+                    </div>
+                  ))
                 )}
-                Send Reply & Resolve
-              </Button>
-            </div>
+              </div>
+
+              <div className="border-t border-border pt-3 mt-2 space-y-2">
+                <Textarea
+                  placeholder="Reply to the user…"
+                  value={reply}
+                  onChange={(e) => setReply(e.target.value)}
+                  className="min-h-[80px]"
+                />
+                <div className="flex gap-2">
+                  <Button
+                    className="flex-1"
+                    variant="outline"
+                    onClick={() => postReply.mutate({ resolve: false })}
+                    disabled={!reply.trim() || postReply.isPending}
+                  >
+                    {postReply.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
+                    Send reply
+                  </Button>
+                  <Button
+                    className="flex-1"
+                    onClick={() => postReply.mutate({ resolve: true })}
+                    disabled={!reply.trim() || postReply.isPending}
+                  >
+                    Send & resolve
+                  </Button>
+                </div>
+              </div>
+            </>
           )}
         </DialogContent>
       </Dialog>

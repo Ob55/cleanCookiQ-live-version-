@@ -24,7 +24,7 @@ export default function Subscribers() {
           <h1 className="text-2xl font-display font-bold flex items-center gap-2">
             <Users className="h-6 w-6 text-primary" /> Newsletter Subscribers
           </h1>
-          <p className="text-sm text-muted-foreground">Users who subscribed via the Marketing Analysis page</p>
+          <p className="text-sm text-muted-foreground">Users who subscribed via the Market Insights page</p>
         </div>
         <DownloadReportButton
           rows={subscribers ?? []}

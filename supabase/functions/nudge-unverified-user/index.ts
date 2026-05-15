@@ -24,13 +24,13 @@ function reminderHtml(name: string, magicLink: string): string {
 <!DOCTYPE html><html><body style="margin:0;padding:16px;background:#f3f4f6;">
 <div style="${BASE_STYLE}">
   <div style="${HEADER_STYLE}">
-    <h1 style="color:#ffffff;margin:0;font-size:20px;font-weight:700;">cleancookIQ</h1>
+    <h1 style="color:#ffffff;margin:0;font-size:20px;font-weight:700;">CleanCookIQ</h1>
   </div>
   <div style="${BODY_STYLE}">
     <h2 style="color:#1a3c2e;margin-top:0;">Just one click to finish setting up your account</h2>
     <p style="color:#374151;line-height:1.6;">Hi ${display},</p>
     <p style="color:#374151;line-height:1.6;">
-      We noticed you started signing up for cleancookIQ but haven't yet
+      We noticed you started signing up for CleanCookIQ but haven't yet
       verified your email. Click the button below to confirm your address
       and head straight to your dashboard.
     </p>
@@ -126,9 +126,9 @@ serve(async (req) => {
     });
 
     await transporter.sendMail({
-      from: `"CleanCook IQ" <${Deno.env.get("SMTP_FROM") || "info@ignis-innovation.com"}>`,
+      from: `"CleanCookIQ" <${Deno.env.get("SMTP_FROM") || "info@ignis-innovation.com"}>`,
       to: targetEmail,
-      subject: "Finish setting up your cleancookIQ account",
+      subject: "Finish setting up your CleanCookIQ account",
       html: reminderHtml(targetName ?? "", magicLink),
     });
 

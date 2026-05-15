@@ -27,6 +27,9 @@ export default defineConfig(({ mode }) => ({
           "vendor-supabase": ["@supabase/supabase-js"],
           // Charting library (heavy, only used in dashboards)
           "vendor-charts": ["recharts"],
+          // ECharts (heavy — used by IntelligencePage). Split out so
+          // its ~700kB doesn't bloat the IntelligencePage chunk.
+          "vendor-echarts": ["echarts", "echarts-for-react"],
           // Map library (heavy, only used on map page)
           "vendor-map": ["leaflet", "react-leaflet"],
           // UI framework

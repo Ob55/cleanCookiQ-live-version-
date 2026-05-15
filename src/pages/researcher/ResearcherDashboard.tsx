@@ -17,6 +17,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 import { useMyActorCode } from "@/hooks/useMyActorCode";
+import { notifyAdmins } from "@/lib/notifications";
+import { institutionLabel } from "@/lib/institutionDisplay";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood",
@@ -67,7 +69,9 @@ export default function ResearcherDashboard() {
   const filtered = (institutions ?? []).filter((inst: any) => {
     if (!searchTerm) return true;
     const q = searchTerm.toLowerCase();
-    return inst.name?.toLowerCase().includes(q) || inst.county?.toLowerCase().includes(q);
+    // Researchers search by institution_code (the abstracted ID) or county.
+    return inst.institution_code?.toLowerCase().includes(q)
+      || inst.county?.toLowerCase().includes(q);
   });
 
   const handleRequestAccess = async () => {
@@ -86,20 +90,13 @@ export default function ResearcherDashboard() {
         raised_by_role: "researcher",
       });
 
-      const { data: adminRoles } = await supabase
-        .from("user_roles")
-        .select("user_id")
-        .in("role", ["admin", "manager"]);
-
-      if (adminRoles?.length) {
-        await supabase.from("notifications").insert(
-          adminRoles.map((a: any) => ({
-            user_id: a.user_id,
-            title: "Researcher Access Request",
-            body: `${profile.full_name || "A researcher"} from ${orgName} is requesting prime access to institution data.`,
-          }))
-        );
-      }
+      // SECURITY: direct cross-user notification inserts are blocked by RLS
+      // (see 20260512100400_security_hardening.sql). Use the notifyAdmins RPC
+      // helper instead, which resolves recipients server-side.
+      await notifyAdmins(
+        "Researcher Access Request",
+        `${profile.full_name || "A researcher"} from ${orgName} is requesting prime access to institution data.`,
+      );
 
       setRequestSent(true);
       toast.success("Access request sent. The admin will review it shortly.");
@@ -264,7 +261,9 @@ export default function ResearcherDashboard() {
                 >
                   <CardContent className="p-4 space-y-3">
                     <div>
-                      <h3 className="font-semibold text-sm leading-snug line-clamp-2">{inst.name}</h3>
+                      <h3 className="font-semibold text-sm leading-snug font-mono">
+                        {institutionLabel({ institution_code: inst.institution_code, name: inst.name })}
+                      </h3>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
                         <MapPin className="h-3 w-3 shrink-0" />
                         <span className="truncate">{inst.county || "—"}</span>

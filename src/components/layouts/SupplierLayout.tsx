@@ -40,7 +40,7 @@ export default function SupplierLayout() {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate("/auth/login");
+    navigate("/");
   };
 
   const initials = profile?.full_name
@@ -51,8 +51,8 @@ export default function SupplierLayout() {
     <div className="flex flex-col h-full">
       <div className="p-5 border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-2">
-          <img src={cleancookIqLogo} alt="cleancookIQ logo" className="h-8 w-8 rounded-lg object-contain" />
-          <span className="font-display font-bold text-lg text-sidebar-foreground">cleancookIQ</span>
+          <img src={cleancookIqLogo} alt="CleanCookIQ logo" className="h-8 w-8 rounded-lg object-contain" />
+          <span className="font-display font-bold text-lg text-sidebar-foreground">CleanCookIQ</span>
         </Link>
         <p className="text-xs text-sidebar-foreground/60 mt-1">Supplier Portal</p>
       </div>
