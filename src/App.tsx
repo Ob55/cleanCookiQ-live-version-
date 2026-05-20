@@ -88,6 +88,7 @@ const AdminProductCategories = lazy(() => import("@/pages/admin/AdminProductCate
 const AdminCreditVerifications = lazy(() => import("@/pages/admin/AdminCreditVerifications"));
 const AdminEngagement = lazy(() => import("@/pages/admin/AdminEngagement"));
 const AssessmentEditor = lazy(() => import("@/pages/admin/AssessmentEditor"));
+const LinkInstitutionSupplier = lazy(() => import("@/pages/admin/LinkInstitutionSupplier"));
 const SupplierQuotes = lazy(() => import("@/pages/supplier/SupplierQuotes"));
 
 // Lazy loaded role pages
@@ -100,6 +101,7 @@ const InstitutionProfile = lazy(() => import("@/pages/institution/InstitutionPro
 const CookingAlchemy = lazy(() => import("@/pages/institution/CookingAlchemy"));
 const InstitutionDocuments = lazy(() => import("@/pages/institution/InstitutionDocuments"));
 const InstitutionIPA = lazy(() => import("@/pages/institution/InstitutionIPA"));
+const InstitutionSupplierDetails = lazy(() => import("@/pages/institution/InstitutionSupplierDetails"));
 
 const SupplierSetup = lazy(() => import("@/pages/supplier/SupplierSetup"));
 const SupplierDashboard = lazy(() => import("@/pages/supplier/SupplierDashboard"));
@@ -233,6 +235,7 @@ const App = () => (
                 <Route path="/institution/alchemy" element={<CookingAlchemy />} />
                 <Route path="/institution/documents" element={<InstitutionDocuments />} />
                 <Route path="/institution/ipa" element={<InstitutionIPA />} />
+                <Route path="/institution/supplier-details" element={<InstitutionSupplierDetails />} />
                 <Route path="/institution/support" element={<TicketsPage />} />
                 <Route path="/institution/account/organisation" element={<OrganisationProfilePage />} />
               </Route>
@@ -330,6 +333,7 @@ const App = () => (
                 <Route path="/admin/institutions/import" element={<InstitutionImport />} />
                 <Route path="/admin/institutions/:id" element={<InstitutionDetail />} />
                 <Route path="/admin/providers" element={<ProviderManagement />} />
+                <Route path="/admin/link-institution-supplier" element={<LinkInstitutionSupplier />} />
                 <Route path="/admin/providers/:id" element={<ProviderDetail />} />
                 <Route path="/admin/assessments" element={<AssessmentQueue />} />
                 <Route path="/admin/assessments/:id/edit" element={<AssessmentEditor />} />
