@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Flame, UtensilsCrossed, Droplets, BarChart3, Loader2, User, Phone, Mail, MapPin } from "lucide-react";
-import TransitionTarget from "@/components/institution/TransitionTarget";
+import TransitionTarget, { TRANSITION_TARGET_LABELS } from "@/components/institution/TransitionTarget";
 import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 
 
@@ -216,11 +216,13 @@ export default function InstitutionDashboard() {
             <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center">
               <Droplets className="h-5 w-5 text-primary" />
             </div>
-            <CardTitle className="text-sm font-medium text-muted-foreground">Transition to Steam</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Transition Target</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className={`text-lg font-semibold ${institution.wishes_to_transition_steam ? "text-primary" : "text-muted-foreground"}`}>
-              {institution.wishes_to_transition_steam === true ? "Yes" : institution.wishes_to_transition_steam === false ? "No" : "—"}
+            <p className={`text-lg font-semibold ${institution.transition_target_fuel ? "text-primary" : "text-muted-foreground"}`}>
+              {institution.transition_target_fuel
+                ? (TRANSITION_TARGET_LABELS[institution.transition_target_fuel] ?? institution.transition_target_fuel)
+                : "Not chosen yet"}
             </p>
           </CardContent>
         </Card>

@@ -1,14 +1,34 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
-import { Users, Check, X, Loader2, Trash2, Search, MailWarning, Send } from "lucide-react";
+import { Users, Check, X, Loader2, Trash2, Search, MailWarning, Send, Building2 } from "lucide-react";
 import { sendEmail, emailAccountApproved, emailAccountRejected } from "@/lib/emailService";
 import { DownloadReportButton, dateColumn } from "@/components/admin/DownloadReportButton";
+
+// Personal email providers — exclude these from "shared domain" detection
+// so we don't suggest two random gmail.com users are colleagues.
+const PERSONAL_EMAIL_DOMAINS = new Set([
+  "gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "live.com",
+  "icloud.com", "me.com", "aol.com", "proton.me", "protonmail.com",
+  "yahoo.co.uk", "yahoo.co.in", "googlemail.com",
+]);
+
+function getEmailDomain(email: string | null | undefined): string | null {
+  if (!email) return null;
+  const idx = email.indexOf("@");
+  if (idx === -1) return null;
+  return email.slice(idx + 1).toLowerCase();
+}
+
+function isOrganisationalDomain(domain: string | null): boolean {
+  return !!domain && !PERSONAL_EMAIL_DOMAINS.has(domain);
+}
 
 type AdminUser = {
   user_id: string;
@@ -116,6 +136,25 @@ export default function UserManagement() {
     );
   });
 
+  // Build domain-cluster map across ALL users (not filtered) so search
+  // doesn't break colleague detection. Only count organisational domains.
+  const domainCounts = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const u of users ?? []) {
+      const d = getEmailDomain(u.email);
+      if (isOrganisationalDomain(d)) map.set(d!, (map.get(d!) ?? 0) + 1);
+    }
+    return map;
+  }, [users]);
+
+  // Domains with 2+ users → colleague clusters worth surfacing.
+  const sharedDomains = useMemo(
+    () => Array.from(domainCounts.entries())
+      .filter(([, n]) => n >= 2)
+      .sort((a, b) => b[1] - a[1]),
+    [domainCounts],
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex items-end justify-between gap-4 flex-wrap">
@@ -168,6 +207,49 @@ export default function UserManagement() {
 
       <UnverifiedRegistrationsPanel />
 
+      {/* Shared-domain colleague clusters — when ≥2 users share an
+          organisational email domain, surface them so the admin knows
+          they likely belong to the same org and can skip questions
+          already answered by their colleagues. */}
+      {sharedDomains.length > 0 && (
+        <div className="bg-card border border-primary/30 rounded-xl shadow-card overflow-hidden">
+          <div className="bg-primary/5 border-b border-primary/20 px-4 py-3 flex items-center gap-2 flex-wrap">
+            <Building2 className="h-4 w-4 text-primary" />
+            <p className="text-sm font-semibold text-foreground">
+              Colleague clusters
+              <span className="ml-2 text-muted-foreground font-normal text-xs">
+                {sharedDomains.length} domain{sharedDomains.length === 1 ? "" : "s"} with multiple users
+              </span>
+            </p>
+            <p className="text-xs text-muted-foreground basis-full">
+              Users sharing an organisational email domain — likely the same organisation. Click a chip to filter the table.
+            </p>
+          </div>
+          <div className="p-4 flex flex-wrap gap-2">
+            {sharedDomains.map(([domain, n]) => {
+              const active = search.trim().toLowerCase() === `@${domain}` || search.trim().toLowerCase() === domain;
+              return (
+                <button
+                  key={domain}
+                  type="button"
+                  onClick={() => setSearch(active ? "" : `@${domain}`)}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition-colors ${
+                    active
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-background hover:bg-primary/10 border-primary/30 text-foreground"
+                  }`}
+                >
+                  <span className="font-mono">@{domain}</span>
+                  <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${active ? "bg-primary-foreground/20" : "bg-primary/15 text-primary"}`}>
+                    {n}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {isLoading ? (
         <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
       ) : error ? (
@@ -188,8 +270,14 @@ export default function UserManagement() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((u) => (
-                <tr key={u.user_id} className="border-b border-border/50 hover:bg-muted/30">
+              {filtered.map((u) => {
+                const domain = getEmailDomain(u.email);
+                const colleagueCount = isOrganisationalDomain(domain) ? (domainCounts.get(domain!) ?? 1) - 1 : 0;
+                return (
+                <tr key={u.user_id} className="border-b border-border/50 hover:bg-muted/30 relative">
+                  {colleagueCount > 0 && (
+                    <td className="absolute left-0 top-0 bottom-0 w-1 bg-primary/40 pointer-events-none p-0" aria-hidden />
+                  )}
                   <td className="p-3">
                     <div className="flex items-center gap-3">
                       <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
@@ -202,7 +290,31 @@ export default function UserManagement() {
                     </div>
                   </td>
                   <td className="p-3">
-                    <div className="text-sm">{u.email || "—"}</div>
+                    <div className="text-sm flex items-center gap-2 flex-wrap">
+                      <span>{u.email || "—"}</span>
+                      {colleagueCount > 0 && (
+                        <TooltipProvider delayDuration={150}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                type="button"
+                                onClick={() => setSearch(`@${domain}`)}
+                                className="inline-flex items-center gap-1 rounded-full bg-primary/15 text-primary px-1.5 py-0.5 text-[10px] font-bold hover:bg-primary/25 transition-colors"
+                              >
+                                <Building2 className="h-2.5 w-2.5" />
+                                +{colleagueCount}
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-xs">
+                              <p className="font-medium">{colleagueCount} colleague{colleagueCount === 1 ? "" : "s"} on @{domain}</p>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                Likely the same organisation — their colleagues may have already answered questions for this org.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
+                    </div>
                     <div className="text-xs text-muted-foreground">
                       {u.email_confirmed_at ? "Verified" : "Unverified"}
                     </div>
@@ -240,7 +352,8 @@ export default function UserManagement() {
                     </div>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={6} className="p-8 text-center text-sm text-muted-foreground">

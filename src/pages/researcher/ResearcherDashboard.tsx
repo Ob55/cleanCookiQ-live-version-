@@ -10,8 +10,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
   Loader2, Lock, FlaskConical, MapPin, Flame, Users,
-  UtensilsCrossed, Send, Search,
+  UtensilsCrossed, Send, Search, X, SlidersHorizontal,
 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -44,6 +45,11 @@ export default function ResearcherDashboard() {
   const hasPrimeAccess = profile?.approval_status === "approved";
 
   const [searchTerm, setSearchTerm] = useState("");
+  // Filter state — "all" means no constraint on that axis.
+  const [filterCounty, setFilterCounty] = useState<string>("all");
+  const [filterFuel, setFilterFuel] = useState<string>("all");
+  const [filterReadiness, setFilterReadiness] = useState<string>("all");
+  const [filterOwnership, setFilterOwnership] = useState<string>("all");
   const [requestSent, setRequestSent] = useState(false);
   const [requesting, setRequesting] = useState(false);
 
@@ -59,20 +65,50 @@ export default function ResearcherDashboard() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("institutions")
-        .select("id, name, county, current_fuel, number_of_students, meals_per_day, assessment_score, assessment_category, ownership_type")
+        .select("id, institution_code, name, county, current_fuel, number_of_students, meals_per_day, assessment_score, assessment_category, ownership_type")
         .order("name");
       if (error) throw error;
       return (data ?? []) as any[];
     },
   });
 
+  // Build unique sorted lists of values that actually appear in the data —
+  // so the filter dropdowns only ever show options that yield results.
+  const counties = Array.from(new Set((institutions ?? []).map((i: any) => i.county).filter(Boolean))).sort();
+  const readinessCategories = Array.from(new Set((institutions ?? []).map((i: any) => i.assessment_category).filter(Boolean))).sort();
+  const ownershipTypes = Array.from(new Set((institutions ?? []).map((i: any) => i.ownership_type).filter(Boolean))).sort();
+
   const filtered = (institutions ?? []).filter((inst: any) => {
-    if (!searchTerm) return true;
-    const q = searchTerm.toLowerCase();
-    // Researchers search by institution_code (the abstracted ID) or county.
-    return inst.institution_code?.toLowerCase().includes(q)
-      || inst.county?.toLowerCase().includes(q);
+    if (searchTerm) {
+      const q = searchTerm.toLowerCase();
+      const matchesSearch = inst.institution_code?.toLowerCase().includes(q)
+        || inst.county?.toLowerCase().includes(q)
+        || inst.name?.toLowerCase().includes(q);
+      if (!matchesSearch) return false;
+    }
+    if (filterCounty !== "all" && inst.county !== filterCounty) return false;
+    if (filterFuel !== "all" && inst.current_fuel !== filterFuel) return false;
+    if (filterReadiness !== "all" && inst.assessment_category !== filterReadiness) return false;
+    if (filterOwnership !== "all" && inst.ownership_type !== filterOwnership) return false;
+    return true;
   });
+
+  const activeFilterCount =
+    (filterCounty !== "all" ? 1 : 0) +
+    (filterFuel !== "all" ? 1 : 0) +
+    (filterReadiness !== "all" ? 1 : 0) +
+    (filterOwnership !== "all" ? 1 : 0);
+
+  const clearAllFilters = () => {
+    setFilterCounty("all");
+    setFilterFuel("all");
+    setFilterReadiness("all");
+    setFilterOwnership("all");
+    setSearchTerm("");
+  };
+
+  const formatOwnership = (v: string) =>
+    v.split("_").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join("-");
 
   const handleRequestAccess = async () => {
     if (!user || !profile) return;
@@ -230,16 +266,87 @@ export default function ResearcherDashboard() {
       {/* Institution data (prime access) */}
       {hasPrimeAccess && (
         <>
-          {/* Search */}
-          <div className="relative max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by name or county…"
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              className="pl-9"
-            />
-          </div>
+          {/* Filter bar — search + four scoped dropdowns */}
+          <Card>
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <SlidersHorizontal className="h-4 w-4 text-primary" />
+                  <span>Filters</span>
+                  {activeFilterCount > 0 && (
+                    <Badge variant="secondary" className="bg-primary/15 text-primary">
+                      {activeFilterCount} active
+                    </Badge>
+                  )}
+                </div>
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <span>{filtered.length} {filtered.length === 1 ? "institution" : "institutions"}</span>
+                  {(activeFilterCount > 0 || searchTerm) && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 px-2 text-xs gap-1"
+                      onClick={clearAllFilters}
+                    >
+                      <X className="h-3 w-3" /> Clear all
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                <div className="relative lg:col-span-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search name / code / county…"
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                    className="pl-9 h-10"
+                  />
+                </div>
+
+                <Select value={filterCounty} onValueChange={setFilterCounty}>
+                  <SelectTrigger className="h-10"><SelectValue placeholder="County" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All counties</SelectItem>
+                    {counties.map((c) => (
+                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={filterFuel} onValueChange={setFilterFuel}>
+                  <SelectTrigger className="h-10"><SelectValue placeholder="Current fuel" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All fuels</SelectItem>
+                    {Object.entries(FUEL_LABELS).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>{label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={filterReadiness} onValueChange={setFilterReadiness}>
+                  <SelectTrigger className="h-10"><SelectValue placeholder="Readiness" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All readiness levels</SelectItem>
+                    {readinessCategories.map((c) => (
+                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={filterOwnership} onValueChange={setFilterOwnership}>
+                  <SelectTrigger className="h-10"><SelectValue placeholder="Ownership" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All ownership types</SelectItem>
+                    {ownershipTypes.map((o) => (
+                      <SelectItem key={o} value={o}>{formatOwnership(o)}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
 
           {isLoading ? (
             <div className="flex items-center justify-center h-48">

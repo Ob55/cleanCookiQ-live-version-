@@ -15,6 +15,8 @@ import { calculateAssessmentScore, loadReadinessWeights } from "@/lib/assessment
 import { deriveStoredImpact } from "@/lib/institutionDerived";
 import { sendEmail, emailInstitutionWelcome } from "@/lib/emailService";
 import CountyCombobox from "@/components/CountyCombobox";
+import { TRANSITION_TARGETS } from "@/components/institution/TransitionTarget";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const FUEL_TYPES = [
   { value: "firewood", label: "Firewood" },
@@ -33,6 +35,20 @@ const FUEL_UNITS: Record<string, string> = {
   electric: "kWh",
   other: "kg",
 };
+
+// Pre-filled needs an institution can tick. "Other" reveals a free-text
+// box so anything not in this list can still be captured.
+const TRANSITION_NEEDS_OPTIONS = [
+  "Equipment (stove / cooker / digester)",
+  "Installation support",
+  "Staff training",
+  "Maintenance contract",
+  "Kitchen renovation / extension",
+  "Financing assistance (loan / grant)",
+  "Energy audit & assessment",
+  "Carbon credit registration",
+  "Fuel supply contract",
+];
 
 export default function InstitutionSetup() {
   const navigate = useNavigate();
@@ -72,7 +88,12 @@ export default function InstitutionSetup() {
   const [contactPhone, setContactPhone] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [numberOfStaff, setNumberOfStaff] = useState("");
-  const [transitionNeeds, setTransitionNeeds] = useState("");
+  // Transition target — preferred clean fuel to switch to
+  const [transitionTarget, setTransitionTarget] = useState("");
+  // Transition needs — checkbox set + optional manual text. Saved as a
+  // single semicolon-joined string in the existing transition_needs column.
+  const [transitionNeedsChoices, setTransitionNeedsChoices] = useState<string[]>([]);
+  const [transitionNeedsOther, setTransitionNeedsOther] = useState("");
   // Assessment scoring fields
   const [numberOfStudents, setNumberOfStudents] = useState("");
   const [monthlyFuelSpend, setMonthlyFuelSpend] = useState("");
@@ -162,7 +183,12 @@ export default function InstitutionSetup() {
         kitchen_condition: kitchenCondition || null,
         financing_preference: financingPreference || null,
         financial_decision_maker: financialDecisionMaker || null,
-        transition_needs: transitionNeeds || null,
+        transition_target_fuel: transitionTarget || null,
+        transition_needs: (() => {
+          const parts = [...transitionNeedsChoices];
+          if (transitionNeedsOther.trim()) parts.push(transitionNeedsOther.trim());
+          return parts.length ? parts.join("; ") : null;
+        })(),
         assessment_score: score,
         assessment_category: category,
         annual_savings_ksh: derived.annual_savings_ksh,
@@ -467,12 +493,68 @@ export default function InstitutionSetup() {
               </div>
             </div>
 
-            {/* Transition Needs */}
-            <div className="pt-2 border-t">
-              <p className="text-sm font-semibold text-muted-foreground mb-3">Transition Needs</p>
+            {/* Transition Target + Needs */}
+            <div className="pt-2 border-t space-y-4">
+              <p className="text-sm font-semibold text-muted-foreground">Transition Plan</p>
+
+              {/* Transition Target — dropdown */}
               <div>
-                <Label htmlFor="transition-needs">What do you need for transitioning to clean cooking?</Label>
-                <Textarea id="transition-needs" value={transitionNeeds} onChange={e => setTransitionNeeds(e.target.value)} placeholder="e.g. We need an industrial LPG stove system, installation support, and staff training..." rows={3} className="mt-1" />
+                <Label>Preferred clean-cooking option you're transitioning to</Label>
+                <Select value={transitionTarget} onValueChange={setTransitionTarget}>
+                  <SelectTrigger className="mt-1"><SelectValue placeholder="Pick a transition method (or 'Undecided')" /></SelectTrigger>
+                  <SelectContent>
+                    {TRANSITION_TARGETS.map(t => (
+                      <SelectItem key={t.value} value={t.value}>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{t.label}</span>
+                          <span className="text-xs text-muted-foreground">{t.desc}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Transition Needs — checkbox group + other-with-text-fallback */}
+              <div>
+                <Label>What support do you need? <span className="text-muted-foreground font-normal">(tick all that apply)</span></Label>
+                <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {TRANSITION_NEEDS_OPTIONS.map((opt) => {
+                    const checked = transitionNeedsChoices.includes(opt);
+                    return (
+                      <label
+                        key={opt}
+                        className={`flex items-start gap-2 rounded-lg border p-3 cursor-pointer transition-colors ${
+                          checked ? "border-primary bg-primary/5" : "border-border hover:bg-muted/40"
+                        }`}
+                      >
+                        <Checkbox
+                          checked={checked}
+                          onCheckedChange={(v) => {
+                            setTransitionNeedsChoices((curr) =>
+                              v === true ? [...curr, opt] : curr.filter((x) => x !== opt)
+                            );
+                          }}
+                          className="mt-0.5"
+                        />
+                        <span className="text-sm leading-snug">{opt}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+                <div className="mt-3">
+                  <Label htmlFor="needs-other" className="text-xs text-muted-foreground font-normal">
+                    Something else? Type it here:
+                  </Label>
+                  <Textarea
+                    id="needs-other"
+                    value={transitionNeedsOther}
+                    onChange={e => setTransitionNeedsOther(e.target.value)}
+                    placeholder="e.g. We have an existing biogas digester that needs upgrading…"
+                    rows={2}
+                    className="mt-1"
+                  />
+                </div>
               </div>
             </div>
 
