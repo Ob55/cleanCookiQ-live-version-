@@ -1,8 +1,8 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Menu, X, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { Menu, X, ChevronDown, Flame, ArrowUpRight } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
@@ -69,19 +69,18 @@ function NavGroupDropdown({
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => setOpen(false)}
           className={cn(
-            "inline-flex items-center gap-1 h-9 px-4 rounded-full text-sm font-medium transition-colors hover:bg-primary/5 hover:text-primary",
-            isActive ? "text-primary bg-primary/5" : "text-foreground/70",
-            open && "text-primary bg-primary/5",
+            "inline-flex items-center gap-1 h-9 px-3.5 rounded-full text-[13px] font-medium transition-colors",
+            isActive || open ? "text-white" : "text-white/65 hover:text-white",
           )}
         >
           {group.label}
-          <ChevronDown className={cn("h-3 w-3 transition-transform", open && "rotate-180")} />
+          <ChevronDown className={cn("h-3 w-3 transition-transform opacity-70", open && "rotate-180")} />
         </button>
       </PopoverTrigger>
       <PopoverContent
         align="start"
-        sideOffset={4}
-        className="w-48 p-1"
+        sideOffset={8}
+        className="w-52 p-1 liquid-glass-strong rounded-2xl border-0 bg-black/95 text-white"
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
       >
@@ -91,8 +90,8 @@ function NavGroupDropdown({
             to={item.href ?? "#"}
             onClick={() => setOpen(false)}
             className={cn(
-              "block select-none rounded-md px-3 py-2 text-sm leading-none transition-colors hover:bg-primary/10 hover:text-primary",
-              isActiveItem(item.href) && "bg-primary/10 text-primary font-medium",
+              "block select-none rounded-xl px-3 py-2 text-sm leading-none transition-colors hover:bg-ignis/15 hover:text-ignis-bright",
+              isActiveItem(item.href) && "bg-ignis/20 text-ignis-bright font-medium",
             )}
           >
             {item.label}
@@ -105,9 +104,17 @@ function NavGroupDropdown({
 
 export default function PublicLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut, isAdmin } = useAuth();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -119,171 +126,209 @@ export default function PublicLayout() {
     g.items.some((it) => it.href && location.pathname === it.href);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="sticky top-3 z-50 mx-3 md:mx-6 mt-3 rounded-2xl border border-border/60 bg-background/85 backdrop-blur-lg shadow-lg shadow-foreground/5">
-        <div className="px-4 md:px-6 flex h-14 items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-2">
-            <img src={cleancookIqLogo} alt="CleanCookIQ logo" className="h-8 w-8 rounded-lg object-contain" />
-            <span className="font-display font-bold text-lg text-foreground">CleanCookIQ</span>
-          </Link>
-
-          {/* Desktop nav — each group is its own Popover so dropdowns
-              anchor under their actual trigger (not centered). */}
-          <nav className="hidden md:flex items-center gap-1">
-            {NAV_GROUPS.map((entry) =>
-              isGroup(entry) ? (
-                <NavGroupDropdown
-                  key={entry.label}
-                  group={entry}
-                  isActive={isActiveGroup(entry)}
-                  isActiveItem={isActiveItem}
-                />
-              ) : (
-                <Link
-                  key={entry.label}
-                  to={entry.href ?? "#"}
-                  className={cn(
-                    "inline-flex items-center h-9 px-4 rounded-full text-sm font-medium transition-colors hover:bg-primary/5 hover:text-primary",
-                    isActiveItem(entry.href) ? "text-primary bg-primary/5" : "text-foreground/70",
-                  )}
-                >
-                  {entry.label}
-                </Link>
-              ),
-            )}
-          </nav>
-
-          <div className="hidden md:flex items-center gap-2">
-            <Link to="/book-demo">
-              <Button variant="ghost" size="sm" className="rounded-full">Book a Demo</Button>
+    <div className="theme-ignis min-h-screen flex flex-col bg-background text-foreground">
+      <header
+        className={cn(
+          "fixed top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-300",
+          "w-[calc(100%-1.5rem)] max-w-[1180px]",
+        )}
+      >
+        <div
+          className={cn(
+            "liquid-glass-strong rounded-full transition-all",
+            scrolled ? "bg-black/75" : "bg-black/45",
+          )}
+        >
+          <div className="flex h-14 items-center justify-between gap-3 pl-5 pr-2">
+            <Link to="/" className="flex items-center gap-2.5 group">
+              <span className="relative h-9 w-9 rounded-xl bg-gradient-ignis flex items-center justify-center shadow-ignis">
+                <Flame className="h-4.5 w-4.5 text-white" strokeWidth={2.5} />
+                <span className="absolute inset-0 rounded-xl bg-gradient-ignis opacity-50 blur-md -z-10 group-hover:opacity-80 transition-opacity" />
+              </span>
+              <span className="font-display font-bold text-base text-white tracking-tight">CleanCookIQ</span>
             </Link>
-            {user ? (
-              <>
-                {isAdmin && (
-                  <Link to="/admin/pipeline">
-                    <Button variant="ghost" size="sm" className="rounded-full">Admin</Button>
-                  </Link>
-                )}
-                <Button variant="ghost" size="sm" className="rounded-full" onClick={handleSignOut}>Sign Out</Button>
-              </>
-            ) : (
-              <>
-                <Link to="/auth/login"><Button variant="ghost" size="sm" className="rounded-full">Log in</Button></Link>
-                <Link to="/auth/register">
-                  <Button
-                    size="sm"
-                    className="rounded-full bg-gradient-to-r from-accent to-amber-light text-accent-foreground shadow-sm hover:from-amber-light hover:to-accent hover:shadow-md transition-all"
+
+            <nav className="hidden lg:flex items-center gap-0.5">
+              {NAV_GROUPS.map((entry) =>
+                isGroup(entry) ? (
+                  <NavGroupDropdown
+                    key={entry.label}
+                    group={entry}
+                    isActive={isActiveGroup(entry)}
+                    isActiveItem={isActiveItem}
+                  />
+                ) : (
+                  <Link
+                    key={entry.label}
+                    to={entry.href ?? "#"}
+                    className={cn(
+                      "inline-flex items-center h-9 px-3.5 rounded-full text-[13px] font-medium transition-colors",
+                      isActiveItem(entry.href) ? "text-white" : "text-white/65 hover:text-white",
+                    )}
                   >
-                    Join the Platform
-                  </Button>
-                </Link>
-              </>
-            )}
+                    {entry.label}
+                  </Link>
+                ),
+              )}
+            </nav>
+
+            <div className="hidden lg:flex items-center gap-1.5">
+              {user ? (
+                <>
+                  {isAdmin && (
+                    <Link to="/admin/pipeline">
+                      <button className="h-9 px-4 rounded-full text-[13px] font-medium text-white/70 hover:text-white transition-colors">Admin</button>
+                    </Link>
+                  )}
+                  <button
+                    onClick={handleSignOut}
+                    className="h-9 px-4 rounded-full text-[13px] font-medium text-white/70 hover:text-white transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                  <Link to="/book-demo">
+                    <button className="h-9 pl-4 pr-4 rounded-full text-[13px] font-semibold bg-white text-hunter-green hover:bg-ignis hover:text-white transition-all inline-flex items-center gap-1">
+                      Book a Demo <ArrowUpRight className="h-3.5 w-3.5" />
+                    </button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link to="/auth/login">
+                    <button className="h-9 px-4 rounded-full text-[13px] font-medium text-white/70 hover:text-white transition-colors">Log in</button>
+                  </Link>
+                  <Link to="/auth/register">
+                    <button className="h-9 pl-4 pr-4 rounded-full text-[13px] font-semibold bg-white text-hunter-green hover:bg-ignis hover:text-white transition-all inline-flex items-center gap-1">
+                      Join <ArrowUpRight className="h-3.5 w-3.5" />
+                    </button>
+                  </Link>
+                </>
+              )}
+            </div>
+
+            <button
+              className="lg:hidden h-9 w-9 mr-1 rounded-full inline-flex items-center justify-center text-white hover:bg-white/10 transition-colors"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           </div>
 
-          <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Toggle menu">
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-        </div>
-
-        {/* Mobile nav: groups become collapsible sections */}
-        {mobileOpen && (
-          <div className="md:hidden border-t border-border/60 bg-background/95 backdrop-blur-lg rounded-b-2xl p-4 space-y-3 max-h-[calc(100vh-5rem)] overflow-y-auto">
-            {NAV_GROUPS.map((entry) =>
-              isGroup(entry) ? (
-                <details key={entry.label} className="group">
-                  <summary className="flex items-center justify-between py-2 text-sm font-medium text-foreground cursor-pointer">
-                    {entry.label}
-                    <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
-                  </summary>
-                  <div className="pl-3 space-y-1 pb-2">
-                    {entry.items.map((item) => (
-                      <Link
-                        key={item.href}
-                        to={item.href ?? "#"}
-                        onClick={() => setMobileOpen(false)}
-                        className="block py-1.5 text-sm text-muted-foreground hover:text-primary"
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
-                </details>
-              ) : (
-                <Link
-                  key={entry.label}
-                  to={entry.href ?? "#"}
-                  onClick={() => setMobileOpen(false)}
-                  className="block py-2 text-sm font-medium text-muted-foreground hover:text-primary"
-                >
-                  {entry.label}
-                </Link>
-              ),
-            )}
-            <div className="border-t pt-3 space-y-2">
-              <Link
-                to="/book-demo"
-                onClick={() => setMobileOpen(false)}
-                className="block py-2 text-sm font-medium text-muted-foreground hover:text-primary"
-              >
-                Book a Demo
-              </Link>
-              <div className="flex gap-2">
-                {user ? (
-                  <Button variant="outline" size="sm" className="w-full" onClick={handleSignOut}>Sign Out</Button>
+          {mobileOpen && (
+            <div className="lg:hidden mt-2 mx-1 mb-1 liquid-glass-strong rounded-3xl bg-black/95 p-4 space-y-2 max-h-[calc(100vh-7rem)] overflow-y-auto">
+              {NAV_GROUPS.map((entry) =>
+                isGroup(entry) ? (
+                  <details key={entry.label} className="group">
+                    <summary className="flex items-center justify-between py-2 text-sm font-medium text-white cursor-pointer list-none">
+                      <span>{entry.label}</span>
+                      <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
+                    </summary>
+                    <div className="pl-3 space-y-1 pb-1">
+                      {entry.items.map((item) => (
+                        <Link
+                          key={item.href}
+                          to={item.href ?? "#"}
+                          onClick={() => setMobileOpen(false)}
+                          className="block py-1.5 text-sm text-white/70 hover:text-ignis-bright"
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </details>
                 ) : (
-                  <>
-                    <Link to="/auth/login" className="flex-1"><Button variant="outline" size="sm" className="w-full">Log in</Button></Link>
-                    <Link to="/auth/register" className="flex-1"><Button size="sm" className="w-full rounded-full bg-gradient-to-r from-accent to-amber-light text-accent-foreground">Join</Button></Link>
-                  </>
-                )}
+                  <Link
+                    key={entry.label}
+                    to={entry.href ?? "#"}
+                    onClick={() => setMobileOpen(false)}
+                    className="block py-2 text-sm font-medium text-white hover:text-ignis-bright"
+                  >
+                    {entry.label}
+                  </Link>
+                ),
+              )}
+              <div className="border-t border-white/10 pt-3 space-y-2">
+                <Link
+                  to="/book-demo"
+                  onClick={() => setMobileOpen(false)}
+                  className="block py-2 text-sm font-medium text-white hover:text-ignis-bright"
+                >
+                  Book a Demo
+                </Link>
+                <div className="flex gap-2">
+                  {user ? (
+                    <Button variant="outline" size="sm" className="w-full rounded-full border-white/20 text-white bg-transparent hover:bg-white/10" onClick={handleSignOut}>Sign Out</Button>
+                  ) : (
+                    <>
+                      <Link to="/auth/login" className="flex-1">
+                        <Button variant="outline" size="sm" className="w-full rounded-full border-white/20 text-white bg-transparent hover:bg-white/10">Log in</Button>
+                      </Link>
+                      <Link to="/auth/register" className="flex-1">
+                        <Button size="sm" className="w-full rounded-full bg-gradient-ignis text-white border-0">Join</Button>
+                      </Link>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </header>
 
       <main className="flex-1"><Outlet /></main>
 
-      <footer className="border-t border-border bg-foreground text-primary-foreground">
-        <div className="container py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <footer className="relative overflow-hidden bg-black text-white border-t border-white/5">
+        {/* ambient glow */}
+        <div className="pointer-events-none absolute inset-x-0 -top-40 h-80 bg-gradient-to-b from-ignis/10 via-transparent to-transparent" />
+        <div className="pointer-events-none absolute -left-32 top-1/3 h-72 w-72 rounded-full bg-rich-emerald/15 blur-3xl animate-glow-pulse" />
+        <div className="pointer-events-none absolute -right-32 bottom-0 h-72 w-72 rounded-full bg-ignis/10 blur-3xl animate-glow-pulse" style={{ animationDelay: "1.5s" }} />
+
+        <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12 pt-16 pb-10">
+          {/* Link grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-14">
             <div>
-              <div className="flex items-center gap-2 mb-4">
-                <img src={cleancookIqLogo} alt="CleanCookIQ logo" className="h-8 w-8 rounded-lg object-contain" />
-                <span className="font-display font-bold text-lg">CleanCookIQ</span>
+              <div className="flex items-center gap-2 mb-5">
+                <span className="h-8 w-8 rounded-lg bg-gradient-ignis flex items-center justify-center shadow-ignis">
+                  <Flame className="h-4 w-4 text-white" strokeWidth={2.5} />
+                </span>
+                <span className="font-display font-bold text-base text-white">CleanCookIQ</span>
               </div>
-              <p className="text-sm text-primary-foreground/60">Orchestrating Kenya's transition to clean institutional cooking.</p>
+              <p className="text-sm text-white/55 leading-relaxed">
+                The coordination and intelligence layer for clean institutional cooking.
+              </p>
             </div>
             <div>
-              <h4 className="font-display font-semibold mb-3 text-sm text-primary-foreground">Marketplace</h4>
-              <div className="space-y-2">
-                <Link to="/marketplace" className="block text-sm text-primary-foreground/60 hover:text-accent">Browse products</Link>
-                <Link to="/providers" className="block text-sm text-primary-foreground/60 hover:text-accent">Provider directory</Link>
+              <h4 className="text-[11px] uppercase tracking-[0.18em] text-ignis-bright mb-4 font-medium">Marketplace</h4>
+              <div className="space-y-2.5">
+                <Link to="/marketplace" className="block text-sm text-white/65 hover:text-white transition-colors">Browse products</Link>
+                <Link to="/providers" className="block text-sm text-white/65 hover:text-white transition-colors">Provider directory</Link>
               </div>
             </div>
             <div>
-              <h4 className="font-display font-semibold mb-3 text-sm text-primary-foreground">Discover</h4>
-              <div className="space-y-2">
-                <Link to="/map" className="block text-sm text-primary-foreground/60 hover:text-accent">National map</Link>
-                <Link to="/counties" className="block text-sm text-primary-foreground/60 hover:text-accent">County profiles</Link>
-                <Link to="/resources" className="block text-sm text-primary-foreground/60 hover:text-accent">Resources</Link>
-                <Link to="/events" className="block text-sm text-primary-foreground/60 hover:text-accent">Events</Link>
-                <Link to="/news" className="block text-sm text-primary-foreground/60 hover:text-accent">News</Link>
-                <Link to="/policy" className="block text-sm text-primary-foreground/60 hover:text-accent">Policy library</Link>
+              <h4 className="text-[11px] uppercase tracking-[0.18em] text-ignis-bright mb-4 font-medium">Discover</h4>
+              <div className="space-y-2.5">
+                <Link to="/map" className="block text-sm text-white/65 hover:text-white transition-colors">National map</Link>
+                <Link to="/counties" className="block text-sm text-white/65 hover:text-white transition-colors">County profiles</Link>
+                <Link to="/resources" className="block text-sm text-white/65 hover:text-white transition-colors">Resources</Link>
+                <Link to="/events" className="block text-sm text-white/65 hover:text-white transition-colors">Events</Link>
+                <Link to="/news" className="block text-sm text-white/65 hover:text-white transition-colors">News</Link>
+                <Link to="/policy" className="block text-sm text-white/65 hover:text-white transition-colors">Policy library</Link>
               </div>
             </div>
             <div>
-              <h4 className="font-display font-semibold mb-3 text-sm text-primary-foreground">Company</h4>
-              <div className="space-y-2">
-                <Link to="/about" className="block text-sm text-primary-foreground/60 hover:text-accent">About</Link>
-                <Link to="/intelligence" className="block text-sm text-primary-foreground/60 hover:text-accent">Intelligence</Link>
-                <Link to="/book-demo" className="block text-sm text-primary-foreground/60 hover:text-accent">Book a demo</Link>
+              <h4 className="text-[11px] uppercase tracking-[0.18em] text-ignis-bright mb-4 font-medium">Company</h4>
+              <div className="space-y-2.5">
+                <Link to="/about" className="block text-sm text-white/65 hover:text-white transition-colors">About</Link>
+                <Link to="/intelligence" className="block text-sm text-white/65 hover:text-white transition-colors">Intelligence</Link>
+                <Link to="/book-demo" className="block text-sm text-white/65 hover:text-white transition-colors">Book a demo</Link>
               </div>
             </div>
           </div>
-          <div className="mt-8 pt-6 border-t border-primary-foreground/20 text-center text-xs text-primary-foreground/60">
-            © {new Date().getFullYear()} CleanCookIQ. All rights reserved.
+
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 border-t border-white/10 text-xs text-white/45">
+            <p>© {new Date().getFullYear()} CleanCookIQ. All rights reserved.</p>
+            <p>Built with intention in Nairobi.</p>
           </div>
         </div>
       </footer>

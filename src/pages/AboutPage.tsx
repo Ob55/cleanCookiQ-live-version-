@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import {
   Building2,
   Users,
-  Leaf,
   Factory,
   Rocket,
   Banknote,
@@ -19,6 +19,9 @@ import {
   ArrowDown,
   FileText,
   Download,
+  Flame,
+  Sparkles,
+  Globe,
 } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 import {
@@ -175,20 +178,26 @@ const inflectionPoints = [
   "Strong policy support across African markets",
 ];
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 30, filter: "blur(6px)" },
+  show: { opacity: 1, y: 0, filter: "blur(0px)" },
+};
+
 type ApproachPillar = (typeof approachPillars)[number];
 
 function ApproachCard({ pillar, step }: { pillar: ApproachPillar; step: number }) {
   const Icon = pillar.icon;
   return (
-    <div className="relative bg-card border border-border rounded-xl p-5 shadow-card hover:shadow-elevated transition-shadow h-full flex flex-col">
-      <div className="absolute -top-3 -left-3 h-8 w-8 rounded-full bg-accent text-accent-foreground text-xs font-bold flex items-center justify-center shadow-md z-10">
+    <div className="group relative ignis-card p-6 h-full flex flex-col hover:-translate-y-1 transition-transform duration-300">
+      <div className="absolute -top-3 -left-3 h-9 w-9 rounded-full bg-gradient-ignis text-white text-xs font-bold flex items-center justify-center shadow-ignis z-10">
         {step}
       </div>
-      <div className="h-11 w-11 rounded-xl bg-primary flex items-center justify-center mb-3">
-        <Icon className="h-5 w-5 text-primary-foreground" />
-      </div>
-      <h3 className="font-display font-bold text-base lg:text-lg leading-tight mb-2">{pillar.title}</h3>
-      <p className="text-sm text-muted-foreground leading-relaxed">{pillar.body}</p>
+      <span className="relative h-11 w-11 rounded-2xl liquid-glass-strong bg-sacramento/60 flex items-center justify-center mb-4">
+        <Icon className="h-5 w-5 text-ignis-bright" strokeWidth={1.8} />
+        <span className="absolute inset-0 rounded-2xl bg-ignis/30 blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+      </span>
+      <h3 className="font-display font-bold text-base lg:text-lg leading-tight mb-2 text-white">{pillar.title}</h3>
+      <p className="text-sm text-white/60 leading-relaxed">{pillar.body}</p>
     </div>
   );
 }
@@ -196,7 +205,7 @@ function ApproachCard({ pillar, step }: { pillar: ApproachPillar; step: number }
 function FlowArrow({ direction }: { direction: "right" | "down" }) {
   const Icon = direction === "right" ? ArrowRight : ArrowDown;
   return (
-    <div className="h-10 w-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary shrink-0">
+    <div className="h-10 w-10 rounded-full bg-ignis/15 border border-ignis/30 flex items-center justify-center text-ignis-bright shrink-0">
       <Icon className="h-5 w-5" strokeWidth={2.5} />
     </div>
   );
@@ -205,11 +214,9 @@ function FlowArrow({ direction }: { direction: "right" | "down" }) {
 export default function AboutPage() {
   const location = useLocation();
 
-  // Scroll to anchored section when arriving with #challenges (etc.)
   useEffect(() => {
     if (!location.hash) return;
     const id = location.hash.slice(1);
-    // Wait a tick for the section to mount, then scroll
     const t = setTimeout(() => {
       const el = document.getElementById(id);
       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -217,8 +224,6 @@ export default function AboutPage() {
     return () => clearTimeout(t);
   }, [location.hash]);
 
-  // Value-proposition resource (slug 'value-proposition' seeded in migration).
-  // Admins can upload/replace the file via AdminResources without a deploy.
   const { data: valueProp } = useQuery({
     queryKey: ["about-value-proposition"],
     queryFn: async () => {
@@ -241,331 +246,501 @@ export default function AboutPage() {
   const valuePropUrl = valueProp?.file_url || valueProp?.external_url || null;
 
   return (
-    <div>
-      {/* Hero */}
-      <section className="relative py-24 lg:py-32 overflow-hidden">
+    <div className="bg-background text-foreground">
+      {/* ─────────── HERO ─────────── */}
+      <section className="relative min-h-[80vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
           <img
             src={heroBg}
             alt="Clean cooking facility in rural Kenya"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover opacity-60"
             width={1920}
             height={1080}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-foreground/90 via-foreground/85 to-foreground/95" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/75 via-background/55 to-background/90" />
+          <div className="absolute inset-0 bg-hero-glow opacity-70" />
+          <div className="absolute inset-0 bg-ember-grid opacity-20" />
+          <div className="absolute top-1/3 left-[20%] h-2 w-2 rounded-full bg-ignis blur-sm animate-ember-float" />
+          <div className="absolute top-2/3 right-[25%] h-1.5 w-1.5 rounded-full bg-ignis-bright blur-sm animate-ember-float" style={{ animationDelay: "1.5s" }} />
         </div>
-        <div className="container relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 bg-accent/20 border border-accent/30 rounded-full px-4 py-1.5 mb-6">
-            <Leaf className="h-4 w-4 text-accent" />
-            <span className="text-xs font-medium text-accent">A Platform for Clean Cooking</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-primary-foreground mb-6 leading-tight">
-            About CleanCookIQ
+
+        <div className="relative z-10 w-full max-w-[1600px] mx-auto px-6 lg:px-12 pt-32 pb-20 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="inline-flex items-center gap-2 liquid-glass rounded-full px-4 py-1.5 mb-8"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-ignis-bright" />
+            <span className="text-xs font-medium text-white/85">A platform for clean cooking</span>
+          </motion.div>
+
+          <h1 className="font-editorial text-5xl md:text-7xl lg:text-8xl leading-[0.95] tracking-tight text-white max-w-5xl mx-auto">
+            <motion.span
+              initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="block"
+            >
+              About
+            </motion.span>
+            <motion.span
+              initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              className="italic text-gradient-ignis block"
+            >
+              CleanCookIQ.
+            </motion.span>
           </h1>
-          <p className="text-primary-foreground/80 max-w-3xl mx-auto text-lg leading-relaxed">
-            CleanCookIQ is a platform that helps institutions across Africa switch to clean cooking, faster.
-          </p>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.5 }}
+            className="mt-8 text-lg lg:text-xl text-white/70 max-w-3xl mx-auto leading-relaxed"
+          >
+            A platform that helps institutions across Africa switch to clean cooking, faster.
+          </motion.p>
+        </div>
+
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-background z-10" />
+      </section>
+
+      {/* ─────────── INTRO ─────────── */}
+      <section className="relative py-24 lg:py-32">
+        <div className="max-w-[1600px] mx-auto px-6 lg:px-12">
+          <div className="grid lg:grid-cols-[1fr_2fr] gap-12 lg:gap-20 max-w-6xl mx-auto">
+            <motion.div
+              initial="hidden" whileInView="show" viewport={{ once: true }}
+              variants={fadeUp} transition={{ duration: 0.7 }}
+            >
+              <span className="text-[11px] uppercase tracking-[0.2em] text-ignis-bright font-semibold">The story</span>
+              <h2 className="font-editorial italic text-4xl lg:text-5xl text-white mt-3 leading-[1.05]">
+                Not a project. <span className="text-gradient-ignis">A layer.</span>
+              </h2>
+            </motion.div>
+            <motion.div
+              initial="hidden" whileInView="show" viewport={{ once: true }}
+              variants={fadeUp} transition={{ duration: 0.7, delay: 0.15 }}
+              className="space-y-6"
+            >
+              <p className="text-white/75 text-lg leading-relaxed">
+                Built to solve the scattered nature of the clean cooking ecosystem, the platform connects institutions, solution providers, financiers, and partners, turning disconnected efforts into coordinated, ready-to-invest opportunities.
+              </p>
+              <p className="text-white/65 text-base leading-relaxed">
+                Rather than operating as a standalone project or technology provider, CleanCookIQ functions as the coordination and intelligence layer powering the next generation of clean cooking markets.
+              </p>
+            </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Intro */}
-      <section className="py-20 bg-background">
-        <div className="container max-w-3xl">
-          <p className="text-muted-foreground text-lg leading-relaxed mb-6">
-            Built to solve the scattered nature of the clean cooking ecosystem, the platform connects institutions, solution providers, financiers, and partners, turning disconnected efforts into coordinated, ready-to-invest opportunities.
-          </p>
-          <p className="text-muted-foreground text-lg leading-relaxed">
-            Rather than operating as a standalone project or technology provider, CleanCookIQ functions as the coordination and intelligence layer powering the next generation of clean cooking markets.
-          </p>
-        </div>
-      </section>
-
-      {/* Value Proposition — admin-managed via resources(slug='value-proposition') */}
+      {/* ─────────── VALUE PROPOSITION ─────────── */}
       {valueProp && (
-        <section id="value-proposition" className="py-14 bg-muted/20 scroll-mt-24">
-          <div className="container max-w-4xl">
-            <div className="bg-card border border-border rounded-2xl shadow-card overflow-hidden">
-              <div className="grid md:grid-cols-[auto_1fr_auto] gap-5 items-center p-6 md:p-8">
-                <div className="h-14 w-14 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto md:mx-0">
-                  <FileText className="h-7 w-7 text-primary" />
+        <section id="value-proposition" className="relative py-16 scroll-mt-24">
+          <div className="max-w-[1600px] mx-auto px-6 lg:px-12">
+            <motion.div
+              initial="hidden" whileInView="show" viewport={{ once: true }}
+              variants={fadeUp} transition={{ duration: 0.7 }}
+              className="ignis-card relative overflow-hidden max-w-5xl mx-auto"
+            >
+              <div className="absolute -right-32 -top-32 h-72 w-72 rounded-full bg-ignis/15 blur-3xl" />
+              <div className="relative grid md:grid-cols-[auto_1fr_auto] gap-6 items-center p-8 md:p-10">
+                <div className="h-16 w-16 rounded-2xl liquid-glass-strong bg-sacramento/60 flex items-center justify-center mx-auto md:mx-0">
+                  <FileText className="h-7 w-7 text-ignis-bright" />
                 </div>
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-1">
+                <div className="text-center md:text-left">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-ignis-bright mb-2">
                     Value Proposition
                   </p>
-                  <h2 className="font-display text-xl md:text-2xl font-bold mb-1.5">
+                  <h2 className="font-editorial italic text-2xl md:text-3xl text-white mb-2">
                     {valueProp.title}
                   </h2>
                   {valueProp.description && (
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                    <p className="text-sm text-white/65 leading-relaxed">
                       {valueProp.description}
                     </p>
                   )}
                 </div>
                 <div className="flex justify-center md:justify-end">
                   {valuePropUrl ? (
-                    <Button asChild size="lg" className="gap-2">
+                    <Button asChild size="lg" className="gap-2 bg-gradient-ignis text-white border-0 rounded-full shadow-ignis hover:translate-y-[-1px] transition-transform">
                       <a href={valuePropUrl} target="_blank" rel="noopener noreferrer">
                         <Download className="h-4 w-4" />
                         Read the brief
                       </a>
                     </Button>
                   ) : (
-                    <span className="text-xs text-muted-foreground italic">
+                    <span className="text-xs text-white/45 italic">
                       Document coming soon
                     </span>
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </section>
       )}
 
-      {/* Challenges + how we close them */}
-      <section id="challenges" className="py-20 bg-muted/20 scroll-mt-24">
-        <div className="container max-w-4xl">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">The Gaps We Close</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+      {/* ─────────── CHALLENGES ─────────── */}
+      <section id="challenges" className="relative py-28 lg:py-36 overflow-hidden scroll-mt-24">
+        <div className="absolute inset-0 bg-ember-grid opacity-15 pointer-events-none" />
+        <div className="absolute left-1/2 top-0 -translate-x-1/2 h-px w-1/2 bg-gradient-to-r from-transparent via-ignis/30 to-transparent" />
+
+        <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-ignis-bright mb-5">
+              <AlertCircle className="h-3 w-3" /> The gaps we close
+            </span>
+            <motion.h2
+              initial="hidden" whileInView="show" viewport={{ once: true }}
+              variants={fadeUp} transition={{ duration: 0.7 }}
+              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-white"
+            >
+              The gaps we <span className="italic text-gradient-ignis">close.</span>
+            </motion.h2>
+            <p className="mt-5 text-white/65 leading-relaxed">
               Even with growing momentum, clean cooking — especially at the institutional level — is held back by a few big barriers. Here is each barrier, and how CleanCookIQ closes it.
             </p>
-          </div>
-          <p className="text-xs text-muted-foreground text-center mb-4 italic">
-            Click any item to read the story behind the gap and how we close it.
-          </p>
-          <Accordion type="single" collapsible className="space-y-4">
-            {challenges.map((item, i) => (
-              <AccordionItem
-                key={item.title}
-                value={`challenge-${i}`}
-                className="bg-card border border-border rounded-xl shadow-card overflow-hidden data-[state=open]:shadow-elevated transition-shadow"
-              >
-                <AccordionTrigger className="px-5 py-4 hover:no-underline hover:bg-muted/30 text-left">
-                  <div className="flex items-start gap-4 flex-1">
-                    <div className="h-9 w-9 rounded-full bg-destructive/10 border border-destructive/30 flex items-center justify-center shrink-0">
-                      <AlertCircle className="h-4 w-4 text-destructive" />
-                    </div>
-                    <span className="font-display font-semibold text-foreground pt-1.5 leading-snug">
-                      {item.title}
-                    </span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="px-5 pb-6">
-                  <div className="ml-13 pl-13 space-y-4 text-sm leading-relaxed">
-                    <div>
-                      <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-1">
-                        What it looks like on the ground
-                      </p>
-                      <p className="text-foreground/85">{item.scenario}</p>
-                    </div>
-                    <div>
-                      <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-1">
-                        The pattern
-                      </p>
-                      <p className="text-foreground/85">{item.pattern}</p>
-                    </div>
-                    <div>
-                      <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-1">
-                        Why it matters
-                      </p>
-                      <p className="text-foreground/85">{item.cost}</p>
-                    </div>
-                    <div className="border-l-4 border-primary bg-primary/5 rounded-r-lg p-4 mt-4 space-y-3">
-                      <p className="text-[11px] font-bold uppercase tracking-widest text-primary flex items-center gap-1">
-                        <Check className="h-3 w-3" strokeWidth={3} /> How CleanCookIQ closes this gap
-                      </p>
-                      <p className="text-foreground/90 font-medium">{item.fix.summary}</p>
-                      <ul className="space-y-2 pt-1">
-                        {item.fix.mechanics.map((m, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-foreground/85">
-                            <Check className="h-3.5 w-3.5 text-primary mt-1 shrink-0" strokeWidth={3} />
-                            <span>{m}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-          <p className="text-muted-foreground text-center mt-10 max-w-2xl mx-auto">
-            These challenges slow down deployment, limit investment flows, and prevent the ecosystem from reaching its full potential.
-          </p>
-        </div>
-      </section>
-
-      {/* Our Approach — cyclic flow */}
-      <section className="py-20 bg-background">
-        <div className="container max-w-5xl">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Our Approach</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              A continuous cycle — every step strengthens the next, and the whole loop compounds momentum across the ecosystem.
+            <p className="text-xs text-white/40 mt-6 italic">
+              Click any item to read the story behind the gap and how we close it.
             </p>
           </div>
 
-          {/* xl (≥1280px): single horizontal row, 1 → 2 → 3 → 4 */}
-          <div className="hidden xl:grid grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] gap-x-3 items-stretch">
-            <ApproachCard pillar={approachPillars[0]} step={1} />
-            <div className="flex items-center"><FlowArrow direction="right" /></div>
-            <ApproachCard pillar={approachPillars[1]} step={2} />
-            <div className="flex items-center"><FlowArrow direction="right" /></div>
-            <ApproachCard pillar={approachPillars[2]} step={3} />
-            <div className="flex items-center"><FlowArrow direction="right" /></div>
-            <ApproachCard pillar={approachPillars[3]} step={4} />
-          </div>
-
-          {/* md/lg: 2×2 grid in natural reading order with right + down arrows */}
-          <div className="hidden md:grid xl:hidden grid-cols-[1fr_auto_1fr] gap-x-4 gap-y-4 items-stretch">
-            <ApproachCard pillar={approachPillars[0]} step={1} />
-            <div className="flex items-center justify-center"><FlowArrow direction="right" /></div>
-            <ApproachCard pillar={approachPillars[1]} step={2} />
-
-            <div className="flex justify-center"><FlowArrow direction="down" /></div>
-            <div />
-            <div className="flex justify-center"><FlowArrow direction="down" /></div>
-
-            <ApproachCard pillar={approachPillars[2]} step={3} />
-            <div className="flex items-center justify-center"><FlowArrow direction="right" /></div>
-            <ApproachCard pillar={approachPillars[3]} step={4} />
-          </div>
-
-          {/* mobile: vertical stack with down arrows */}
-          <div className="md:hidden space-y-3">
-            {approachPillars.map((p, i) => (
-              <div key={p.title}>
-                <ApproachCard pillar={p} step={i + 1} />
-                {i < approachPillars.length - 1 && (
-                  <div className="flex justify-center my-2"><FlowArrow direction="down" /></div>
-                )}
-              </div>
-            ))}
+          <div className="max-w-4xl mx-auto">
+            <Accordion type="single" collapsible className="space-y-3">
+              {challenges.map((item, i) => (
+                <motion.div
+                  key={item.title}
+                  initial="hidden" whileInView="show" viewport={{ once: true, margin: "-50px" }}
+                  variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.06 }}
+                >
+                  <AccordionItem
+                    value={`challenge-${i}`}
+                    className="ignis-card overflow-hidden data-[state=open]:shadow-ignis transition-shadow border-0"
+                  >
+                    <AccordionTrigger className="px-6 py-5 hover:no-underline group text-left [&[data-state=open]]:bg-ignis/5">
+                      <div className="flex items-start gap-4 flex-1">
+                        <span className="h-9 w-9 rounded-xl bg-ignis/15 border border-ignis/30 flex items-center justify-center shrink-0 group-data-[state=open]:bg-ignis group-data-[state=open]:border-ignis transition-colors">
+                          <span className="text-[11px] font-bold text-ignis-bright group-data-[state=open]:text-white tabular-nums">
+                            0{i + 1}
+                          </span>
+                        </span>
+                        <span className="font-display font-semibold text-white pt-1.5 leading-snug">
+                          {item.title}
+                        </span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-6 pb-7">
+                      <div className="space-y-5 text-sm leading-relaxed pl-0 md:pl-13">
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-ignis-bright mb-2">
+                            What it looks like on the ground
+                          </p>
+                          <p className="text-white/75">{item.scenario}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-ignis-bright mb-2">
+                            The pattern
+                          </p>
+                          <p className="text-white/75">{item.pattern}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-ignis-bright mb-2">
+                            Why it matters
+                          </p>
+                          <p className="text-white/75">{item.cost}</p>
+                        </div>
+                        <div className="relative overflow-hidden border-l-2 border-ignis/60 bg-ignis/5 rounded-r-xl p-5 mt-4 space-y-3">
+                          <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-ignis/15 blur-2xl" />
+                          <p className="relative text-[10px] font-bold uppercase tracking-[0.2em] text-ignis-bright flex items-center gap-1.5">
+                            <Check className="h-3 w-3" strokeWidth={3} /> How CleanCookIQ closes this gap
+                          </p>
+                          <p className="relative text-white font-medium">{item.fix.summary}</p>
+                          <ul className="relative space-y-2 pt-1">
+                            {item.fix.mechanics.map((m, idx) => (
+                              <li key={idx} className="flex items-start gap-2 text-white/80">
+                                <Check className="h-3.5 w-3.5 text-ignis-bright mt-1 shrink-0" strokeWidth={3} />
+                                <span>{m}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </motion.div>
+              ))}
+            </Accordion>
+            <p className="text-white/60 text-center mt-12 max-w-2xl mx-auto leading-relaxed">
+              These challenges slow down deployment, limit investment flows, and prevent the ecosystem from reaching its full potential.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-20 bg-muted/20">
-        <div className="container max-w-5xl">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">How It Works</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+      {/* ─────────── OUR APPROACH ─────────── */}
+      <section className="relative py-28 lg:py-36 overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-sacramento/40 to-background" />
+        </div>
+
+        <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-ignis-bright mb-5">
+              <Layers className="h-3 w-3" /> Our approach
+            </span>
+            <motion.h2
+              initial="hidden" whileInView="show" viewport={{ once: true }}
+              variants={fadeUp} transition={{ duration: 0.7 }}
+              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-white"
+            >
+              A continuous <span className="italic text-gradient-ignis">cycle.</span>
+            </motion.h2>
+            <p className="mt-5 text-white/65 leading-relaxed">
+              Every step strengthens the next, and the whole loop compounds momentum across the ecosystem.
+            </p>
+          </div>
+
+          <div className="max-w-6xl mx-auto">
+            {/* xl: single horizontal row */}
+            <div className="hidden xl:grid grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] gap-x-3 items-stretch">
+              <ApproachCard pillar={approachPillars[0]} step={1} />
+              <div className="flex items-center"><FlowArrow direction="right" /></div>
+              <ApproachCard pillar={approachPillars[1]} step={2} />
+              <div className="flex items-center"><FlowArrow direction="right" /></div>
+              <ApproachCard pillar={approachPillars[2]} step={3} />
+              <div className="flex items-center"><FlowArrow direction="right" /></div>
+              <ApproachCard pillar={approachPillars[3]} step={4} />
+            </div>
+
+            {/* md/lg: 2×2 grid */}
+            <div className="hidden md:grid xl:hidden grid-cols-[1fr_auto_1fr] gap-x-4 gap-y-4 items-stretch">
+              <ApproachCard pillar={approachPillars[0]} step={1} />
+              <div className="flex items-center justify-center"><FlowArrow direction="right" /></div>
+              <ApproachCard pillar={approachPillars[1]} step={2} />
+
+              <div className="flex justify-center"><FlowArrow direction="down" /></div>
+              <div />
+              <div className="flex justify-center"><FlowArrow direction="down" /></div>
+
+              <ApproachCard pillar={approachPillars[2]} step={3} />
+              <div className="flex items-center justify-center"><FlowArrow direction="right" /></div>
+              <ApproachCard pillar={approachPillars[3]} step={4} />
+            </div>
+
+            {/* mobile: vertical stack */}
+            <div className="md:hidden space-y-3">
+              {approachPillars.map((p, i) => (
+                <div key={p.title}>
+                  <ApproachCard pillar={p} step={i + 1} />
+                  {i < approachPillars.length - 1 && (
+                    <div className="flex justify-center my-2"><FlowArrow direction="down" /></div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────── HOW IT WORKS ─────────── */}
+      <section className="relative py-28 lg:py-36 overflow-hidden">
+        <div className="absolute inset-0 bg-ember-grid opacity-15 pointer-events-none" />
+
+        <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-ignis-bright mb-5">
+              <Rocket className="h-3 w-3" /> How it works
+            </span>
+            <motion.h2
+              initial="hidden" whileInView="show" viewport={{ once: true }}
+              variants={fadeUp} transition={{ duration: 0.7 }}
+              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-white"
+            >
+              Coordination, <span className="italic text-gradient-ignis">made simple.</span>
+            </motion.h2>
+            <p className="mt-5 text-white/65">
               CleanCookIQ transforms clean cooking deployment into a coordinated process.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {howItWorksSteps.map((s) => (
-              <div key={s.step} className="bg-card border border-border rounded-xl p-6 shadow-card">
-                <span className="text-xs font-bold text-primary tracking-widest uppercase">Step {s.step}</span>
-                <h3 className="font-display font-bold text-lg mt-2 mb-2">{s.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* Who We Serve */}
-      <section className="py-20 bg-background">
-        <div className="container max-w-5xl">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Who We Serve</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              CleanCookIQ is designed for a multi-stakeholder ecosystem.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {stakeholders.map((s) => (
-              <div key={s.title} className="bg-card border border-border rounded-xl p-6 shadow-card">
-                <div className="h-10 w-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
-                  <s.icon className="h-5 w-5 text-primary" />
-                </div>
-                <h3 className="font-display font-bold text-lg mb-2">{s.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Why Now */}
-      <section className="py-20 bg-muted/20">
-        <div className="container max-w-3xl">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Why Now</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              The clean cooking sector is at a critical inflection point.
-            </p>
-          </div>
-          <ul className="space-y-4">
-            {inflectionPoints.map((item) => (
-              <li
-                key={item}
-                className="flex items-start gap-4 bg-card border border-border rounded-xl p-5 shadow-card"
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
+            {howItWorksSteps.map((s, i) => (
+              <motion.div
+                key={s.step}
+                initial="hidden" whileInView="show" viewport={{ once: true, margin: "-50px" }}
+                variants={fadeUp} transition={{ duration: 0.6, delay: i * 0.1 }}
+                className="group ignis-card p-7 hover:-translate-y-1 transition-transform"
               >
-                <div className="h-9 w-9 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0">
-                  <Zap className="h-4 w-4 text-primary" />
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-[10px] font-bold text-ignis-bright tracking-[0.2em] uppercase">Step {s.step}</span>
+                  <span className="font-editorial italic text-2xl text-white/15 group-hover:text-ignis/40 transition-colors">0{i + 1}</span>
                 </div>
-                <p className="text-foreground font-medium pt-1.5">{item}</p>
-              </li>
+                <h3 className="font-display font-bold text-lg text-white mb-2">{s.title}</h3>
+                <p className="text-sm text-white/60 leading-relaxed">{s.desc}</p>
+              </motion.div>
             ))}
-          </ul>
-          <p className="text-muted-foreground text-center mt-10 max-w-2xl mx-auto">
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────── WHO WE SERVE ─────────── */}
+      <section className="relative py-28 lg:py-36 overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-sacramento/40 to-background" />
+        </div>
+
+        <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-ignis-bright mb-5">
+              <Users className="h-3 w-3" /> Who we serve
+            </span>
+            <motion.h2
+              initial="hidden" whileInView="show" viewport={{ once: true }}
+              variants={fadeUp} transition={{ duration: 0.7 }}
+              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-white"
+            >
+              A multi-stakeholder <span className="italic text-gradient-ignis">ecosystem.</span>
+            </motion.h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
+            {stakeholders.map((s, i) => (
+              <motion.div
+                key={s.title}
+                initial="hidden" whileInView="show" viewport={{ once: true, margin: "-50px" }}
+                variants={fadeUp} transition={{ duration: 0.6, delay: i * 0.08 }}
+                className="group ignis-card p-7 hover:-translate-y-1 transition-transform"
+              >
+                <span className="relative inline-flex h-12 w-12 rounded-2xl liquid-glass-strong bg-sacramento/60 items-center justify-center mb-5">
+                  <s.icon className="h-5 w-5 text-ignis-bright" strokeWidth={1.8} />
+                  <span className="absolute inset-0 rounded-2xl bg-ignis/30 blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </span>
+                <h3 className="font-display font-bold text-lg text-white mb-2">{s.title}</h3>
+                <p className="text-sm text-white/60 leading-relaxed">{s.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────── WHY NOW ─────────── */}
+      <section className="relative py-28 lg:py-36 overflow-hidden">
+        <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-ignis-bright mb-5">
+              <Zap className="h-3 w-3" /> Why now
+            </span>
+            <motion.h2
+              initial="hidden" whileInView="show" viewport={{ once: true }}
+              variants={fadeUp} transition={{ duration: 0.7 }}
+              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-white"
+            >
+              A critical <span className="italic text-gradient-ignis">inflection point.</span>
+            </motion.h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+            {inflectionPoints.map((item, i) => (
+              <motion.div
+                key={item}
+                initial="hidden" whileInView="show" viewport={{ once: true, margin: "-50px" }}
+                variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.08 }}
+                className="ignis-card flex items-start gap-4 p-5"
+              >
+                <span className="h-10 w-10 rounded-xl bg-ignis/15 border border-ignis/30 flex items-center justify-center shrink-0">
+                  <Zap className="h-4 w-4 text-ignis-bright" />
+                </span>
+                <p className="text-white/85 font-medium pt-2 leading-snug">{item}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <p className="text-white/60 text-center mt-12 max-w-2xl mx-auto leading-relaxed">
             CleanCookIQ exists to turn this momentum into real, large-scale progress, not scattered wins.
           </p>
         </div>
       </section>
 
-      {/* Our Focus */}
-      <section className="py-20 bg-background">
-        <div className="container max-w-4xl">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Our Focus</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+      {/* ─────────── OUR FOCUS ─────────── */}
+      <section className="relative py-28 lg:py-36 overflow-hidden">
+        <div className="absolute inset-0 bg-ember-grid opacity-15 pointer-events-none" />
+
+        <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-ignis-bright mb-5">
+              <Globe className="h-3 w-3" /> Our focus
+            </span>
+            <motion.h2
+              initial="hidden" whileInView="show" viewport={{ once: true }}
+              variants={fadeUp} transition={{ duration: 0.7 }}
+              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-white"
+            >
+              From Kenya, <span className="italic text-gradient-ignis">outward.</span>
+            </motion.h2>
+            <p className="mt-5 text-white/65 max-w-2xl mx-auto">
               The platform is initially focused on institutional markets, where impact can be aggregated and scaled efficiently.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-card border border-border rounded-xl p-7 shadow-card">
-              <div className="flex items-center gap-3 mb-3">
-                <MapPin className="h-5 w-5 text-primary" />
-                <span className="text-xs font-bold text-primary tracking-widest uppercase">Wave 1</span>
-              </div>
-              <h3 className="font-display font-bold text-2xl">Kenya</h3>
-            </div>
-            <div className="bg-card border border-border rounded-xl p-7 shadow-card">
-              <div className="flex items-center gap-3 mb-3">
-                <MapPin className="h-5 w-5 text-primary" />
-                <span className="text-xs font-bold text-primary tracking-widest uppercase">Wave 2</span>
-              </div>
-              <h3 className="font-display font-bold text-2xl">Uganda and Sierra Leone</h3>
-            </div>
-            <div className="bg-card border border-border rounded-xl p-7 shadow-card">
-              <div className="flex items-center gap-3 mb-3">
-                <MapPin className="h-5 w-5 text-primary" />
-                <span className="text-xs font-bold text-primary tracking-widest uppercase">Wave 3</span>
-              </div>
-              <h3 className="font-display font-bold text-2xl">Africa and the rest of the world</h3>
-            </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+            {[
+              { wave: "Wave 1", region: "Kenya" },
+              { wave: "Wave 2", region: "Uganda and Sierra Leone" },
+              { wave: "Wave 3", region: "Africa and the rest of the world" },
+            ].map((item, i) => (
+              <motion.div
+                key={item.wave}
+                initial="hidden" whileInView="show" viewport={{ once: true, margin: "-50px" }}
+                variants={fadeUp} transition={{ duration: 0.6, delay: i * 0.12 }}
+                className="group ignis-card p-8 hover:-translate-y-1 transition-transform relative overflow-hidden"
+              >
+                <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-ignis/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative flex items-center gap-3 mb-4">
+                  <MapPin className="h-4 w-4 text-ignis-bright" />
+                  <span className="text-[10px] font-bold text-ignis-bright tracking-[0.2em] uppercase">{item.wave}</span>
+                </div>
+                <h3 className="relative font-editorial italic text-3xl text-white leading-tight">{item.region}</h3>
+              </motion.div>
+            ))}
           </div>
-          <p className="text-muted-foreground text-center mt-8 max-w-2xl mx-auto">
+
+          <p className="text-white/55 text-center mt-12 max-w-2xl mx-auto">
             These markets offer enabling environments for rapid deployment and ecosystem collaboration.
           </p>
         </div>
       </section>
 
-      {/* Our Vision */}
-      <section className="py-20 bg-gradient-hero text-primary-foreground">
-        <div className="container max-w-3xl text-center">
-          <h2 className="text-3xl md:text-4xl font-display font-bold mb-6">Our Vision</h2>
-          <p className="text-primary-foreground/90 text-xl leading-relaxed font-display italic">
-            To build the operating system for clean cooking markets, enabling coordinated, data-driven, large-scale change across Africa and beyond.
-          </p>
+      {/* ─────────── OUR VISION ─────────── */}
+      <section className="relative py-32 lg:py-44 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-[hsl(141_55%_10%)] to-background" />
+        <div className="absolute inset-0 bg-hero-glow opacity-80" />
+        <div className="absolute inset-0 bg-ember-grid opacity-25" />
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-ignis/20 blur-3xl animate-glow-pulse" />
+
+        <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12 text-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="inline-flex items-center gap-2 liquid-glass rounded-full px-4 py-1.5 mb-8"
+          >
+            <Flame className="h-3.5 w-3.5 text-ignis-bright" />
+            <span className="text-xs font-medium text-white/85 uppercase tracking-[0.2em]">Our vision</span>
+          </motion.div>
+
+          <motion.h2
+            initial="hidden" whileInView="show" viewport={{ once: true }}
+            variants={fadeUp} transition={{ duration: 0.8 }}
+            className="font-editorial italic text-4xl md:text-6xl lg:text-7xl leading-[1.05] tracking-tight text-white max-w-5xl mx-auto"
+          >
+            To build the operating system for <span className="text-gradient-ignis">clean cooking markets</span>, enabling coordinated, data-driven, large-scale change across Africa and beyond.
+          </motion.h2>
         </div>
       </section>
-
     </div>
   );
 }

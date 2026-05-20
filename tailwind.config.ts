@@ -15,7 +15,8 @@ export default {
     extend: {
       fontFamily: {
         display: ["'Playfair Display'", "Georgia", "serif"],
-        body: ["'DM Sans'", "system-ui", "sans-serif"],
+        editorial: ["'Instrument Serif'", "'Playfair Display'", "Georgia", "serif"],
+        body: ["'Inter'", "'DM Sans'", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -61,6 +62,7 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Legacy aliases kept so dashboard pages keep working.
         emerald: {
           DEFAULT: "hsl(var(--emerald))",
           light: "hsl(var(--emerald-light))",
@@ -78,6 +80,17 @@ export default {
         sage: "hsl(var(--sage))",
         cream: "hsl(var(--cream))",
         charcoal: "hsl(var(--charcoal))",
+        // Ignis tokens
+        ignis: {
+          DEFAULT: "hsl(var(--ignis))",
+          bright: "hsl(var(--ignis-bright))",
+          deep: "hsl(var(--ignis-deep))",
+        },
+        "rich-emerald": "hsl(var(--rich-emerald))",
+        "sap-green": "hsl(var(--sap-green))",
+        sacramento: "hsl(var(--sacramento))",
+        "la-salle": "hsl(var(--la-salle))",
+        "hunter-green": "hsl(var(--hunter-green))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -96,6 +109,10 @@ export default {
         "fade-in": {
           from: { opacity: "0", transform: "translateY(16px)" },
           to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "fade-up": {
+          from: { opacity: "0", transform: "translateY(20px)", filter: "blur(4px)" },
+          to: { opacity: "1", transform: "translateY(0)", filter: "blur(0)" },
         },
         "count-up": {
           from: { opacity: "0", transform: "scale(0.8)" },
@@ -118,16 +135,32 @@ export default {
           "60%": { transform: "rotateX(20deg)", opacity: "1" },
           "100%": { transform: "rotateX(0deg)", opacity: "1" },
         },
+        "ember-float": {
+          "0%, 100%": { transform: "translateY(0) scale(1)", opacity: "0.5" },
+          "50%": { transform: "translateY(-12px) scale(1.05)", opacity: "0.9" },
+        },
+        "glow-pulse": {
+          "0%, 100%": { opacity: "0.6", filter: "blur(60px)" },
+          "50%": { opacity: "1", filter: "blur(40px)" },
+        },
+        "spin-slow": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 1.4s ease-out forwards",
+        "fade-up": "fade-up 700ms cubic-bezier(0.16, 1, 0.3, 1) forwards",
         "count-up": "count-up 0.8s ease-out forwards",
-        "marquee": "marquee 30s linear infinite",
+        "marquee": "marquee 35s linear infinite",
         "arrow-pulse": "arrow-pulse 1.4s ease-in-out infinite",
         "slide-up": "slide-up 1.6s ease-out forwards",
         "flip-down": "flip-down 0.55s cubic-bezier(0.33, 1, 0.68, 1)",
+        "ember-float": "ember-float 6s ease-in-out infinite",
+        "glow-pulse": "glow-pulse 4s ease-in-out infinite",
+        "spin-slow": "spin-slow 30s linear infinite",
       },
     },
   },

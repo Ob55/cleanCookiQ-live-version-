@@ -1,10 +1,14 @@
 import { Link, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { MapPin, BarChart3, Users, TrendingUp, Leaf, Building2, ArrowRight, Flame, Factory, Banknote, Briefcase, FolderKanban, GraduationCap, UserPlus, ClipboardCheck, Handshake, Rocket, Activity, ChevronRight, Check, AlertCircle } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  MapPin, BarChart3, TrendingUp, Leaf, Building2,
+  ArrowRight, Flame, Factory, Banknote, Briefcase, FolderKanban,
+  GraduationCap, UserPlus, ClipboardCheck, Handshake, Rocket, Activity,
+  ChevronRight, Check, AlertCircle, ArrowUpRight,
+} from "lucide-react";
 import FuelOptionsSection from "@/components/institution/FuelOptionsSection";
 import { supabase } from "@/integrations/supabase/client";
-import heroBg from "@/assets/hero-bg.jpg";
 import kitchenTransitionBg from "@/assets/kitchen-transition.png";
 import partner1 from "@/assets/partners/partner1.png";
 import partner2 from "@/assets/partners/partner2.png";
@@ -34,12 +38,12 @@ function formatPipelineValue(totalKsh: number): { num: number; suffix: string; d
 }
 
 const modules = [
-  { title: "Institution Map", desc: "An interactive map showing every institution, the fuel they cook with today, how ready they are to switch, and the progress of their transition.", icon: MapPin, color: "bg-primary" },
-  { title: "Provider Directory", desc: "A vetted list of equipment suppliers, installers, and service partners, organised by category so institutions can find the right fit.", icon: Factory, color: "bg-accent" },
-  { title: "Training & Technical Support", desc: "Connects institutions that need training or design help with qualified support partners in their county.", icon: GraduationCap, color: "bg-emerald-light" },
-  { title: "Financing", desc: "Brings grants, loans, and investment together in one place, and connects institutions with funders.", icon: Banknote, color: "bg-primary" },
-  { title: "Portfolio Tracking", desc: "Once equipment is installed, the platform tracks performance, service contracts, and support requests.", icon: Briefcase, color: "bg-accent" },
-  { title: "Programme Management", desc: "Tools for running large programmes across many institutions: procurement, provider bidding, and due diligence.", icon: FolderKanban, color: "bg-emerald-light" },
+  { title: "Institution Map", desc: "An interactive map showing every institution, the fuel they cook with today, how ready they are to switch, and the progress of their transition.", icon: MapPin },
+  { title: "Provider Directory", desc: "A vetted list of equipment suppliers, installers, and service partners, organised by category so institutions can find the right fit.", icon: Factory },
+  { title: "Training & Technical Support", desc: "Connects institutions that need training or design help with qualified support partners in their county.", icon: GraduationCap },
+  { title: "Financing", desc: "Brings grants, loans, and investment together in one place, and connects institutions with funders.", icon: Banknote },
+  { title: "Portfolio Tracking", desc: "Once equipment is installed, the platform tracks performance, service contracts, and support requests.", icon: Briefcase },
+  { title: "Programme Management", desc: "Tools for running large programmes across many institutions: procurement, provider bidding, and due diligence.", icon: FolderKanban },
 ];
 
 const failures = [
@@ -54,6 +58,31 @@ const steps = [
   { step: "04", title: "Install", icon: Rocket, desc: "Equipment is installed and progress is tracked in real time." },
   { step: "05", title: "Monitor", icon: Activity, desc: "After installation, we track performance and produce impact and carbon reports." },
 ];
+
+// Word-by-word reveal for the hero headline. Each word fades up + un-blurs
+// in turn — adapted from the BlurText pattern in the Liquid Glass prompt.
+function BlurWords({ text, delay = 0, className = "" }: { text: string; delay?: number; className?: string }) {
+  return (
+    <span className={className}>
+      {text.split(" ").map((word, i) => (
+        <motion.span
+          key={`${word}-${i}`}
+          initial={{ opacity: 0, y: 28, filter: "blur(10px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.65, delay: delay + i * 0.08, ease: [0.16, 1, 0.3, 1] }}
+          className="inline-block mr-[0.22em]"
+        >
+          {word}
+        </motion.span>
+      ))}
+    </span>
+  );
+}
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 30, filter: "blur(6px)" },
+  show: { opacity: 1, y: 0, filter: "blur(0px)" },
+};
 
 export default function HomePage() {
   const { user, profile, roles, loading } = useAuth();
@@ -99,95 +128,12 @@ export default function HomePage() {
   }
 
   return (
-    <div>
-      {/* Hero */}
-      <section className="relative min-h-[85vh] flex items-center overflow-hidden -mt-[68px] pt-[68px]">
-        <div className="absolute inset-0">
-          <img src={kitchenTransitionBg} alt="Institutional kitchen transitioning to clean cooking equipment" className="w-full h-full object-cover" width={1920} height={1080} />
-          <div className="absolute inset-0 bg-gradient-to-r from-foreground/95 via-foreground/85 to-foreground/50" />
-        </div>
-        <div className="container relative z-10 py-20">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 bg-accent/20 border border-accent/30 rounded-full px-4 py-1.5 mb-6 animate-fade-in" style={{ animationDelay: "0ms" }}>
-              <Leaf className="h-4 w-4 text-accent" />
-              <span className="text-xs font-medium text-accent">National Coordination Platform</span>
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-primary-foreground leading-tight mb-6 animate-fade-in" style={{ animationDelay: "150ms" }}>
-              Powering Kenya's Clean Cooking Transition
-            </h1>
-            <p className="text-lg text-primary-foreground/80 mb-8 max-w-xl font-body animate-fade-in" style={{ animationDelay: "300ms" }}>
-              Digital Infrastructure that converts fragmented demand, dispersed supply, and available financing into a structured, verified national transition pipeline.
-            </p>
-            <div className="flex flex-wrap gap-4 animate-fade-in" style={{ animationDelay: "500ms" }}>
-              <Link to="/map">
-                <Button size="lg" className="bg-accent text-accent-foreground hover:bg-amber-light font-semibold">
-                  <MapPin className="mr-2 h-4 w-4" /> Explore the Map
-                </Button>
-              </Link>
-              <Link to="/book-demo">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="bg-transparent border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground font-semibold"
-                >
-                  Book a Demo <ChevronRight className="ml-1 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Live Stats Bar */}
-      <section className="bg-primary py-5">
-        <div className="container">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {stats.map((stat) => (
-              <div key={stat.label} className="flex items-center gap-3 text-primary-foreground">
-                <stat.icon className="h-5 w-5 text-accent shrink-0" />
-                <div>
-                  <p className="text-lg md:text-xl font-display font-bold">
-                    <AnimatedNumber value={stat.num} suffix={stat.suffix} decimals={stat.decimals} />
-                  </p>
-                  <p className="text-[11px] text-primary-foreground/70 leading-tight">{stat.label}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 6 Modules */}
-      <section className="py-20 lg:py-28 bg-background">
-        <div className="container">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">What the Platform Does</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">Everything needed to move an institution from its current fuel to a clean alternative, in one place.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {modules.map((mod, i) => (
-              <div key={mod.title} className="relative bg-card rounded-xl p-8 shadow-card border border-border hover:shadow-elevated transition-shadow">
-                <div className="flex items-center gap-4 mb-5">
-                  <div className={`h-12 w-12 rounded-xl ${mod.color} flex items-center justify-center`}>
-                    <mod.icon className="h-6 w-6 text-primary-foreground" />
-                  </div>
-                  <span className="text-sm font-bold text-muted-foreground font-body">Module {i + 1}</span>
-                </div>
-                <h3 className="font-display font-bold text-xl mb-3">{mod.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{mod.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Fuel Options */}
-      <section className="py-20 lg:py-28 bg-background">
-        <div className="container"><FuelOptionsSection /></div>
-      </section>
-
-      {/* Five Market Failures — two columns */}
-      <section className="relative py-20 lg:py-28 overflow-hidden">
+    <div className="bg-background text-foreground">
+      {/* ─────────── HERO ─────────── */}
+      <section className="relative min-h-screen flex items-center overflow-hidden">
+        {/* Background image — kept clearly visible. Black vignette on
+            the left for headline legibility, image breathes on the right
+            behind the stat cards. */}
         <div className="absolute inset-0">
           <img
             src={kitchenTransitionBg}
@@ -196,89 +142,383 @@ export default function HomePage() {
             width={1920}
             height={1080}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-foreground/85 via-foreground/80 to-foreground/90" />
+          {/* brand-green wash for text contrast (heaviest on the left,
+              fades right so the kitchen photo breathes behind the cards) */}
+          <div className="absolute inset-0 bg-gradient-to-r from-background/92 via-background/70 to-background/25" />
+          {/* bottom fade into next section */}
+          <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-b from-transparent to-background" />
+          {/* warm + green glow + ember grid for ambience */}
+          <div className="absolute inset-0 bg-hero-glow opacity-70" />
+          <div className="absolute inset-0 bg-ember-grid opacity-20" />
+          {/* floating orange embers */}
+          <div className="absolute top-1/3 left-[15%] h-2 w-2 rounded-full bg-ignis blur-sm animate-ember-float" style={{ animationDelay: "0s" }} />
+          <div className="absolute top-2/3 left-[28%] h-1.5 w-1.5 rounded-full bg-ignis-bright blur-sm animate-ember-float" style={{ animationDelay: "1.2s" }} />
+          <div className="absolute top-1/4 right-[20%] h-2 w-2 rounded-full bg-ignis blur-sm animate-ember-float" style={{ animationDelay: "2.4s" }} />
+          <div className="absolute bottom-1/3 right-[10%] h-1.5 w-1.5 rounded-full bg-ignis-bright blur-sm animate-ember-float" style={{ animationDelay: "0.6s" }} />
         </div>
-        <div className="container relative z-10">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 text-primary-foreground">Closing the Gaps in Institutional Clean Cooking</h2>
-            <p className="text-primary-foreground/80 max-w-2xl mx-auto">The clean cooking sector for institutions has real gaps. CleanCookIQ fills them.</p>
+
+        <div className="relative z-10 w-full max-w-[1600px] mx-auto px-6 lg:px-12 pt-32 pb-20">
+          <div className="grid lg:grid-cols-[1.2fr_1fr] gap-10 items-center">
+            {/* Headline column */}
+            <div>
+              <h1 className="font-editorial text-[3rem] sm:text-6xl lg:text-7xl xl:text-[5.5rem] leading-[0.95] tracking-tight text-white">
+                <BlurWords text="Powering Kenya's" />
+                <br />
+                <motion.span
+                  initial={{ opacity: 0, y: 28, filter: "blur(10px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  className="italic ignis-shimmer inline-block"
+                >
+                  clean cooking
+                </motion.span>
+                <br />
+                <BlurWords text="transition." delay={0.5} />
+              </h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.8, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="mt-8 inline-block bg-[#F6F3EE] text-black text-base lg:text-lg leading-relaxed max-w-xl rounded-2xl px-5 py-4 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)] border-l-4 border-[#FF8C00]"
+              >
+                Digital infrastructure that converts fragmented demand, dispersed supply, and available financing into a structured, verified national transition pipeline.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 1.1 }}
+                className="mt-10 flex flex-wrap gap-3"
+              >
+                <Link to="/map">
+                  <button className="group relative inline-flex items-center gap-2 h-12 px-7 rounded-full bg-gradient-ignis text-white font-semibold shadow-ignis hover:translate-y-[-1px] transition-transform">
+                    <MapPin className="h-4 w-4" /> Explore the Map
+                    <span className="absolute inset-0 rounded-full bg-gradient-ignis opacity-50 blur-md -z-10 group-hover:opacity-80 transition-opacity" />
+                  </button>
+                </Link>
+                <Link to="/book-demo">
+                  <button className="inline-flex items-center gap-2 h-12 px-7 rounded-full liquid-glass-strong text-white font-medium hover:bg-white/10 transition-colors">
+                    Book a Demo <ArrowUpRight className="h-4 w-4" />
+                  </button>
+                </Link>
+              </motion.div>
+
+              {/* mini partner strip */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 1.4 }}
+                className="mt-14 flex flex-wrap items-center gap-x-6 gap-y-3"
+              >
+                <span className="text-[11px] uppercase tracking-[0.18em] text-[#FF8C00] font-bold drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">Trusted partners</span>
+                <div className="flex items-center gap-5">
+                  {partners.slice(0, 4).map((p, i) => (
+                    <img key={i} src={p} alt="" className="h-7 max-w-[80px] object-contain" />
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Right column — floating glass stat cards */}
+            <motion.div
+              initial={{ opacity: 0, x: 40, filter: "blur(8px)" }}
+              animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.9, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="hidden lg:block relative"
+            >
+              {/* Big featured stat */}
+              <div className="liquid-glass-strong rounded-[2rem] p-8 mb-4 bg-background/75">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="h-2 w-2 rounded-full bg-ignis animate-pulse" />
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-ignis-bright font-semibold">Live pipeline</span>
+                </div>
+                <p className="font-editorial italic text-6xl text-white leading-none">
+                  <AnimatedNumber value={totalInstitutions} />
+                </p>
+                <p className="mt-3 text-sm text-white/85">institutions being tracked across <span className="text-white font-medium">47 counties</span></p>
+                <div className="mt-6 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                <div className="mt-4 grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.18em] text-white/65 mb-1">Assessed</p>
+                    <p className="font-display font-bold text-2xl text-white"><AnimatedNumber value={assessedCount} /></p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.18em] text-white/65 mb-1">In delivery</p>
+                    <p className="font-display font-bold text-2xl text-ignis-bright"><AnimatedNumber value={inDeliveryCount} /></p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="liquid-glass rounded-2xl p-5 bg-background/60">
+                  <Leaf className="h-5 w-5 text-rich-emerald mb-3" />
+                  <p className="font-display font-bold text-2xl text-white"><AnimatedNumber value={co2Tonnes} /></p>
+                  <p className="text-[11px] text-white/75 mt-1 leading-tight">Tonnes CO₂ avoided / year</p>
+                </div>
+                <div className="liquid-glass rounded-2xl p-5 bg-background/60">
+                  <Flame className="h-5 w-5 text-ignis mb-3" />
+                  <p className="font-display font-bold text-2xl text-white">
+                    KSh <AnimatedNumber value={pipelineDisplay.num} suffix={pipelineDisplay.suffix} decimals={pipelineDisplay.decimals} />
+                  </p>
+                  <p className="text-[11px] text-white/75 mt-1 leading-tight">Pipeline value</p>
+                </div>
+              </div>
+            </motion.div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 rounded-2xl overflow-hidden shadow-elevated border border-border">
-            {/* Left — Failures */}
-            <div className="p-8 lg:p-10 bg-background">
+        </div>
+
+        {/* Bottom fade into next section */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-background z-10" />
+      </section>
+
+      {/* ─────────── LIVE STATS BAR (mobile + tablet) ─────────── */}
+      <section className="lg:hidden relative -mt-6 z-20">
+        <div className="max-w-[1600px] mx-auto px-6">
+          <div className="ignis-card p-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {stats.map((s) => (
+                <div key={s.label} className="flex items-center gap-3">
+                  <s.icon className="h-5 w-5 text-ignis-bright shrink-0" />
+                  <div>
+                    <p className="font-display font-bold text-lg text-white leading-none">
+                      <AnimatedNumber value={s.num} suffix={s.suffix} decimals={s.decimals} />
+                    </p>
+                    <p className="text-[10px] text-white/55 mt-0.5 leading-tight">{s.label}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────── WHAT THE PLATFORM DOES ─────────── */}
+      <section className="relative py-28 lg:py-36 overflow-hidden">
+        <div className="absolute inset-0 bg-ember-grid opacity-20 pointer-events-none" />
+        <div className="absolute left-1/2 top-0 -translate-x-1/2 h-px w-1/2 bg-gradient-to-r from-transparent via-ignis/30 to-transparent" />
+
+        <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <motion.span
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-ignis-bright mb-5"
+            >
+              <Flame className="h-3 w-3" /> The platform
+            </motion.span>
+            <motion.h2
+              initial="hidden" whileInView="show" viewport={{ once: true }}
+              variants={fadeUp} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-white"
+            >
+              Everything one transition needs, <span className="italic text-gradient-ignis">in one place.</span>
+            </motion.h2>
+            <p className="mt-5 text-white/65 leading-relaxed">
+              Six modules that move an institution from current fuel to a clean alternative — with the supply, finance, training and tracking built in.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {modules.map((mod, i) => (
+              <motion.div
+                key={mod.title}
+                initial="hidden" whileInView="show" viewport={{ once: true, margin: "-50px" }}
+                variants={fadeUp} transition={{ duration: 0.6, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                className="group relative ignis-card p-7 hover:-translate-y-1 transition-transform duration-300"
+              >
+                <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-ignis/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="flex items-start justify-between mb-6">
+                  <span className="relative h-12 w-12 rounded-2xl liquid-glass-strong bg-sacramento/60 flex items-center justify-center">
+                    <mod.icon className="h-5 w-5 text-ignis-bright" strokeWidth={1.8} />
+                    <span className="absolute inset-0 rounded-2xl bg-ignis/30 blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </span>
+                  <span className="font-editorial italic text-2xl text-white/15 group-hover:text-ignis/40 transition-colors">0{i + 1}</span>
+                </div>
+                <h3 className="font-display font-bold text-lg mb-3 text-white">{mod.title}</h3>
+                <p className="text-sm text-white/60 leading-relaxed">{mod.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────── FUEL OPTIONS ─────────── */}
+      <section className="relative py-20 lg:py-28">
+        <div className="max-w-[1600px] mx-auto px-6 lg:px-12">
+          <FuelOptionsSection />
+        </div>
+      </section>
+
+      {/* ─────────── CLOSING THE GAPS ─────────── */}
+      <section className="relative py-28 lg:py-36 overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src={kitchenTransitionBg}
+            alt=""
+            className="w-full h-full object-cover opacity-15"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-background/85 to-background" />
+          <div className="absolute inset-0 bg-hero-glow opacity-40" />
+        </div>
+
+        <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-ignis-bright mb-5">
+              <AlertCircle className="h-3 w-3" /> The gaps we close
+            </span>
+            <motion.h2
+              initial="hidden" whileInView="show" viewport={{ once: true }}
+              variants={fadeUp} transition={{ duration: 0.7 }}
+              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-white"
+            >
+              Closing the gaps in <span className="italic text-gradient-ignis">institutional cooking.</span>
+            </motion.h2>
+            <p className="mt-5 text-white/70">
+              The clean cooking sector has real gaps. CleanCookIQ fills them.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* Failures */}
+            <motion.div
+              initial="hidden" whileInView="show" viewport={{ once: true }}
+              variants={fadeUp} transition={{ duration: 0.7 }}
+              className="ignis-card p-8 lg:p-10"
+            >
               <div className="flex items-center gap-3 mb-8">
-                <div className="h-8 w-8 rounded-lg bg-destructive/10 border border-destructive/30 flex items-center justify-center shrink-0">
+                <span className="h-9 w-9 rounded-xl bg-destructive/15 border border-destructive/30 flex items-center justify-center">
                   <AlertCircle className="h-4 w-4 text-destructive" strokeWidth={2.5} />
-                </div>
-                <p className="text-destructive text-xs font-bold uppercase tracking-widest">The Problem</p>
+                </span>
+                <p className="text-destructive text-[11px] font-bold uppercase tracking-[0.2em]">The Problem</p>
               </div>
               <ul className="space-y-6">
                 {failures.map((item, i) => (
-                  <li key={item.fail} className="flex items-start gap-4 animate-slide-up" style={{ animationDelay: `${i * 80}ms`, animationFillMode: "backwards" }}>
-                    <div className="h-9 w-9 rounded-full bg-destructive/10 border border-destructive/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <motion.li
+                    key={item.fail}
+                    initial={{ opacity: 0, x: -16 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
+                    transition={{ delay: i * 0.1, duration: 0.5 }}
+                    className="flex items-start gap-4"
+                  >
+                    <span className="h-9 w-9 rounded-full bg-destructive/15 border border-destructive/30 flex items-center justify-center shrink-0 mt-0.5">
                       <AlertCircle className="h-4 w-4 text-destructive" strokeWidth={2.5} />
-                    </div>
-                    <p className="text-sm text-foreground leading-relaxed pt-1.5">{item.fail}</p>
-                  </li>
+                    </span>
+                    <p className="text-sm text-white/85 leading-relaxed pt-1.5">{item.fail}</p>
+                  </motion.li>
                 ))}
               </ul>
-            </div>
-            {/* Right — Solutions */}
-            <div className="p-8 lg:p-10 bg-background border-t md:border-t-0 md:border-l border-border">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="h-8 w-8 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0">
-                  <Check className="h-4 w-4 text-primary" strokeWidth={3} />
-                </div>
-                <p className="text-primary text-xs font-bold uppercase tracking-widest">Our Solution</p>
+            </motion.div>
+
+            {/* Solutions */}
+            <motion.div
+              initial="hidden" whileInView="show" viewport={{ once: true }}
+              variants={fadeUp} transition={{ duration: 0.7, delay: 0.15 }}
+              className="ignis-card p-8 lg:p-10 relative overflow-hidden"
+            >
+              <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-ignis/15 blur-3xl" />
+              <div className="relative flex items-center gap-3 mb-8">
+                <span className="h-9 w-9 rounded-xl bg-ignis/20 border border-ignis/40 flex items-center justify-center">
+                  <Check className="h-4 w-4 text-ignis-bright" strokeWidth={3} />
+                </span>
+                <p className="text-ignis-bright text-[11px] font-bold uppercase tracking-[0.2em]">Our Solution</p>
               </div>
-              <ul className="space-y-6">
+              <ul className="relative space-y-6">
                 {failures.map((item, i) => (
-                  <li key={item.fix} className="flex items-start gap-4 animate-slide-up" style={{ animationDelay: `${i * 80 + 200}ms`, animationFillMode: "backwards" }}>
-                    <div className="h-9 w-9 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0 mt-0.5">
-                      <Check className="h-4 w-4 text-primary" strokeWidth={3} />
-                    </div>
-                    <p className="text-sm text-foreground leading-relaxed pt-1.5">{item.fix}</p>
-                  </li>
+                  <motion.li
+                    key={item.fix}
+                    initial={{ opacity: 0, x: 16 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 + 0.2, duration: 0.5 }}
+                    className="flex items-start gap-4"
+                  >
+                    <span className="h-9 w-9 rounded-full bg-ignis/20 border border-ignis/40 flex items-center justify-center shrink-0 mt-0.5">
+                      <Check className="h-4 w-4 text-ignis-bright" strokeWidth={3} />
+                    </span>
+                    <p className="text-sm text-white/85 leading-relaxed pt-1.5">{item.fix}</p>
+                  </motion.li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
           </div>
-          <div className="text-center mt-10">
-            <Link to="/about#challenges" className="inline-flex items-center gap-2 text-accent hover:text-amber-light font-semibold transition-colors">
-              Learn more about how we close these gaps <ArrowRight className="h-4 w-4" />
+
+          <div className="text-center mt-12">
+            <Link to="/about#challenges" className="inline-flex items-center gap-2 text-ignis-bright hover:text-white font-semibold transition-colors group">
+              Learn more about how we close these gaps <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-20 lg:py-28 bg-background">
-        <div className="container">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">How It Works</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">Five steps take an institution from signup to a fully tracked clean kitchen.</p>
+      {/* ─────────── HOW IT WORKS ─────────── */}
+      <section className="relative py-28 lg:py-36 overflow-hidden">
+        <div className="absolute inset-0 bg-ember-grid opacity-15 pointer-events-none" />
+
+        <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
+          <div className="text-center max-w-3xl mx-auto mb-20">
+            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-ignis-bright mb-5">
+              <Rocket className="h-3 w-3" /> How it works
+            </span>
+            <motion.h2
+              initial="hidden" whileInView="show" viewport={{ once: true }}
+              variants={fadeUp} transition={{ duration: 0.7 }}
+              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-white"
+            >
+              Five steps. <span className="italic text-gradient-ignis">One fully tracked kitchen.</span>
+            </motion.h2>
+            <p className="mt-5 text-white/65">
+              From sign-up to monitoring, every move is captured against the same shared record.
+            </p>
           </div>
-          <div className="flex flex-col lg:flex-row items-start justify-center gap-0">
-            {steps.map((item, i) => (
-              <div key={item.step} className="flex items-center">
-                <div
-                  className="flex flex-col items-center text-center group w-48 animate-slide-up"
-                  style={{ animationDelay: `${i * 120}ms`, animationFillMode: "backwards" }}
+
+          {/* Desktop horizontal timeline */}
+          <div className="hidden lg:block relative">
+            <div className="absolute left-12 right-12 top-12 h-px bg-gradient-to-r from-transparent via-ignis/40 to-transparent" />
+            <div className="grid grid-cols-5 gap-2">
+              {steps.map((s, i) => (
+                <motion.div
+                  key={s.step}
+                  initial="hidden" whileInView="show" viewport={{ once: true }}
+                  variants={fadeUp} transition={{ duration: 0.6, delay: i * 0.12 }}
+                  className="flex flex-col items-center text-center group px-2"
                 >
-                  <div className="h-24 w-24 rounded-full bg-primary flex items-center justify-center mb-5 shadow-lg shadow-primary/20 transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-primary/40">
-                    <item.icon className="h-11 w-11 text-primary-foreground transition-transform duration-300 group-hover:scale-110" />
+                  <div className="relative mb-5">
+                    <div className="h-24 w-24 rounded-full liquid-glass-strong bg-sacramento/70 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                      <s.icon className="h-9 w-9 text-ignis-bright" strokeWidth={1.6} />
+                    </div>
+                    <span className="absolute inset-0 rounded-full bg-ignis/30 blur-2xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
-                  <span className="text-xs font-bold text-primary tracking-widest uppercase mb-2">Step {item.step}</span>
-                  <h3 className="font-display font-bold text-xl mb-3">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed max-w-[160px]">{item.desc}</p>
+                  <span className="text-[10px] font-bold text-ignis-bright tracking-[0.2em] uppercase mb-2">Step {s.step}</span>
+                  <h3 className="font-display font-bold text-lg text-white mb-2">{s.title}</h3>
+                  <p className="text-xs text-white/55 leading-relaxed max-w-[180px]">{s.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Mobile / tablet stacked */}
+          <div className="lg:hidden space-y-4">
+            {steps.map((s, i) => (
+              <motion.div
+                key={s.step}
+                initial="hidden" whileInView="show" viewport={{ once: true }}
+                variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.06 }}
+                className="ignis-card p-5 flex items-start gap-4"
+              >
+                <div className="relative">
+                  <div className="h-14 w-14 rounded-2xl liquid-glass-strong bg-sacramento/70 flex items-center justify-center shrink-0">
+                    <s.icon className="h-5 w-5 text-ignis-bright" />
+                  </div>
+                </div>
+                <div className="flex-1 pt-0.5">
+                  <span className="text-[10px] font-bold text-ignis-bright tracking-[0.2em] uppercase">Step {s.step}</span>
+                  <h3 className="font-display font-bold text-lg text-white mt-0.5 mb-1.5">{s.title}</h3>
+                  <p className="text-sm text-white/60 leading-relaxed">{s.desc}</p>
                 </div>
                 {i < steps.length - 1 && (
-                  <div className="hidden lg:flex items-center mx-1 mt-[-110px]">
-                    <div className="w-8 h-0.5 bg-primary/30" />
-                    <ChevronRight className="h-7 w-7 text-primary animate-arrow-pulse -ml-2" />
-                  </div>
+                  <ChevronRight className="h-5 w-5 text-ignis/40 self-center shrink-0" />
                 )}
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -286,46 +526,86 @@ export default function HomePage() {
 
       <SummitCountdown />
 
-      {/* Our Partners - animated marquee */}
-      <section className="py-16 lg:py-20 bg-background border-t border-border">
-        <div className="container">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-display font-bold mb-2">Our Partners</h2>
-            <p className="text-sm text-muted-foreground">Trusted organisations powering Kenya's clean cooking transition.</p>
+      {/* ─────────── PARTNERS MARQUEE ─────────── */}
+      <section className="relative py-20 lg:py-24 overflow-hidden border-t border-white/5">
+        <div className="max-w-[1600px] mx-auto px-6 lg:px-12 mb-12">
+          <div className="text-center">
+            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-ignis-bright mb-4">
+              <Handshake className="h-3 w-3" /> Our partners
+            </span>
+            <h3 className="font-editorial text-3xl md:text-4xl text-white">
+              Trusted organisations <span className="italic text-gradient-ignis">powering the transition.</span>
+            </h3>
           </div>
         </div>
         <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
           <div className="flex w-max animate-marquee gap-16 items-center">
             {[...partners, ...partners].map((logo, i) => (
               <div key={i} className="h-20 w-40 flex items-center justify-center shrink-0">
-                <img src={logo} alt={`Partner ${(i % partners.length) + 1}`} className="max-h-16 max-w-full object-contain" />
+                <img
+                  src={logo}
+                  alt={`Partner ${(i % partners.length) + 1}`}
+                  className="max-h-16 max-w-full object-contain"
+                />
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-20 bg-gradient-hero text-primary-foreground">
-        <div className="container text-center">
-          <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Ready to Join the Transition?</h2>
-          <p className="text-primary-foreground/80 max-w-xl mx-auto mb-8">Whether you are an institution, provider, funder, or researcher, there is a place for you on CleanCookIQ.</p>
-          <div className="flex flex-wrap gap-4 justify-center">
+      {/* ─────────── FINAL CTA ─────────── */}
+      <section className="relative py-28 lg:py-36 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-[hsl(141_55%_10%)] to-background" />
+        <div className="absolute inset-0 bg-hero-glow opacity-80" />
+        <div className="absolute inset-0 bg-ember-grid opacity-25" />
+        {/* big ember */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-ignis/20 blur-3xl animate-glow-pulse" />
+
+        <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12 text-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="inline-flex items-center gap-2 liquid-glass rounded-full px-4 py-1.5 mb-7"
+          >
+            <Flame className="h-3.5 w-3.5 text-ignis-bright" />
+            <span className="text-xs font-medium text-white/85">Join the transition</span>
+          </motion.div>
+
+          <motion.h2
+            initial="hidden" whileInView="show" viewport={{ once: true }}
+            variants={fadeUp} transition={{ duration: 0.8 }}
+            className="font-editorial text-4xl md:text-6xl lg:text-7xl xl:text-8xl leading-[0.95] tracking-tight text-white max-w-5xl mx-auto"
+          >
+            Ready to join the <span className="italic text-gradient-ignis">transition?</span>
+          </motion.h2>
+
+          <motion.p
+            initial="hidden" whileInView="show" viewport={{ once: true }}
+            variants={fadeUp} transition={{ duration: 0.7, delay: 0.2 }}
+            className="mt-7 text-lg text-white/70 max-w-2xl mx-auto leading-relaxed"
+          >
+            Whether you are an institution, provider, funder, or researcher, there is a place for you on CleanCookIQ.
+          </motion.p>
+
+          <motion.div
+            initial="hidden" whileInView="show" viewport={{ once: true }}
+            variants={fadeUp} transition={{ duration: 0.7, delay: 0.3 }}
+            className="mt-10 flex flex-wrap gap-3 justify-center"
+          >
             <Link to="/auth/register">
-              <Button size="lg" className="bg-accent text-accent-foreground hover:bg-amber-light font-semibold">
-                Join the Platform <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              <button className="group relative inline-flex items-center gap-2 h-12 px-8 rounded-full bg-gradient-ignis text-white font-semibold shadow-ignis hover:translate-y-[-1px] transition-transform">
+                Join the Platform <ArrowRight className="h-4 w-4" />
+                <span className="absolute inset-0 rounded-full bg-gradient-ignis opacity-50 blur-md -z-10 group-hover:opacity-80 transition-opacity" />
+              </button>
             </Link>
             <Link to="/book-demo">
-              <Button
-                size="lg"
-                variant="outline"
-                className="bg-transparent border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground font-semibold"
-              >
+              <button className="inline-flex items-center gap-2 h-12 px-8 rounded-full liquid-glass-strong text-white font-medium hover:bg-white/10 transition-colors">
                 Book a Demo
-              </Button>
+              </button>
             </Link>
-          </div>
+          </motion.div>
         </div>
       </section>
     </div>
