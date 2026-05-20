@@ -20,20 +20,46 @@ export default function LoginPage() {
   const [wrongPassword, setWrongPassword] = useState(false);
   const navigate = useNavigate();
 
-  // Auto-redirect if user is already signed in (e.g. after clicking verification email)
+  // Auto-redirect if user is already signed in OR signs in via the URL
+  // hash that Supabase parses after the verification email click.
+  // We listen to onAuthStateChange because getSession() can race the
+  // SDK's hash-parsing on a fresh-from-email landing.
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session) return;
+    let handled = false;
+    const handle = async (session: any) => {
+      if (handled || !session) return;
+      handled = true;
       await redirectUser(session.user.id, session.user);
+    };
+
+    supabase.auth.getSession().then(({ data: { session } }) => handle(session));
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if ((event === "SIGNED_IN" || event === "INITIAL_SESSION" || event === "TOKEN_REFRESHED") && session) {
+        handle(session);
+      }
     });
+
+    return () => subscription.unsubscribe();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const redirectUser = async (userId: string, user: any) => {
-    const [{ data: rolesData }, { data: profileData }] = await Promise.all([
-      supabase.from("user_roles").select("role").eq("user_id", userId),
-      supabase.from("profiles").select("org_type, organisation_id, approval_status").eq("user_id", userId).maybeSingle(),
-    ]);
+    // Profile is created by a Supabase trigger on signup. For a brand-new
+    // user landing here straight from the verification email, the trigger
+    // can lag by a few hundred ms; retry once before giving up so the user
+    // doesn't bounce to /auth/pending.
+    const loadProfileAndRoles = async () =>
+      Promise.all([
+        supabase.from("user_roles").select("role").eq("user_id", userId),
+        supabase.from("profiles").select("org_type, organisation_id, approval_status").eq("user_id", userId).maybeSingle(),
+      ]);
+
+    let [{ data: rolesData }, { data: profileData }] = await loadProfileAndRoles();
+    if (!profileData) {
+      await new Promise((r) => setTimeout(r, 800));
+      [{ data: rolesData }, { data: profileData }] = await loadProfileAndRoles();
+    }
 
     const roles = rolesData?.map((r: any) => r.role) ?? [];
     const orgType = profileData?.org_type ?? user?.user_metadata?.org_type ?? null;

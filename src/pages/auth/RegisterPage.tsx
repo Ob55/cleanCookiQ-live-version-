@@ -24,7 +24,7 @@ const orgTypes = [
   { value: "supplier", label: "Supplier / Provider", desc: "Equipment, installation, maintenance", icon: Factory },
   { value: "funder", label: "Funder / Financing Partner", desc: "Finance partner or investor", icon: Banknote },
   { value: "researcher", label: "Researcher", desc: "Academic or independent researcher", icon: FlaskConical },
-  { value: "kplc_depot", label: "KPLC Depot", desc: "Regional office, service depot, or substation", icon: Zap },
+  { value: "kplc_depot", label: "Electricity & Utilities", desc: "Regional office, service depot, or utility branch", icon: Zap },
   { value: "other", label: "Other Organisation", desc: "Other organisations interested in the platform", icon: HelpCircle },
 ];
 
@@ -100,7 +100,7 @@ export default function RegisterPage() {
       if (error.message?.toLowerCase().includes("sending confirmation email")) {
         // User was created but Supabase couldn't send the verification email — navigate anyway
         toast.warning("Account created! The confirmation email is delayed — check your inbox in a few minutes or contact info@ignis-innovation.com.");
-        navigate("/auth/verify-email");
+        navigate("/auth/verify-email", { state: { email } });
       } else {
         toast.error(error.message);
       }
@@ -185,7 +185,11 @@ export default function RegisterPage() {
     }
 
     setLoading(false);
-    navigate(isOther || isKplc ? "/auth/pending" : "/auth/verify-email");
+    if (isOther || isKplc) {
+      navigate("/auth/pending");
+    } else {
+      navigate("/auth/verify-email", { state: { email } });
+    }
   };
 
   return (
@@ -271,19 +275,27 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              {isOther && (
-                <div>
-                  <Label htmlFor="description">Brief Description *</Label>
-                  <Textarea
-                    id="description"
-                    value={description}
-                    onChange={e => setDescription(e.target.value)}
-                    placeholder="Tell us about your organisation and what you're looking for..."
-                    className="mt-1 min-h-[80px]"
-                    required
-                  />
-                </div>
-              )}
+              {/* Purpose of joining — captured for every org type so admins
+                  understand intent at a glance. Required for Other, optional
+                  for the rest. */}
+              <div>
+                <Label htmlFor="description">
+                  Why are you joining? {isOther && <span className="text-destructive">*</span>}
+                </Label>
+                <Textarea
+                  id="description"
+                  value={description}
+                  onChange={e => setDescription(e.target.value)}
+                  placeholder={
+                    isOther
+                      ? "Tell us about your organisation and what you're looking for..."
+                      : "Briefly — what do you hope to do on the platform?"
+                  }
+                  className="mt-1 min-h-[70px]"
+                  rows={3}
+                  required={isOther}
+                />
+              </div>
 
               {isFunder && (
                 <div>
@@ -321,8 +333,8 @@ export default function RegisterPage() {
                     </select>
                   </div>
                   <div>
-                    <Label htmlFor="kplcLicense">KPLC Registration / License Number *</Label>
-                    <Input id="kplcLicense" value={kplcLicenseNumber} onChange={e => setKplcLicenseNumber(e.target.value)} placeholder="e.g. KPLC-WS-2024-001" className="mt-1" required />
+                    <Label htmlFor="kplcLicense">Utility Registration / License Number *</Label>
+                    <Input id="kplcLicense" value={kplcLicenseNumber} onChange={e => setKplcLicenseNumber(e.target.value)} placeholder="e.g. KPLC-WS-2024-001 or NWSC-001" className="mt-1" required />
                   </div>
                   <div>
                     <Label htmlFor="branchManager">Branch Manager Name *</Label>

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -7,14 +7,21 @@ import { toast } from "sonner";
 import AuthBackButton from "@/components/auth/AuthBackButton";
 
 export default function VerifyEmailPage() {
+  const location = useLocation();
+  // RegisterPage navigates here with the email in location state so we can
+  // resend if needed. Falls back to a manual prompt if state is missing
+  // (e.g. user opened the page directly).
+  const stateEmail = (location.state as { email?: string } | null)?.email ?? "";
+  const [email, setEmail] = useState(stateEmail);
   const [resending, setResending] = useState(false);
 
   const handleResend = async () => {
+    if (!email) { toast.error("We don't have your email on this page. Please sign up again."); return; }
     setResending(true);
-    const { error } = await supabase.auth.resend({ type: "signup", email: "" });
+    const { error } = await supabase.auth.resend({ type: "signup", email });
     setResending(false);
-    if (error) toast.error("Please try signing up again");
-    else toast.success("Verification email resent");
+    if (error) toast.error(error.message || "Couldn't resend — try signing up again");
+    else toast.success(`Verification email resent to ${email}`);
   };
 
   return (
@@ -26,13 +33,13 @@ export default function VerifyEmailPage() {
         </div>
         <h1 className="text-2xl font-display font-bold mb-2">Check your email</h1>
         <p className="text-muted-foreground mb-6">
-          We've sent a verification link to your email address. Click the link to verify your account and you'll be taken straight to your dashboard.
+          We've sent a verification link to <span className="font-medium text-foreground">{email || "your email address"}</span>. Click it to verify your account and you'll be taken straight to your dashboard.
         </p>
         <div className="bg-card border border-border rounded-xl p-6 shadow-card mb-6">
           <p className="text-sm text-muted-foreground">
             Didn't receive the email? Check your spam folder or
           </p>
-          <Button variant="link" className="text-primary p-0 h-auto mt-1" onClick={handleResend} disabled={resending}>
+          <Button variant="link" className="text-primary p-0 h-auto mt-1" onClick={handleResend} disabled={resending || !email}>
             Resend verification email
           </Button>
         </div>
