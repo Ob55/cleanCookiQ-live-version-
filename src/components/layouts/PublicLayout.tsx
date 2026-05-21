@@ -116,6 +116,20 @@ export default function PublicLayout() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
+
+  // Lock body scroll while mobile menu is open
+  useEffect(() => {
+    if (mobileOpen) {
+      const original = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = original; };
+    }
+  }, [mobileOpen]);
+
   const handleSignOut = async () => {
     await signOut();
     navigate("/");
@@ -210,27 +224,43 @@ export default function PublicLayout() {
               className="lg:hidden h-9 w-9 mr-1 rounded-full inline-flex items-center justify-center text-white hover:bg-white/10 transition-colors"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Toggle menu"
+              aria-expanded={mobileOpen}
             >
               {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
+        </div>
+      </header>
 
-          {mobileOpen && (
-            <div className="lg:hidden mt-2 mx-1 mb-1 liquid-glass-strong rounded-3xl bg-black/95 p-4 space-y-2 max-h-[calc(100vh-7rem)] overflow-y-auto">
+      {/* Mobile menu — full-screen overlay panel anchored below the pill */}
+      {mobileOpen && (
+        <>
+          <div
+            className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+            onClick={() => setMobileOpen(false)}
+            aria-hidden="true"
+          />
+          <div className="lg:hidden fixed top-[5.25rem] left-3 right-3 z-50 max-h-[calc(100vh-6.5rem)] overflow-y-auto rounded-3xl bg-[hsl(28_18%_10%)] border border-white/10 shadow-2xl animate-in slide-in-from-top-4 fade-in duration-200">
+            <nav className="p-2">
               {NAV_GROUPS.map((entry) =>
                 isGroup(entry) ? (
-                  <details key={entry.label} className="group">
-                    <summary className="flex items-center justify-between py-2 text-sm font-medium text-white cursor-pointer list-none">
+                  <details key={entry.label} className="group/details rounded-2xl">
+                    <summary className="flex items-center justify-between px-4 h-12 text-[15px] font-medium text-white cursor-pointer list-none rounded-2xl hover:bg-white/5 active:bg-white/10 transition-colors">
                       <span>{entry.label}</span>
-                      <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
+                      <ChevronDown className="h-4 w-4 text-white/60 transition-transform group-open/details:rotate-180" />
                     </summary>
-                    <div className="pl-3 space-y-1 pb-1">
+                    <div className="pl-3 pr-2 pb-1.5 space-y-0.5">
                       {entry.items.map((item) => (
                         <Link
                           key={item.href}
                           to={item.href ?? "#"}
                           onClick={() => setMobileOpen(false)}
-                          className="block py-1.5 text-sm text-white/70 hover:text-ignis-bright"
+                          className={cn(
+                            "flex items-center px-4 h-11 text-[14px] rounded-xl transition-colors",
+                            isActiveItem(item.href)
+                              ? "bg-ignis/15 text-ignis-bright font-medium"
+                              : "text-white/70 hover:text-white hover:bg-white/5 active:bg-white/10",
+                          )}
                         >
                           {item.label}
                         </Link>
@@ -242,39 +272,56 @@ export default function PublicLayout() {
                     key={entry.label}
                     to={entry.href ?? "#"}
                     onClick={() => setMobileOpen(false)}
-                    className="block py-2 text-sm font-medium text-white hover:text-ignis-bright"
+                    className={cn(
+                      "flex items-center px-4 h-12 text-[15px] font-medium rounded-2xl transition-colors",
+                      isActiveItem(entry.href)
+                        ? "bg-ignis/15 text-ignis-bright"
+                        : "text-white hover:bg-white/5 active:bg-white/10",
+                    )}
                   >
                     {entry.label}
                   </Link>
                 ),
               )}
-              <div className="border-t border-white/10 pt-3 space-y-2">
-                <Link
-                  to="/book-demo"
-                  onClick={() => setMobileOpen(false)}
-                  className="block py-2 text-sm font-medium text-white hover:text-ignis-bright"
-                >
-                  Book a Demo
-                </Link>
+            </nav>
+            <div className="border-t border-white/10 p-3 space-y-2.5">
+              <Link
+                to="/book-demo"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-center gap-1.5 h-11 rounded-full bg-white text-hunter-green text-[14px] font-semibold hover:bg-ignis hover:text-white transition-colors"
+              >
+                Book a Demo <ArrowUpRight className="h-4 w-4" />
+              </Link>
+              {user ? (
                 <div className="flex gap-2">
-                  {user ? (
-                    <Button variant="outline" size="sm" className="w-full rounded-full border-white/20 text-white bg-transparent hover:bg-white/10" onClick={handleSignOut}>Sign Out</Button>
-                  ) : (
-                    <>
-                      <Link to="/auth/login" className="flex-1">
-                        <Button variant="outline" size="sm" className="w-full rounded-full border-white/20 text-white bg-transparent hover:bg-white/10">Log in</Button>
-                      </Link>
-                      <Link to="/auth/register" className="flex-1">
-                        <Button size="sm" className="w-full rounded-full bg-gradient-ignis text-white border-0">Join</Button>
-                      </Link>
-                    </>
+                  {isAdmin && (
+                    <Link to="/admin/pipeline" onClick={() => setMobileOpen(false)} className="flex-1">
+                      <Button variant="outline" size="default" className="w-full rounded-full border-white/20 text-white bg-transparent hover:bg-white/10">Admin</Button>
+                    </Link>
                   )}
+                  <Button
+                    variant="outline"
+                    size="default"
+                    className="flex-1 rounded-full border-white/20 text-white bg-transparent hover:bg-white/10"
+                    onClick={() => { setMobileOpen(false); handleSignOut(); }}
+                  >
+                    Sign Out
+                  </Button>
                 </div>
-              </div>
+              ) : (
+                <div className="flex gap-2">
+                  <Link to="/auth/login" onClick={() => setMobileOpen(false)} className="flex-1">
+                    <Button variant="outline" size="default" className="w-full rounded-full border-white/20 text-white bg-transparent hover:bg-white/10">Log in</Button>
+                  </Link>
+                  <Link to="/auth/register" onClick={() => setMobileOpen(false)} className="flex-1">
+                    <Button size="default" className="w-full rounded-full bg-gradient-ignis text-white border-0 hover:opacity-95">Join</Button>
+                  </Link>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </header>
+          </div>
+        </>
+      )}
 
       <main className="flex-1"><Outlet /></main>
 

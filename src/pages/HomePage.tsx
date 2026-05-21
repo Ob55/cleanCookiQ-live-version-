@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import FuelOptionsSection from "@/components/institution/FuelOptionsSection";
 import { supabase } from "@/integrations/supabase/client";
-import kitchenTransitionBg from "@/assets/kitchen-transition.png";
+import kitchenTransitionBg from "@/assets/kitchen-transition.jpg";
 import partner1 from "@/assets/partners/partner1.png";
 import partner2 from "@/assets/partners/partner2.png";
 import partner3 from "@/assets/partners/partner3.png";
@@ -141,6 +141,8 @@ export default function HomePage() {
             className="w-full h-full object-cover"
             width={1920}
             height={1080}
+            fetchPriority="high"
+            decoding="async"
           />
           {/* brand-green wash for text contrast (heaviest on the left,
               fades right so the kitchen photo breathes behind the cards) */}
@@ -164,14 +166,9 @@ export default function HomePage() {
               <h1 className="font-editorial text-[3rem] sm:text-6xl lg:text-7xl xl:text-[5.5rem] leading-[0.95] tracking-tight text-white">
                 <BlurWords text="Powering Kenya's" />
                 <br />
-                <motion.span
-                  initial={{ opacity: 0, y: 28, filter: "blur(10px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                  className="italic ignis-shimmer inline-block"
-                >
+                <span className="italic ignis-shimmer inline-block">
                   clean cooking
-                </motion.span>
+                </span>
                 <br />
                 <BlurWords text="transition." delay={0.5} />
               </h1>

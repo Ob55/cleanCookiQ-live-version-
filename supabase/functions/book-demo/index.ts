@@ -1,23 +1,47 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import nodemailer from "npm:nodemailer@6.9.9";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+import { buildCorsHeaders } from "../_shared/cors.ts";
 
 const NOTIFY_TO = "bmwangi@ignis-innovation.com";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^[+\d][\d\s\-().]{6,}$/;
 
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
+// Simple in-isolate rate limit — caps the same IP at 5 submissions per
+// hour. Edge isolates are per-region and may be recycled, so this isn't
+// a perfect global limit, but it stops trivial form-spam abuse without
+// needing Redis. Stricter limits can be added later.
+const RATE_WINDOW_MS = 60 * 60 * 1000;
+const RATE_MAX = 5;
+const rateState = new Map<string, { count: number; resetAt: number }>();
+
+function rateLimit(ip: string): { ok: boolean; retryAfter: number } {
+  const now = Date.now();
+  const cur = rateState.get(ip);
+  if (!cur || cur.resetAt < now) {
+    rateState.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return { ok: true, retryAfter: 0 };
+  }
+  if (cur.count >= RATE_MAX) {
+    return { ok: false, retryAfter: Math.ceil((cur.resetAt - now) / 1000) };
+  }
+  cur.count += 1;
+  return { ok: true, retryAfter: 0 };
+}
+
+function clientIp(req: Request): string {
+  const fwd = req.headers.get("x-forwarded-for") ?? "";
+  const first = fwd.split(",")[0]?.trim();
+  return first || req.headers.get("cf-connecting-ip") || req.headers.get("x-real-ip") || "unknown";
+}
+
+function makeJson(corsHeaders: HeadersInit) {
+  return (body: unknown, status = 200, extraHeaders: Record<string, string> = {}) =>
+    new Response(JSON.stringify(body), {
+      status,
+      headers: { ...corsHeaders, "Content-Type": "application/json", ...extraHeaders },
+    });
 }
 
 const BASE_STYLE = `font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;background:#ffffff;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;`;
@@ -76,8 +100,20 @@ function escape(s: string): string {
 }
 
 serve(async (req) => {
+  const corsHeaders = buildCorsHeaders(req);
+  const json = makeJson(corsHeaders);
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
+
+  const ip = clientIp(req);
+  const limit = rateLimit(ip);
+  if (!limit.ok) {
+    return json(
+      { error: "Too many requests. Please try again later." },
+      429,
+      { "Retry-After": String(limit.retryAfter) },
+    );
+  }
 
   let body: { name?: unknown; email?: unknown; phone?: unknown };
   try {

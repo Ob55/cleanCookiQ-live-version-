@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePersistedState, clearPersisted } from "@/hooks/usePersistedForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -74,33 +75,47 @@ export default function InstitutionSetup() {
     })();
   }, [user, navigate]);
 
-  const [name, setName] = useState("");
-  const [county, setCounty] = useState("");
-  const [subCounty, setSubCounty] = useState("");
-  const [ownershipType, setOwnershipType] = useState("");
-  const [institutionCategory, setInstitutionCategory] = useState("");
-  const [schoolType, setSchoolType] = useState("");
-  const [mealsPerDay, setMealsPerDay] = useState("");
-  const [fuelType, setFuelType] = useState("");
-  const [consumption, setConsumption] = useState("");
-  const [cookingTimeHours, setCookingTimeHours] = useState("");
-  const [contactPerson, setContactPerson] = useState("");
-  const [contactPhone, setContactPhone] = useState("");
-  const [contactEmail, setContactEmail] = useState("");
-  const [numberOfStaff, setNumberOfStaff] = useState("");
+  // Per-user draft key so switching accounts on the same machine doesn't
+  // pull up a stranger's half-filled form.
+  const draftKey = `institution-setup-draft:${user?.id ?? "anon"}`;
+  const [name, setName] = usePersistedState(`${draftKey}:name`, "");
+  const [county, setCounty] = usePersistedState(`${draftKey}:county`, "");
+  const [subCounty, setSubCounty] = usePersistedState(`${draftKey}:subCounty`, "");
+  const [ownershipType, setOwnershipType] = usePersistedState(`${draftKey}:ownershipType`, "");
+  const [institutionCategory, setInstitutionCategory] = usePersistedState(`${draftKey}:institutionCategory`, "");
+  const [schoolType, setSchoolType] = usePersistedState(`${draftKey}:schoolType`, "");
+  const [mealsPerDay, setMealsPerDay] = usePersistedState(`${draftKey}:mealsPerDay`, "");
+  const [fuelType, setFuelType] = usePersistedState(`${draftKey}:fuelType`, "");
+  const [consumption, setConsumption] = usePersistedState(`${draftKey}:consumption`, "");
+  const [cookingTimeHours, setCookingTimeHours] = usePersistedState(`${draftKey}:cookingTimeHours`, "");
+  const [contactPerson, setContactPerson] = usePersistedState(`${draftKey}:contactPerson`, "");
+  const [contactPhone, setContactPhone] = usePersistedState(`${draftKey}:contactPhone`, "");
+  const [contactEmail, setContactEmail] = usePersistedState(`${draftKey}:contactEmail`, "");
+  const [numberOfStaff, setNumberOfStaff] = usePersistedState(`${draftKey}:numberOfStaff`, "");
   // Transition target — preferred clean fuel to switch to
-  const [transitionTarget, setTransitionTarget] = useState("");
+  const [transitionTarget, setTransitionTarget] = usePersistedState(`${draftKey}:transitionTarget`, "");
   // Transition needs — checkbox set + optional manual text. Saved as a
   // single semicolon-joined string in the existing transition_needs column.
-  const [transitionNeedsChoices, setTransitionNeedsChoices] = useState<string[]>([]);
-  const [transitionNeedsOther, setTransitionNeedsOther] = useState("");
+  const [transitionNeedsChoices, setTransitionNeedsChoices] = usePersistedState<string[]>(`${draftKey}:transitionNeedsChoices`, []);
+  const [transitionNeedsOther, setTransitionNeedsOther] = usePersistedState(`${draftKey}:transitionNeedsOther`, "");
   // Assessment scoring fields
-  const [numberOfStudents, setNumberOfStudents] = useState("");
-  const [monthlyFuelSpend, setMonthlyFuelSpend] = useState("");
-  const [hasDedicatedKitchen, setHasDedicatedKitchen] = useState("");
-  const [kitchenCondition, setKitchenCondition] = useState("");
-  const [financingPreference, setFinancingPreference] = useState("");
-  const [financialDecisionMaker, setFinancialDecisionMaker] = useState("");
+  const [numberOfStudents, setNumberOfStudents] = usePersistedState(`${draftKey}:numberOfStudents`, "");
+  const [monthlyFuelSpend, setMonthlyFuelSpend] = usePersistedState(`${draftKey}:monthlyFuelSpend`, "");
+  const [hasDedicatedKitchen, setHasDedicatedKitchen] = usePersistedState(`${draftKey}:hasDedicatedKitchen`, "");
+  const [kitchenCondition, setKitchenCondition] = usePersistedState(`${draftKey}:kitchenCondition`, "");
+  const [financingPreference, setFinancingPreference] = usePersistedState(`${draftKey}:financingPreference`, "");
+  const [financialDecisionMaker, setFinancialDecisionMaker] = usePersistedState(`${draftKey}:financialDecisionMaker`, "");
+
+  const clearDraft = () => {
+    [
+      "name", "county", "subCounty", "ownershipType", "institutionCategory",
+      "schoolType", "mealsPerDay", "fuelType", "consumption", "cookingTimeHours",
+      "contactPerson", "contactPhone", "contactEmail", "numberOfStaff",
+      "transitionTarget", "transitionNeedsChoices", "transitionNeedsOther",
+      "numberOfStudents", "monthlyFuelSpend", "hasDedicatedKitchen",
+      "kitchenCondition", "financingPreference", "financialDecisionMaker",
+    ].forEach((field) => clearPersisted(`${draftKey}:${field}`));
+  };
 
   const unit = fuelType ? FUEL_UNITS[fuelType] : null;
 
@@ -257,6 +272,7 @@ export default function InstitutionSetup() {
       } else {
         toast.success("Institution setup complete!");
       }
+      clearDraft();
       setTimeout(() => navigate("/institution/dashboard"), 100);
     } catch (err: any) {
       toast.error(err.message || "Failed to save");

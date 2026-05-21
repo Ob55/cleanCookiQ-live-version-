@@ -109,25 +109,26 @@
   }
 
   /* Ignis dark canvas — public pages opt into this via PublicLayout.
-     Warm-neutral espresso dark — sits exactly between brand-green and
-     brand-orange so both read as accents, neither dominates. */
+     Warm-neutral espresso — sits exactly between brand-green and
+     brand-orange so both read as accents, neither dominates. Lightness
+     raised from 7%→13% so the canvas feels lifted, not heavy. */
   .theme-ignis {
-    --background: 28 15% 7%;           /* warm espresso dark */
+    --background: 28 15% 20%;          /* warm espresso (brightened more) */
     --foreground: 36 27% 95%;          /* #F6F3EE cream */
-    --card: 28 16% 10%;
+    --card: 28 16% 23%;
     --card-foreground: 36 27% 95%;
-    --popover: 28 16% 10%;
+    --popover: 28 16% 23%;
     --popover-foreground: 36 27% 95%;
     --primary: 33 100% 50%;            /* #FF8C00 brand orange */
     --primary-foreground: 0 0% 100%;
     --secondary: 141 75% 22%;          /* #0E612D brand emerald */
     --secondary-foreground: 36 27% 95%;
-    --muted: 28 12% 12%;
-    --muted-foreground: 36 18% 78%;
+    --muted: 28 12% 25%;
+    --muted-foreground: 36 18% 84%;
     --accent: 33 100% 50%;
     --accent-foreground: 0 0% 100%;
-    --border: 28 18% 16%;
-    --input: 28 18% 16%;
+    --border: 28 18% 29%;
+    --input: 28 18% 29%;
     --ring: 33 100% 50%;
     color-scheme: dark;
   }

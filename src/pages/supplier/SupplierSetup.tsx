@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePersistedState, clearPersisted } from "@/hooks/usePersistedForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,9 +15,15 @@ export default function SupplierSetup() {
   const navigate = useNavigate();
   const { user, refreshProfile } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [companyName, setCompanyName] = useState("");
-  const [contactEmail, setContactEmail] = useState("");
-  const [contactPhone, setContactPhone] = useState("");
+  const draftKey = `supplier-setup-draft:${user?.id ?? "anon"}`;
+  const [companyName, setCompanyName] = usePersistedState(`${draftKey}:companyName`, "");
+  const [contactEmail, setContactEmail] = usePersistedState(`${draftKey}:contactEmail`, "");
+  const [contactPhone, setContactPhone] = usePersistedState(`${draftKey}:contactPhone`, "");
+  const clearDraft = () => {
+    ["companyName", "contactEmail", "contactPhone"].forEach((f) =>
+      clearPersisted(`${draftKey}:${f}`),
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,6 +88,7 @@ export default function SupplierSetup() {
       } else {
         toast.success("Company setup complete!");
       }
+      clearDraft();
       setTimeout(() => navigate("/supplier/dashboard"), 100);
     } catch (err: any) {
       toast.error(err.message || "Failed to save");

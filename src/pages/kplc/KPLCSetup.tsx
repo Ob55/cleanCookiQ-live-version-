@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePersistedState, clearPersisted } from "@/hooks/usePersistedForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +15,8 @@ export default function KPLCSetup() {
   const { user, refreshProfile } = useAuth();
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
-  const [depotName, setDepotName] = useState("");
+  const draftKey = `kplc-setup-draft:${user?.id ?? "anon"}`;
+  const [depotName, setDepotName] = usePersistedState(`${draftKey}:depotName`, "");
 
   useEffect(() => {
     if (!user) return;
@@ -82,6 +84,7 @@ export default function KPLCSetup() {
       await refreshProfile();
 
       toast.success("Depot setup complete!");
+      clearPersisted(`${draftKey}:depotName`);
       setTimeout(() => navigate("/kplc/dashboard"), 100);
     } catch (err: any) {
       toast.error(err.message || "Failed to save");
