@@ -192,12 +192,12 @@ function ApproachCard({ pillar, step }: { pillar: ApproachPillar; step: number }
       <div className="absolute -top-3 -left-3 h-9 w-9 rounded-full bg-gradient-ignis text-white text-xs font-bold flex items-center justify-center shadow-ignis z-10">
         {step}
       </div>
-      <span className="relative h-11 w-11 rounded-2xl liquid-glass-strong bg-sacramento/60 flex items-center justify-center mb-4">
-        <Icon className="h-5 w-5 text-ignis-bright" strokeWidth={1.8} />
-        <span className="absolute inset-0 rounded-2xl bg-ignis/30 blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <span className="relative h-11 w-11 rounded-2xl liquid-glass-strong bg-muted flex items-center justify-center mb-4">
+        <Icon className="h-5 w-5 text-primary" strokeWidth={1.8} />
+        <span className="absolute inset-0 rounded-2xl bg-primary/30 blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
       </span>
-      <h3 className="font-display font-bold text-base lg:text-lg leading-tight mb-2 text-white">{pillar.title}</h3>
-      <p className="text-sm text-white/60 leading-relaxed">{pillar.body}</p>
+      <h3 className="font-display font-bold text-base lg:text-lg leading-tight mb-2 text-foreground">{pillar.title}</h3>
+      <p className="text-sm text-muted-foreground leading-relaxed">{pillar.body}</p>
     </div>
   );
 }
@@ -205,7 +205,7 @@ function ApproachCard({ pillar, step }: { pillar: ApproachPillar; step: number }
 function FlowArrow({ direction }: { direction: "right" | "down" }) {
   const Icon = direction === "right" ? ArrowRight : ArrowDown;
   return (
-    <div className="h-10 w-10 rounded-full bg-ignis/15 border border-ignis/30 flex items-center justify-center text-ignis-bright shrink-0">
+    <div className="h-10 w-10 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center text-primary shrink-0">
       <Icon className="h-5 w-5" strokeWidth={2.5} />
     </div>
   );
@@ -271,11 +271,11 @@ export default function AboutPage() {
             transition={{ duration: 0.6 }}
             className="inline-flex items-center gap-2 liquid-glass rounded-full px-4 py-1.5 mb-8"
           >
-            <Sparkles className="h-3.5 w-3.5 text-ignis-bright" />
-            <span className="text-xs font-medium text-white/85">A platform for clean cooking</span>
+            <Sparkles className="h-3.5 w-3.5 text-primary" />
+            <span className="text-xs font-medium text-foreground/85">A platform for clean cooking</span>
           </motion.div>
 
-          <h1 className="font-editorial text-5xl md:text-7xl lg:text-8xl leading-[0.95] tracking-tight text-white max-w-5xl mx-auto">
+          <h1 className="font-editorial text-5xl md:text-7xl lg:text-8xl leading-[0.95] tracking-tight text-foreground max-w-5xl mx-auto">
             <motion.span
               initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -298,7 +298,7 @@ export default function AboutPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.5 }}
-            className="mt-8 text-lg lg:text-xl text-white/70 max-w-3xl mx-auto leading-relaxed"
+            className="mt-8 text-lg lg:text-xl text-foreground/70 max-w-3xl mx-auto leading-relaxed"
           >
             A platform that helps institutions across Africa switch to clean cooking, faster.
           </motion.p>
@@ -315,8 +315,8 @@ export default function AboutPage() {
               initial="hidden" whileInView="show" viewport={{ once: true }}
               variants={fadeUp} transition={{ duration: 0.7 }}
             >
-              <span className="text-[11px] uppercase tracking-[0.2em] text-ignis-bright font-semibold">The story</span>
-              <h2 className="font-editorial italic text-4xl lg:text-5xl text-white mt-3 leading-[1.05]">
+              <span className="text-[11px] uppercase tracking-[0.2em] text-primary font-semibold">The story</span>
+              <h2 className="font-editorial italic text-4xl lg:text-5xl text-foreground mt-3 leading-[1.05]">
                 Not a project. <span className="text-gradient-ignis">A layer.</span>
               </h2>
             </motion.div>
@@ -325,10 +325,10 @@ export default function AboutPage() {
               variants={fadeUp} transition={{ duration: 0.7, delay: 0.15 }}
               className="space-y-6"
             >
-              <p className="text-white/75 text-lg leading-relaxed">
+              <p className="text-foreground/75 text-lg leading-relaxed">
                 Built to solve the scattered nature of the clean cooking ecosystem, the platform connects institutions, solution providers, financiers, and partners, turning disconnected efforts into coordinated, ready-to-invest opportunities.
               </p>
-              <p className="text-white/65 text-base leading-relaxed">
+              <p className="text-muted-foreground text-base leading-relaxed">
                 Rather than operating as a standalone project or technology provider, CleanCookIQ functions as the coordination and intelligence layer powering the next generation of clean cooking markets.
               </p>
             </motion.div>
@@ -345,20 +345,20 @@ export default function AboutPage() {
               variants={fadeUp} transition={{ duration: 0.7 }}
               className="ignis-card relative overflow-hidden max-w-5xl mx-auto"
             >
-              <div className="absolute -right-32 -top-32 h-72 w-72 rounded-full bg-ignis/15 blur-3xl" />
+              <div className="absolute -right-32 -top-32 h-72 w-72 rounded-full bg-primary/15 blur-3xl" />
               <div className="relative grid md:grid-cols-[auto_1fr_auto] gap-6 items-center p-8 md:p-10">
-                <div className="h-16 w-16 rounded-2xl liquid-glass-strong bg-sacramento/60 flex items-center justify-center mx-auto md:mx-0">
-                  <FileText className="h-7 w-7 text-ignis-bright" />
+                <div className="h-16 w-16 rounded-2xl liquid-glass-strong bg-muted flex items-center justify-center mx-auto md:mx-0">
+                  <FileText className="h-7 w-7 text-primary" />
                 </div>
                 <div className="text-center md:text-left">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-ignis-bright mb-2">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-2">
                     Value Proposition
                   </p>
-                  <h2 className="font-editorial italic text-2xl md:text-3xl text-white mb-2">
+                  <h2 className="font-editorial italic text-2xl md:text-3xl text-foreground mb-2">
                     {valueProp.title}
                   </h2>
                   {valueProp.description && (
-                    <p className="text-sm text-white/65 leading-relaxed">
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       {valueProp.description}
                     </p>
                   )}
@@ -372,7 +372,7 @@ export default function AboutPage() {
                       </a>
                     </Button>
                   ) : (
-                    <span className="text-xs text-white/45 italic">
+                    <span className="text-xs text-muted-foreground italic">
                       Document coming soon
                     </span>
                   )}
@@ -386,24 +386,24 @@ export default function AboutPage() {
       {/* ─────────── CHALLENGES ─────────── */}
       <section id="challenges" className="relative py-28 lg:py-36 overflow-hidden scroll-mt-24">
         <div className="absolute inset-0 bg-ember-grid opacity-15 pointer-events-none" />
-        <div className="absolute left-1/2 top-0 -translate-x-1/2 h-px w-1/2 bg-gradient-to-r from-transparent via-ignis/30 to-transparent" />
+        <div className="absolute left-1/2 top-0 -translate-x-1/2 h-px w-1/2 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
 
         <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
           <div className="text-center max-w-3xl mx-auto mb-14">
-            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-ignis-bright mb-5">
+            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-primary mb-5">
               <AlertCircle className="h-3 w-3" /> The gaps we close
             </span>
             <motion.h2
               initial="hidden" whileInView="show" viewport={{ once: true }}
               variants={fadeUp} transition={{ duration: 0.7 }}
-              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-white"
+              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-foreground"
             >
               The gaps we <span className="italic text-gradient-ignis">close.</span>
             </motion.h2>
-            <p className="mt-5 text-white/65 leading-relaxed">
+            <p className="mt-5 text-muted-foreground leading-relaxed">
               Even with growing momentum, clean cooking — especially at the institutional level — is held back by a few big barriers. Here is each barrier, and how CleanCookIQ closes it.
             </p>
-            <p className="text-xs text-white/40 mt-6 italic">
+            <p className="text-xs text-muted-foreground mt-6 italic">
               Click any item to read the story behind the gap and how we close it.
             </p>
           </div>
@@ -420,14 +420,14 @@ export default function AboutPage() {
                     value={`challenge-${i}`}
                     className="ignis-card overflow-hidden data-[state=open]:shadow-ignis transition-shadow border-0"
                   >
-                    <AccordionTrigger className="px-6 py-5 hover:no-underline group text-left [&[data-state=open]]:bg-ignis/5">
+                    <AccordionTrigger className="px-6 py-5 hover:no-underline group text-left [&[data-state=open]]:bg-primary/5">
                       <div className="flex items-start gap-4 flex-1">
-                        <span className="h-9 w-9 rounded-xl bg-ignis/15 border border-ignis/30 flex items-center justify-center shrink-0 group-data-[state=open]:bg-ignis group-data-[state=open]:border-ignis transition-colors">
-                          <span className="text-[11px] font-bold text-ignis-bright group-data-[state=open]:text-white tabular-nums">
+                        <span className="h-9 w-9 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0 group-data-[state=open]:bg-primary group-data-[state=open]:border-primary transition-colors">
+                          <span className="text-[11px] font-bold text-primary group-data-[state=open]:text-white tabular-nums">
                             0{i + 1}
                           </span>
                         </span>
-                        <span className="font-display font-semibold text-white pt-1.5 leading-snug">
+                        <span className="font-display font-semibold text-foreground pt-1.5 leading-snug">
                           {item.title}
                         </span>
                       </div>
@@ -435,33 +435,33 @@ export default function AboutPage() {
                     <AccordionContent className="px-6 pb-7">
                       <div className="space-y-5 text-sm leading-relaxed pl-0 md:pl-13">
                         <div>
-                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-ignis-bright mb-2">
+                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary mb-2">
                             What it looks like on the ground
                           </p>
-                          <p className="text-white/75">{item.scenario}</p>
+                          <p className="text-foreground/75">{item.scenario}</p>
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-ignis-bright mb-2">
+                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary mb-2">
                             The pattern
                           </p>
-                          <p className="text-white/75">{item.pattern}</p>
+                          <p className="text-foreground/75">{item.pattern}</p>
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-ignis-bright mb-2">
+                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary mb-2">
                             Why it matters
                           </p>
-                          <p className="text-white/75">{item.cost}</p>
+                          <p className="text-foreground/75">{item.cost}</p>
                         </div>
-                        <div className="relative overflow-hidden border-l-2 border-ignis/60 bg-ignis/5 rounded-r-xl p-5 mt-4 space-y-3">
-                          <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-ignis/15 blur-2xl" />
-                          <p className="relative text-[10px] font-bold uppercase tracking-[0.2em] text-ignis-bright flex items-center gap-1.5">
+                        <div className="relative overflow-hidden border-l-2 border-primary/60 bg-primary/5 rounded-r-xl p-5 mt-4 space-y-3">
+                          <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-primary/15 blur-2xl" />
+                          <p className="relative text-[10px] font-bold uppercase tracking-[0.2em] text-primary flex items-center gap-1.5">
                             <Check className="h-3 w-3" strokeWidth={3} /> How CleanCookIQ closes this gap
                           </p>
-                          <p className="relative text-white font-medium">{item.fix.summary}</p>
+                          <p className="relative text-foreground font-medium">{item.fix.summary}</p>
                           <ul className="relative space-y-2 pt-1">
                             {item.fix.mechanics.map((m, idx) => (
-                              <li key={idx} className="flex items-start gap-2 text-white/80">
-                                <Check className="h-3.5 w-3.5 text-ignis-bright mt-1 shrink-0" strokeWidth={3} />
+                              <li key={idx} className="flex items-start gap-2 text-foreground/80">
+                                <Check className="h-3.5 w-3.5 text-primary mt-1 shrink-0" strokeWidth={3} />
                                 <span>{m}</span>
                               </li>
                             ))}
@@ -473,7 +473,7 @@ export default function AboutPage() {
                 </motion.div>
               ))}
             </Accordion>
-            <p className="text-white/60 text-center mt-12 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-muted-foreground text-center mt-12 max-w-2xl mx-auto leading-relaxed">
               These challenges slow down deployment, limit investment flows, and prevent the ecosystem from reaching its full potential.
             </p>
           </div>
@@ -488,17 +488,17 @@ export default function AboutPage() {
 
         <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-ignis-bright mb-5">
+            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-primary mb-5">
               <Layers className="h-3 w-3" /> Our approach
             </span>
             <motion.h2
               initial="hidden" whileInView="show" viewport={{ once: true }}
               variants={fadeUp} transition={{ duration: 0.7 }}
-              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-white"
+              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-foreground"
             >
               A continuous <span className="italic text-gradient-ignis">cycle.</span>
             </motion.h2>
-            <p className="mt-5 text-white/65 leading-relaxed">
+            <p className="mt-5 text-muted-foreground leading-relaxed">
               Every step strengthens the next, and the whole loop compounds momentum across the ecosystem.
             </p>
           </div>
@@ -551,17 +551,17 @@ export default function AboutPage() {
 
         <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-ignis-bright mb-5">
+            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-primary mb-5">
               <Rocket className="h-3 w-3" /> How it works
             </span>
             <motion.h2
               initial="hidden" whileInView="show" viewport={{ once: true }}
               variants={fadeUp} transition={{ duration: 0.7 }}
-              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-white"
+              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-foreground"
             >
               Coordination, <span className="italic text-gradient-ignis">made simple.</span>
             </motion.h2>
-            <p className="mt-5 text-white/65">
+            <p className="mt-5 text-muted-foreground">
               CleanCookIQ transforms clean cooking deployment into a coordinated process.
             </p>
           </div>
@@ -575,11 +575,11 @@ export default function AboutPage() {
                 className="group ignis-card p-7 hover:-translate-y-1 transition-transform"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-[10px] font-bold text-ignis-bright tracking-[0.2em] uppercase">Step {s.step}</span>
-                  <span className="font-editorial italic text-2xl text-white/15 group-hover:text-ignis/40 transition-colors">0{i + 1}</span>
+                  <span className="text-[10px] font-bold text-primary tracking-[0.2em] uppercase">Step {s.step}</span>
+                  <span className="font-editorial italic text-2xl text-foreground/15 group-hover:text-primary/40 transition-colors">0{i + 1}</span>
                 </div>
-                <h3 className="font-display font-bold text-lg text-white mb-2">{s.title}</h3>
-                <p className="text-sm text-white/60 leading-relaxed">{s.desc}</p>
+                <h3 className="font-display font-bold text-lg text-foreground mb-2">{s.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -594,13 +594,13 @@ export default function AboutPage() {
 
         <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-ignis-bright mb-5">
+            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-primary mb-5">
               <Users className="h-3 w-3" /> Who we serve
             </span>
             <motion.h2
               initial="hidden" whileInView="show" viewport={{ once: true }}
               variants={fadeUp} transition={{ duration: 0.7 }}
-              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-white"
+              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-foreground"
             >
               A multi-stakeholder <span className="italic text-gradient-ignis">ecosystem.</span>
             </motion.h2>
@@ -614,12 +614,12 @@ export default function AboutPage() {
                 variants={fadeUp} transition={{ duration: 0.6, delay: i * 0.08 }}
                 className="group ignis-card p-7 hover:-translate-y-1 transition-transform"
               >
-                <span className="relative inline-flex h-12 w-12 rounded-2xl liquid-glass-strong bg-sacramento/60 items-center justify-center mb-5">
-                  <s.icon className="h-5 w-5 text-ignis-bright" strokeWidth={1.8} />
-                  <span className="absolute inset-0 rounded-2xl bg-ignis/30 blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="relative inline-flex h-12 w-12 rounded-2xl liquid-glass-strong bg-muted items-center justify-center mb-5">
+                  <s.icon className="h-5 w-5 text-primary" strokeWidth={1.8} />
+                  <span className="absolute inset-0 rounded-2xl bg-primary/30 blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </span>
-                <h3 className="font-display font-bold text-lg text-white mb-2">{s.title}</h3>
-                <p className="text-sm text-white/60 leading-relaxed">{s.desc}</p>
+                <h3 className="font-display font-bold text-lg text-foreground mb-2">{s.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -630,13 +630,13 @@ export default function AboutPage() {
       <section className="relative py-28 lg:py-36 overflow-hidden">
         <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
           <div className="text-center max-w-3xl mx-auto mb-14">
-            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-ignis-bright mb-5">
+            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-primary mb-5">
               <Zap className="h-3 w-3" /> Why now
             </span>
             <motion.h2
               initial="hidden" whileInView="show" viewport={{ once: true }}
               variants={fadeUp} transition={{ duration: 0.7 }}
-              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-white"
+              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-foreground"
             >
               A critical <span className="italic text-gradient-ignis">inflection point.</span>
             </motion.h2>
@@ -650,15 +650,15 @@ export default function AboutPage() {
                 variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.08 }}
                 className="ignis-card flex items-start gap-4 p-5"
               >
-                <span className="h-10 w-10 rounded-xl bg-ignis/15 border border-ignis/30 flex items-center justify-center shrink-0">
-                  <Zap className="h-4 w-4 text-ignis-bright" />
+                <span className="h-10 w-10 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0">
+                  <Zap className="h-4 w-4 text-primary" />
                 </span>
-                <p className="text-white/85 font-medium pt-2 leading-snug">{item}</p>
+                <p className="text-foreground/85 font-medium pt-2 leading-snug">{item}</p>
               </motion.div>
             ))}
           </div>
 
-          <p className="text-white/60 text-center mt-12 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-muted-foreground text-center mt-12 max-w-2xl mx-auto leading-relaxed">
             CleanCookIQ exists to turn this momentum into real, large-scale progress, not scattered wins.
           </p>
         </div>
@@ -670,17 +670,17 @@ export default function AboutPage() {
 
         <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-ignis-bright mb-5">
+            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-primary mb-5">
               <Globe className="h-3 w-3" /> Our focus
             </span>
             <motion.h2
               initial="hidden" whileInView="show" viewport={{ once: true }}
               variants={fadeUp} transition={{ duration: 0.7 }}
-              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-white"
+              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-foreground"
             >
               From Kenya, <span className="italic text-gradient-ignis">outward.</span>
             </motion.h2>
-            <p className="mt-5 text-white/65 max-w-2xl mx-auto">
+            <p className="mt-5 text-muted-foreground max-w-2xl mx-auto">
               The platform is initially focused on institutional markets, where impact can be aggregated and scaled efficiently.
             </p>
           </div>
@@ -697,17 +697,17 @@ export default function AboutPage() {
                 variants={fadeUp} transition={{ duration: 0.6, delay: i * 0.12 }}
                 className="group ignis-card p-8 hover:-translate-y-1 transition-transform relative overflow-hidden"
               >
-                <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-ignis/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-primary/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="relative flex items-center gap-3 mb-4">
-                  <MapPin className="h-4 w-4 text-ignis-bright" />
-                  <span className="text-[10px] font-bold text-ignis-bright tracking-[0.2em] uppercase">{item.wave}</span>
+                  <MapPin className="h-4 w-4 text-primary" />
+                  <span className="text-[10px] font-bold text-primary tracking-[0.2em] uppercase">{item.wave}</span>
                 </div>
-                <h3 className="relative font-editorial italic text-3xl text-white leading-tight">{item.region}</h3>
+                <h3 className="relative font-editorial italic text-3xl text-foreground leading-tight">{item.region}</h3>
               </motion.div>
             ))}
           </div>
 
-          <p className="text-white/55 text-center mt-12 max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-center mt-12 max-w-2xl mx-auto">
             These markets offer enabling environments for rapid deployment and ecosystem collaboration.
           </p>
         </div>
@@ -718,7 +718,7 @@ export default function AboutPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-background via-[hsl(141_55%_10%)] to-background" />
         <div className="absolute inset-0 bg-hero-glow opacity-80" />
         <div className="absolute inset-0 bg-ember-grid opacity-25" />
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-ignis/20 blur-3xl animate-glow-pulse" />
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-primary/20 blur-3xl animate-glow-pulse" />
 
         <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12 text-center">
           <motion.div
@@ -728,14 +728,14 @@ export default function AboutPage() {
             transition={{ duration: 0.6 }}
             className="inline-flex items-center gap-2 liquid-glass rounded-full px-4 py-1.5 mb-8"
           >
-            <Flame className="h-3.5 w-3.5 text-ignis-bright" />
-            <span className="text-xs font-medium text-white/85 uppercase tracking-[0.2em]">Our vision</span>
+            <Flame className="h-3.5 w-3.5 text-primary" />
+            <span className="text-xs font-medium text-foreground/85 uppercase tracking-[0.2em]">Our vision</span>
           </motion.div>
 
           <motion.h2
             initial="hidden" whileInView="show" viewport={{ once: true }}
             variants={fadeUp} transition={{ duration: 0.8 }}
-            className="font-editorial italic text-4xl md:text-6xl lg:text-7xl leading-[1.05] tracking-tight text-white max-w-5xl mx-auto"
+            className="font-editorial italic text-4xl md:text-6xl lg:text-7xl leading-[1.05] tracking-tight text-foreground max-w-5xl mx-auto"
           >
             To build the operating system for <span className="text-gradient-ignis">clean cooking markets</span>, enabling coordinated, data-driven, large-scale change across Africa and beyond.
           </motion.h2>

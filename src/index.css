@@ -110,26 +110,25 @@
   }
 
   /* Ignis canvas — public pages opt into this via PublicLayout.
-     Bright green canvas with orange accents. */
+     White canvas with green + orange accents. */
   .theme-ignis {
-    --background: 144 30% 20%;          /* lifted emerald canvas */
-    --foreground: 36 27% 96%;           /* #F6F3EE cream */
-    --card: 144 28% 24%;
-    --card-foreground: 36 27% 96%;
-    --popover: 144 28% 24%;
-    --popover-foreground: 36 27% 96%;
-    --primary: 33 100% 50%;             /* #FF8C00 brand orange */
+    --background: 0 0% 100%;            /* white */
+    --foreground: 144 60% 10%;          /* dark green text */
+    --card: 0 0% 100%;
+    --card-foreground: 144 60% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 144 60% 10%;
+    --primary: 144 100% 22%;            /* Rich Emerald #00712D */
     --primary-foreground: 0 0% 100%;
-    --secondary: 144 100% 30%;          /* brighter Rich Emerald */
-    --secondary-foreground: 36 27% 96%;
-    --muted: 144 22% 27%;
-    --muted-foreground: 89 25% 78%;
-    --accent: 33 100% 50%;
+    --secondary: 89 50% 33%;            /* Sap Green #507D2A */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 140 10% 95%;
+    --muted-foreground: 144 15% 40%;
+    --accent: 33 100% 50%;              /* ignis orange */
     --accent-foreground: 0 0% 100%;
-    --border: 144 20% 32%;
-    --input: 144 20% 32%;
-    --ring: 33 100% 50%;
-    color-scheme: dark;
+    --border: 140 12% 90%;
+    --input: 140 12% 90%;
+    --ring: 144 100% 22%;
   }
 }
 
@@ -154,12 +153,12 @@
      Agency prompts, tinted with Ignis greens so the gradient border
      reads as warm-emerald instead of cold silver. */
   .liquid-glass {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.80);
     background-blend-mode: luminosity;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border: none;
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.50);
     position: relative;
     overflow: hidden;
   }
@@ -170,10 +169,10 @@
     border-radius: inherit;
     padding: 1.2px;
     background: linear-gradient(180deg,
-      rgba(255, 255, 255, 0.45) 0%,
-      rgba(255, 255, 255, 0.10) 25%,
-      rgba(255, 140, 0, 0.10) 60%,
-      rgba(255, 140, 0, 0.35) 100%);
+      rgba(0, 113, 45, 0.15) 0%,
+      rgba(0, 113, 45, 0.05) 25%,
+      rgba(255, 140, 0, 0.08) 60%,
+      rgba(255, 140, 0, 0.20) 100%);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -181,13 +180,13 @@
   }
 
   .liquid-glass-strong {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.85);
     background-blend-mode: luminosity;
     backdrop-filter: blur(40px) saturate(1.4);
     -webkit-backdrop-filter: blur(40px) saturate(1.4);
     box-shadow:
-      4px 4px 14px rgba(0, 0, 0, 0.18),
-      inset 0 1px 1px rgba(255, 255, 255, 0.18);
+      4px 4px 14px rgba(0, 0, 0, 0.06),
+      inset 0 1px 1px rgba(255, 255, 255, 0.50);
     position: relative;
     overflow: hidden;
   }
@@ -198,10 +197,10 @@
     border-radius: inherit;
     padding: 1.4px;
     background: linear-gradient(180deg,
-      rgba(255, 255, 255, 0.55) 0%,
-      rgba(255, 255, 255, 0.18) 30%,
-      rgba(255, 140, 0, 0.20) 70%,
-      rgba(255, 140, 0, 0.55) 100%);
+      rgba(0, 113, 45, 0.20) 0%,
+      rgba(0, 113, 45, 0.08) 30%,
+      rgba(255, 140, 0, 0.12) 70%,
+      rgba(255, 140, 0, 0.30) 100%);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -231,28 +230,28 @@
     box-shadow: 0 1px 2px hsl(141 30% 20% / 0.06), 0 18px 40px -16px hsl(141 30% 20% / 0.20);
   }
 
-  /* Frosted card sitting on the green canvas. */
+  /* Clean card with subtle green tint. */
   .ignis-card {
     background: linear-gradient(180deg,
-      hsl(144 30% 22% / 0.90) 0%,
-      hsl(144 35% 18% / 0.94) 100%);
-    border: 1px solid hsl(144 25% 30% / 0.75);
+      hsl(0 0% 100%) 0%,
+      hsl(140 15% 97%) 100%);
+    border: 1px solid hsl(140 15% 88%);
     border-radius: 1.25rem;
     box-shadow:
-      inset 0 1px 0 hsl(36 40% 60% / 0.10),
-      0 18px 40px -20px hsl(0 0% 0% / 0.50);
+      0 1px 3px hsl(144 30% 20% / 0.06),
+      0 10px 30px -12px hsl(144 30% 20% / 0.10);
   }
 
-  /* Hero orange — solid, saturated, glowing shimmer. */
+  /* Hero green shimmer — emerald gradient text on white. */
   .ignis-shimmer {
-    color: #ff8c00;
+    color: #00712D;
     background-image: linear-gradient(
       100deg,
-      hsl(28 95% 48%) 0%,
-      hsl(33 100% 55%) 35%,
-      hsl(38 100% 64%) 50%,
-      hsl(33 100% 55%) 65%,
-      hsl(28 95% 48%) 100%
+      hsl(144 100% 18%) 0%,
+      hsl(112 75% 28%) 35%,
+      hsl(89 50% 40%) 50%,
+      hsl(112 75% 28%) 65%,
+      hsl(144 100% 18%) 100%
     );
     background-size: 220% 100%;
     background-position: 100% 0;
@@ -260,8 +259,8 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: ignis-shimmer 5s linear infinite;
-    filter: drop-shadow(0 0 18px hsl(33 100% 50% / 0.55))
-            drop-shadow(0 0 40px hsl(33 100% 50% / 0.35));
+    filter: drop-shadow(0 0 12px hsl(144 100% 22% / 0.30))
+            drop-shadow(0 0 30px hsl(144 100% 22% / 0.15));
     font-weight: 500;
   }
   @keyframes ignis-shimmer {
@@ -278,18 +277,18 @@
     color: transparent;
   }
 
-  /* Subtle ember dot grid backdrop. */
+  /* Subtle dot grid backdrop. */
   .bg-ember-grid {
     background-image:
-      radial-gradient(circle at 1px 1px, hsl(33 100% 50% / 0.18) 1px, transparent 0);
+      radial-gradient(circle at 1px 1px, hsl(144 100% 22% / 0.08) 1px, transparent 0);
     background-size: 28px 28px;
   }
 
-  /* Radial spotlight behind hero copy — green + orange in balance. */
+  /* Radial spotlight behind hero copy — soft green + orange on white. */
   .bg-hero-glow {
-    background: radial-gradient(60% 50% at 50% 30%, hsl(33 100% 50% / 0.18) 0%, transparent 70%),
-                radial-gradient(45% 35% at 80% 80%, hsl(144 100% 22% / 0.35) 0%, transparent 70%),
-                radial-gradient(40% 40% at 15% 90%, hsl(112 75% 22% / 0.30) 0%, transparent 70%);
+    background: radial-gradient(60% 50% at 50% 30%, hsl(33 100% 50% / 0.08) 0%, transparent 70%),
+                radial-gradient(45% 35% at 80% 80%, hsl(144 100% 22% / 0.10) 0%, transparent 70%),
+                radial-gradient(40% 40% at 15% 90%, hsl(112 75% 22% / 0.08) 0%, transparent 70%);
   }
 }
 

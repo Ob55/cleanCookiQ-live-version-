@@ -153,17 +153,17 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-hero-glow opacity-70" />
           <div className="absolute inset-0 bg-ember-grid opacity-20" />
           {/* floating orange embers */}
-          <div className="absolute top-1/3 left-[15%] h-2 w-2 rounded-full bg-ignis blur-sm animate-ember-float" style={{ animationDelay: "0s" }} />
-          <div className="absolute top-2/3 left-[28%] h-1.5 w-1.5 rounded-full bg-ignis-bright blur-sm animate-ember-float" style={{ animationDelay: "1.2s" }} />
-          <div className="absolute top-1/4 right-[20%] h-2 w-2 rounded-full bg-ignis blur-sm animate-ember-float" style={{ animationDelay: "2.4s" }} />
-          <div className="absolute bottom-1/3 right-[10%] h-1.5 w-1.5 rounded-full bg-ignis-bright blur-sm animate-ember-float" style={{ animationDelay: "0.6s" }} />
+          <div className="absolute top-1/3 left-[15%] h-2 w-2 rounded-full bg-primary blur-sm animate-ember-float" style={{ animationDelay: "0s" }} />
+          <div className="absolute top-2/3 left-[28%] h-1.5 w-1.5 rounded-full bg-primary/60 blur-sm animate-ember-float" style={{ animationDelay: "1.2s" }} />
+          <div className="absolute top-1/4 right-[20%] h-2 w-2 rounded-full bg-primary blur-sm animate-ember-float" style={{ animationDelay: "2.4s" }} />
+          <div className="absolute bottom-1/3 right-[10%] h-1.5 w-1.5 rounded-full bg-primary/60 blur-sm animate-ember-float" style={{ animationDelay: "0.6s" }} />
         </div>
 
         <div className="relative z-10 w-full max-w-[1600px] mx-auto px-6 lg:px-12 pt-32 pb-20">
           <div className="grid lg:grid-cols-[1.2fr_1fr] gap-10 items-center">
             {/* Headline column */}
             <div>
-              <h1 className="font-editorial text-[3rem] sm:text-6xl lg:text-7xl xl:text-[5.5rem] leading-[0.95] tracking-tight text-white">
+              <h1 className="font-editorial text-[3rem] sm:text-6xl lg:text-7xl xl:text-[5.5rem] leading-[0.95] tracking-tight text-foreground">
                 <BlurWords text="Powering Kenya's" />
                 <br />
                 <span className="italic ignis-shimmer inline-block">
@@ -195,7 +195,7 @@ export default function HomePage() {
                   </button>
                 </Link>
                 <Link to="/book-demo">
-                  <button className="inline-flex items-center gap-2 h-12 px-7 rounded-full liquid-glass-strong text-white font-medium hover:bg-white/10 transition-colors">
+                  <button className="inline-flex items-center gap-2 h-12 px-7 rounded-full liquid-glass-strong text-foreground font-medium hover:bg-white/10 transition-colors">
                     Book a Demo <ArrowUpRight className="h-4 w-4" />
                   </button>
                 </Link>
@@ -208,7 +208,7 @@ export default function HomePage() {
                 transition={{ duration: 1, delay: 1.4 }}
                 className="mt-14 flex flex-wrap items-center gap-x-6 gap-y-3"
               >
-                <span className="text-[11px] uppercase tracking-[0.18em] text-[#FF8C00] font-bold drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">Trusted partners</span>
+                <span className="text-[11px] uppercase tracking-[0.18em] text-accent font-bold drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">Trusted partners</span>
                 <div className="flex items-center gap-5">
                   {partners.slice(0, 4).map((p, i) => (
                     <img key={i} src={p} alt="" className="h-7 max-w-[80px] object-contain" />
@@ -227,22 +227,22 @@ export default function HomePage() {
               {/* Big featured stat */}
               <div className="liquid-glass-strong rounded-[2rem] p-8 mb-4 bg-background/75">
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="h-2 w-2 rounded-full bg-ignis animate-pulse" />
-                  <span className="text-[10px] uppercase tracking-[0.2em] text-ignis-bright font-semibold">Live pipeline</span>
+                  <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold">Live pipeline</span>
                 </div>
-                <p className="font-editorial italic text-6xl text-white leading-none">
+                <p className="font-editorial italic text-6xl text-foreground leading-none">
                   <AnimatedNumber value={totalInstitutions} />
                 </p>
-                <p className="mt-3 text-sm text-white/85">institutions being tracked across <span className="text-white font-medium">47 counties</span></p>
+                <p className="mt-3 text-sm text-foreground/85">institutions being tracked across <span className="text-foreground font-medium">47 counties</span></p>
                 <div className="mt-6 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                 <div className="mt-4 grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-white/65 mb-1">Assessed</p>
-                    <p className="font-display font-bold text-2xl text-white"><AnimatedNumber value={assessedCount} /></p>
+                    <p className="text-[10px] uppercase tracking-[0.18em] text-foreground/65 mb-1">Assessed</p>
+                    <p className="font-display font-bold text-2xl text-foreground"><AnimatedNumber value={assessedCount} /></p>
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-white/65 mb-1">In delivery</p>
-                    <p className="font-display font-bold text-2xl text-ignis-bright"><AnimatedNumber value={inDeliveryCount} /></p>
+                    <p className="text-[10px] uppercase tracking-[0.18em] text-foreground/65 mb-1">In delivery</p>
+                    <p className="font-display font-bold text-2xl text-primary"><AnimatedNumber value={inDeliveryCount} /></p>
                   </div>
                 </div>
               </div>
@@ -250,15 +250,15 @@ export default function HomePage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="liquid-glass rounded-2xl p-5 bg-background/60">
                   <Leaf className="h-5 w-5 text-rich-emerald mb-3" />
-                  <p className="font-display font-bold text-2xl text-white"><AnimatedNumber value={co2Tonnes} /></p>
-                  <p className="text-[11px] text-white/75 mt-1 leading-tight">Tonnes CO₂ avoided / year</p>
+                  <p className="font-display font-bold text-2xl text-foreground"><AnimatedNumber value={co2Tonnes} /></p>
+                  <p className="text-[11px] text-foreground/75 mt-1 leading-tight">Tonnes CO₂ avoided / year</p>
                 </div>
                 <div className="liquid-glass rounded-2xl p-5 bg-background/60">
-                  <Flame className="h-5 w-5 text-ignis mb-3" />
-                  <p className="font-display font-bold text-2xl text-white">
+                  <Flame className="h-5 w-5 text-accent mb-3" />
+                  <p className="font-display font-bold text-2xl text-foreground">
                     KSh <AnimatedNumber value={pipelineDisplay.num} suffix={pipelineDisplay.suffix} decimals={pipelineDisplay.decimals} />
                   </p>
-                  <p className="text-[11px] text-white/75 mt-1 leading-tight">Pipeline value</p>
+                  <p className="text-[11px] text-foreground/75 mt-1 leading-tight">Pipeline value</p>
                 </div>
               </div>
             </motion.div>
@@ -276,12 +276,12 @@ export default function HomePage() {
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {stats.map((s) => (
                 <div key={s.label} className="flex items-center gap-3">
-                  <s.icon className="h-5 w-5 text-ignis-bright shrink-0" />
+                  <s.icon className="h-5 w-5 text-primary shrink-0" />
                   <div>
-                    <p className="font-display font-bold text-lg text-white leading-none">
+                    <p className="font-display font-bold text-lg text-foreground leading-none">
                       <AnimatedNumber value={s.num} suffix={s.suffix} decimals={s.decimals} />
                     </p>
-                    <p className="text-[10px] text-white/55 mt-0.5 leading-tight">{s.label}</p>
+                    <p className="text-[10px] text-foreground/55 mt-0.5 leading-tight">{s.label}</p>
                   </div>
                 </div>
               ))}
@@ -293,7 +293,7 @@ export default function HomePage() {
       {/* ─────────── WHAT THE PLATFORM DOES ─────────── */}
       <section className="relative py-28 lg:py-36 overflow-hidden">
         <div className="absolute inset-0 bg-ember-grid opacity-20 pointer-events-none" />
-        <div className="absolute left-1/2 top-0 -translate-x-1/2 h-px w-1/2 bg-gradient-to-r from-transparent via-ignis/30 to-transparent" />
+        <div className="absolute left-1/2 top-0 -translate-x-1/2 h-px w-1/2 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
 
         <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -302,18 +302,18 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-ignis-bright mb-5"
+              className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-primary mb-5"
             >
               <Flame className="h-3 w-3" /> The platform
             </motion.span>
             <motion.h2
               initial="hidden" whileInView="show" viewport={{ once: true }}
               variants={fadeUp} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-white"
+              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-foreground"
             >
               Everything one transition needs, <span className="italic text-gradient-ignis">in one place.</span>
             </motion.h2>
-            <p className="mt-5 text-white/65 leading-relaxed">
+            <p className="mt-5 text-foreground/65 leading-relaxed">
               Six modules that move an institution from current fuel to a clean alternative — with the supply, finance, training and tracking built in.
             </p>
           </div>
@@ -326,16 +326,16 @@ export default function HomePage() {
                 variants={fadeUp} transition={{ duration: 0.6, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
                 className="group relative ignis-card p-7 hover:-translate-y-1 transition-transform duration-300"
               >
-                <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-ignis/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="flex items-start justify-between mb-6">
-                  <span className="relative h-12 w-12 rounded-2xl liquid-glass-strong bg-sacramento/60 flex items-center justify-center">
-                    <mod.icon className="h-5 w-5 text-ignis-bright" strokeWidth={1.8} />
+                  <span className="relative h-12 w-12 rounded-2xl liquid-glass-strong bg-muted flex items-center justify-center">
+                    <mod.icon className="h-5 w-5 text-primary" strokeWidth={1.8} />
                     <span className="absolute inset-0 rounded-2xl bg-ignis/30 blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </span>
-                  <span className="font-editorial italic text-2xl text-white/15 group-hover:text-ignis/40 transition-colors">0{i + 1}</span>
+                  <span className="font-editorial italic text-2xl text-foreground/15 group-hover:text-accent/40 transition-colors">0{i + 1}</span>
                 </div>
-                <h3 className="font-display font-bold text-lg mb-3 text-white">{mod.title}</h3>
-                <p className="text-sm text-white/60 leading-relaxed">{mod.desc}</p>
+                <h3 className="font-display font-bold text-lg mb-3 text-foreground">{mod.title}</h3>
+                <p className="text-sm text-foreground/60 leading-relaxed">{mod.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -363,17 +363,17 @@ export default function HomePage() {
 
         <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
           <div className="text-center max-w-3xl mx-auto mb-14">
-            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-ignis-bright mb-5">
+            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-primary mb-5">
               <AlertCircle className="h-3 w-3" /> The gaps we close
             </span>
             <motion.h2
               initial="hidden" whileInView="show" viewport={{ once: true }}
               variants={fadeUp} transition={{ duration: 0.7 }}
-              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-white"
+              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-foreground"
             >
               Closing the gaps in <span className="italic text-gradient-ignis">institutional cooking.</span>
             </motion.h2>
-            <p className="mt-5 text-white/70">
+            <p className="mt-5 text-foreground/70">
               The clean cooking sector has real gaps. CleanCookIQ fills them.
             </p>
           </div>
@@ -402,7 +402,7 @@ export default function HomePage() {
                     <span className="h-9 w-9 rounded-full bg-destructive/15 border border-destructive/30 flex items-center justify-center shrink-0 mt-0.5">
                       <AlertCircle className="h-4 w-4 text-destructive" strokeWidth={2.5} />
                     </span>
-                    <p className="text-sm text-white/85 leading-relaxed pt-1.5">{item.fail}</p>
+                    <p className="text-sm text-foreground/85 leading-relaxed pt-1.5">{item.fail}</p>
                   </motion.li>
                 ))}
               </ul>
@@ -417,9 +417,9 @@ export default function HomePage() {
               <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-ignis/15 blur-3xl" />
               <div className="relative flex items-center gap-3 mb-8">
                 <span className="h-9 w-9 rounded-xl bg-ignis/20 border border-ignis/40 flex items-center justify-center">
-                  <Check className="h-4 w-4 text-ignis-bright" strokeWidth={3} />
+                  <Check className="h-4 w-4 text-primary" strokeWidth={3} />
                 </span>
-                <p className="text-ignis-bright text-[11px] font-bold uppercase tracking-[0.2em]">Our Solution</p>
+                <p className="text-primary text-[11px] font-bold uppercase tracking-[0.2em]">Our Solution</p>
               </div>
               <ul className="relative space-y-6">
                 {failures.map((item, i) => (
@@ -430,9 +430,9 @@ export default function HomePage() {
                     className="flex items-start gap-4"
                   >
                     <span className="h-9 w-9 rounded-full bg-ignis/20 border border-ignis/40 flex items-center justify-center shrink-0 mt-0.5">
-                      <Check className="h-4 w-4 text-ignis-bright" strokeWidth={3} />
+                      <Check className="h-4 w-4 text-primary" strokeWidth={3} />
                     </span>
-                    <p className="text-sm text-white/85 leading-relaxed pt-1.5">{item.fix}</p>
+                    <p className="text-sm text-foreground/85 leading-relaxed pt-1.5">{item.fix}</p>
                   </motion.li>
                 ))}
               </ul>
@@ -440,7 +440,7 @@ export default function HomePage() {
           </div>
 
           <div className="text-center mt-12">
-            <Link to="/about#challenges" className="inline-flex items-center gap-2 text-ignis-bright hover:text-white font-semibold transition-colors group">
+            <Link to="/about#challenges" className="inline-flex items-center gap-2 text-primary hover:text-foreground font-semibold transition-colors group">
               Learn more about how we close these gaps <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
@@ -453,24 +453,24 @@ export default function HomePage() {
 
         <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
           <div className="text-center max-w-3xl mx-auto mb-20">
-            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-ignis-bright mb-5">
+            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-primary mb-5">
               <Rocket className="h-3 w-3" /> How it works
             </span>
             <motion.h2
               initial="hidden" whileInView="show" viewport={{ once: true }}
               variants={fadeUp} transition={{ duration: 0.7 }}
-              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-white"
+              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-foreground"
             >
               Five steps. <span className="italic text-gradient-ignis">One fully tracked kitchen.</span>
             </motion.h2>
-            <p className="mt-5 text-white/65">
+            <p className="mt-5 text-foreground/65">
               From sign-up to monitoring, every move is captured against the same shared record.
             </p>
           </div>
 
           {/* Desktop horizontal timeline */}
           <div className="hidden lg:block relative">
-            <div className="absolute left-12 right-12 top-12 h-px bg-gradient-to-r from-transparent via-ignis/40 to-transparent" />
+            <div className="absolute left-12 right-12 top-12 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
             <div className="grid grid-cols-5 gap-2">
               {steps.map((s, i) => (
                 <motion.div
@@ -480,14 +480,14 @@ export default function HomePage() {
                   className="flex flex-col items-center text-center group px-2"
                 >
                   <div className="relative mb-5">
-                    <div className="h-24 w-24 rounded-full liquid-glass-strong bg-sacramento/70 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                      <s.icon className="h-9 w-9 text-ignis-bright" strokeWidth={1.6} />
+                    <div className="h-24 w-24 rounded-full liquid-glass-strong bg-muted flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                      <s.icon className="h-9 w-9 text-primary" strokeWidth={1.6} />
                     </div>
                     <span className="absolute inset-0 rounded-full bg-ignis/30 blur-2xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
-                  <span className="text-[10px] font-bold text-ignis-bright tracking-[0.2em] uppercase mb-2">Step {s.step}</span>
-                  <h3 className="font-display font-bold text-lg text-white mb-2">{s.title}</h3>
-                  <p className="text-xs text-white/55 leading-relaxed max-w-[180px]">{s.desc}</p>
+                  <span className="text-[10px] font-bold text-primary tracking-[0.2em] uppercase mb-2">Step {s.step}</span>
+                  <h3 className="font-display font-bold text-lg text-foreground mb-2">{s.title}</h3>
+                  <p className="text-xs text-foreground/55 leading-relaxed max-w-[180px]">{s.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -503,17 +503,17 @@ export default function HomePage() {
                 className="ignis-card p-5 flex items-start gap-4"
               >
                 <div className="relative">
-                  <div className="h-14 w-14 rounded-2xl liquid-glass-strong bg-sacramento/70 flex items-center justify-center shrink-0">
-                    <s.icon className="h-5 w-5 text-ignis-bright" />
+                  <div className="h-14 w-14 rounded-2xl liquid-glass-strong bg-muted flex items-center justify-center shrink-0">
+                    <s.icon className="h-5 w-5 text-primary" />
                   </div>
                 </div>
                 <div className="flex-1 pt-0.5">
-                  <span className="text-[10px] font-bold text-ignis-bright tracking-[0.2em] uppercase">Step {s.step}</span>
-                  <h3 className="font-display font-bold text-lg text-white mt-0.5 mb-1.5">{s.title}</h3>
-                  <p className="text-sm text-white/60 leading-relaxed">{s.desc}</p>
+                  <span className="text-[10px] font-bold text-primary tracking-[0.2em] uppercase">Step {s.step}</span>
+                  <h3 className="font-display font-bold text-lg text-foreground mt-0.5 mb-1.5">{s.title}</h3>
+                  <p className="text-sm text-foreground/60 leading-relaxed">{s.desc}</p>
                 </div>
                 {i < steps.length - 1 && (
-                  <ChevronRight className="h-5 w-5 text-ignis/40 self-center shrink-0" />
+                  <ChevronRight className="h-5 w-5 text-accent/40 self-center shrink-0" />
                 )}
               </motion.div>
             ))}
@@ -527,10 +527,10 @@ export default function HomePage() {
       <section className="relative py-20 lg:py-24 overflow-hidden border-t border-white/5">
         <div className="max-w-[1600px] mx-auto px-6 lg:px-12 mb-12">
           <div className="text-center">
-            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-ignis-bright mb-4">
+            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-primary mb-4">
               <Handshake className="h-3 w-3" /> Our partners
             </span>
-            <h3 className="font-editorial text-3xl md:text-4xl text-white">
+            <h3 className="font-editorial text-3xl md:text-4xl text-foreground">
               Trusted organisations <span className="italic text-gradient-ignis">powering the transition.</span>
             </h3>
           </div>
@@ -566,14 +566,14 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             className="inline-flex items-center gap-2 liquid-glass rounded-full px-4 py-1.5 mb-7"
           >
-            <Flame className="h-3.5 w-3.5 text-ignis-bright" />
-            <span className="text-xs font-medium text-white/85">Join the transition</span>
+            <Flame className="h-3.5 w-3.5 text-primary" />
+            <span className="text-xs font-medium text-foreground/85">Join the transition</span>
           </motion.div>
 
           <motion.h2
             initial="hidden" whileInView="show" viewport={{ once: true }}
             variants={fadeUp} transition={{ duration: 0.8 }}
-            className="font-editorial text-4xl md:text-6xl lg:text-7xl xl:text-8xl leading-[0.95] tracking-tight text-white max-w-5xl mx-auto"
+            className="font-editorial text-4xl md:text-6xl lg:text-7xl xl:text-8xl leading-[0.95] tracking-tight text-foreground max-w-5xl mx-auto"
           >
             Ready to join the <span className="italic text-gradient-ignis">transition?</span>
           </motion.h2>
@@ -581,7 +581,7 @@ export default function HomePage() {
           <motion.p
             initial="hidden" whileInView="show" viewport={{ once: true }}
             variants={fadeUp} transition={{ duration: 0.7, delay: 0.2 }}
-            className="mt-7 text-lg text-white/70 max-w-2xl mx-auto leading-relaxed"
+            className="mt-7 text-lg text-foreground/70 max-w-2xl mx-auto leading-relaxed"
           >
             Whether you are an institution, provider, funder, or researcher, there is a place for you on CleanCookIQ.
           </motion.p>
@@ -598,7 +598,7 @@ export default function HomePage() {
               </button>
             </Link>
             <Link to="/book-demo">
-              <button className="inline-flex items-center gap-2 h-12 px-8 rounded-full liquid-glass-strong text-white font-medium hover:bg-white/10 transition-colors">
+              <button className="inline-flex items-center gap-2 h-12 px-8 rounded-full liquid-glass-strong text-foreground font-medium hover:bg-white/10 transition-colors">
                 Book a Demo
               </button>
             </Link>
