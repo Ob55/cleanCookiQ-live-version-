@@ -308,15 +308,15 @@ export default function AboutPage() {
       </section>
 
       {/* ─────────── INTRO ─────────── */}
-      <section className="relative py-24 lg:py-32">
+      <section className="relative py-24 lg:py-32 bg-[#00712D]">
         <div className="max-w-[1600px] mx-auto px-6 lg:px-12">
           <div className="grid lg:grid-cols-[1fr_2fr] gap-12 lg:gap-20 max-w-6xl mx-auto">
             <motion.div
               initial="hidden" whileInView="show" viewport={{ once: true }}
               variants={fadeUp} transition={{ duration: 0.7 }}
             >
-              <span className="text-[11px] uppercase tracking-[0.2em] text-primary font-semibold">The story</span>
-              <h2 className="font-editorial italic text-4xl lg:text-5xl text-foreground mt-3 leading-[1.05]">
+              <span className="text-[11px] uppercase tracking-[0.2em] text-amber-400 font-semibold">The story</span>
+              <h2 className="font-editorial italic text-4xl lg:text-5xl text-white mt-3 leading-[1.05]">
                 Not a project. <span className="text-gradient-ignis">A layer.</span>
               </h2>
             </motion.div>
@@ -325,10 +325,10 @@ export default function AboutPage() {
               variants={fadeUp} transition={{ duration: 0.7, delay: 0.15 }}
               className="space-y-6"
             >
-              <p className="text-foreground/75 text-lg leading-relaxed">
+              <p className="text-white/75 text-lg leading-relaxed">
                 Built to solve the scattered nature of the clean cooking ecosystem, the platform connects institutions, solution providers, financiers, and partners, turning disconnected efforts into coordinated, ready-to-invest opportunities.
               </p>
-              <p className="text-muted-foreground text-base leading-relaxed">
+              <p className="text-white/60 text-base leading-relaxed">
                 Rather than operating as a standalone project or technology provider, CleanCookIQ functions as the coordination and intelligence layer powering the next generation of clean cooking markets.
               </p>
             </motion.div>
@@ -384,7 +384,7 @@ export default function AboutPage() {
       )}
 
       {/* ─────────── CHALLENGES ─────────── */}
-      <section id="challenges" className="relative py-28 lg:py-36 overflow-hidden scroll-mt-24">
+      <section id="challenges" className="relative py-28 lg:py-36 overflow-hidden scroll-mt-24 bg-[#FFF5E6]">
         <div className="absolute inset-0 bg-ember-grid opacity-15 pointer-events-none" />
         <div className="absolute left-1/2 top-0 -translate-x-1/2 h-px w-1/2 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
 
@@ -546,22 +546,22 @@ export default function AboutPage() {
       </section>
 
       {/* ─────────── HOW IT WORKS ─────────── */}
-      <section className="relative py-28 lg:py-36 overflow-hidden">
+      <section className="relative py-28 lg:py-36 overflow-hidden bg-[#00712D]">
         <div className="absolute inset-0 bg-ember-grid opacity-15 pointer-events-none" />
 
         <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-primary mb-5">
+            <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-amber-400 mb-5">
               <Rocket className="h-3 w-3" /> How it works
             </span>
             <motion.h2
               initial="hidden" whileInView="show" viewport={{ once: true }}
               variants={fadeUp} transition={{ duration: 0.7 }}
-              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-foreground"
+              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-white"
             >
               Coordination, <span className="italic text-gradient-ignis">made simple.</span>
             </motion.h2>
-            <p className="mt-5 text-muted-foreground">
+            <p className="mt-5 text-white/60">
               CleanCookIQ transforms clean cooking deployment into a coordinated process.
             </p>
           </div>
@@ -575,11 +575,11 @@ export default function AboutPage() {
                 className="group ignis-card p-7 hover:-translate-y-1 transition-transform"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-[10px] font-bold text-primary tracking-[0.2em] uppercase">Step {s.step}</span>
-                  <span className="font-editorial italic text-2xl text-foreground/15 group-hover:text-primary/40 transition-colors">0{i + 1}</span>
+                  <span className="text-[10px] font-bold text-amber-400 tracking-[0.2em] uppercase">Step {s.step}</span>
+                  <span className="font-editorial italic text-2xl text-white/15 group-hover:text-amber-400/40 transition-colors">0{i + 1}</span>
                 </div>
-                <h3 className="font-display font-bold text-lg text-foreground mb-2">{s.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
+                <h3 className="font-display font-bold text-lg text-white mb-2">{s.title}</h3>
+                <p className="text-sm text-white/60 leading-relaxed">{s.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -627,7 +627,7 @@ export default function AboutPage() {
       </section>
 
       {/* ─────────── WHY NOW ─────────── */}
-      <section className="relative py-28 lg:py-36 overflow-hidden">
+      <section className="relative py-28 lg:py-36 overflow-hidden bg-[#FFF5E6]">
         <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
           <div className="text-center max-w-3xl mx-auto mb-14">
             <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-primary mb-5">
@@ -714,7 +714,7 @@ export default function AboutPage() {
       </section>
 
       {/* ─────────── OUR VISION ─────────── */}
-      <section className="relative py-32 lg:py-44 overflow-hidden">
+      <section className="relative py-32 lg:py-44 overflow-hidden bg-[#00712D]">
         <div className="absolute inset-0 bg-gradient-to-br from-background via-[hsl(141_55%_10%)] to-background" />
         <div className="absolute inset-0 bg-hero-glow opacity-80" />
         <div className="absolute inset-0 bg-ember-grid opacity-25" />
@@ -728,14 +728,14 @@ export default function AboutPage() {
             transition={{ duration: 0.6 }}
             className="inline-flex items-center gap-2 liquid-glass rounded-full px-4 py-1.5 mb-8"
           >
-            <Flame className="h-3.5 w-3.5 text-primary" />
-            <span className="text-xs font-medium text-foreground/85 uppercase tracking-[0.2em]">Our vision</span>
+            <Flame className="h-3.5 w-3.5 text-amber-400" />
+            <span className="text-xs font-medium text-white/85 uppercase tracking-[0.2em]">Our vision</span>
           </motion.div>
 
           <motion.h2
             initial="hidden" whileInView="show" viewport={{ once: true }}
             variants={fadeUp} transition={{ duration: 0.8 }}
-            className="font-editorial italic text-4xl md:text-6xl lg:text-7xl leading-[1.05] tracking-tight text-foreground max-w-5xl mx-auto"
+            className="font-editorial italic text-4xl md:text-6xl lg:text-7xl leading-[1.05] tracking-tight text-white max-w-5xl mx-auto"
           >
             To build the operating system for <span className="text-gradient-ignis">clean cooking markets</span>, enabling coordinated, data-driven, large-scale change across Africa and beyond.
           </motion.h2>

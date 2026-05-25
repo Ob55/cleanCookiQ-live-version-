@@ -325,7 +325,7 @@ export default function PublicLayout() {
 
       <main className="flex-1"><Outlet /></main>
 
-      <footer className="relative overflow-hidden bg-background text-foreground border-t border-border">
+      <footer className="relative overflow-hidden bg-[#00712D] text-white border-t border-white/10">
         {/* ambient glow */}
         <div className="pointer-events-none absolute inset-x-0 -top-40 h-80 bg-gradient-to-b from-ignis/10 via-transparent to-transparent" />
         <div className="pointer-events-none absolute -left-32 top-1/3 h-72 w-72 rounded-full bg-rich-emerald/15 blur-3xl animate-glow-pulse" />
@@ -339,41 +339,41 @@ export default function PublicLayout() {
                 <span className="h-8 w-8 rounded-lg bg-gradient-ignis flex items-center justify-center shadow-ignis">
                   <Flame className="h-4 w-4 text-white" strokeWidth={2.5} />
                 </span>
-                <span className="font-display font-bold text-base text-foreground">CleanCookIQ</span>
+                <span className="font-display font-bold text-base text-white">CleanCookIQ</span>
               </div>
-              <p className="text-sm text-foreground/55 leading-relaxed">
+              <p className="text-sm text-white/55 leading-relaxed">
                 The coordination and intelligence layer for clean institutional cooking.
               </p>
             </div>
             <div>
-              <h4 className="text-[11px] uppercase tracking-[0.18em] text-primary mb-4 font-medium">Marketplace</h4>
+              <h4 className="text-[11px] uppercase tracking-[0.18em] text-amber-400 mb-4 font-medium">Marketplace</h4>
               <div className="space-y-2.5">
-                <Link to="/marketplace" className="block text-sm text-foreground/65 hover:text-primary transition-colors">Browse products</Link>
-                <Link to="/providers" className="block text-sm text-foreground/65 hover:text-primary transition-colors">Provider directory</Link>
+                <Link to="/marketplace" className="block text-sm text-white/65 hover:text-amber-400 transition-colors">Browse products</Link>
+                <Link to="/providers" className="block text-sm text-white/65 hover:text-amber-400 transition-colors">Provider directory</Link>
               </div>
             </div>
             <div>
-              <h4 className="text-[11px] uppercase tracking-[0.18em] text-primary mb-4 font-medium">Discover</h4>
+              <h4 className="text-[11px] uppercase tracking-[0.18em] text-amber-400 mb-4 font-medium">Discover</h4>
               <div className="space-y-2.5">
-                <Link to="/map" className="block text-sm text-foreground/65 hover:text-primary transition-colors">National map</Link>
-                <Link to="/counties" className="block text-sm text-foreground/65 hover:text-primary transition-colors">County profiles</Link>
-                <Link to="/resources" className="block text-sm text-foreground/65 hover:text-primary transition-colors">Resources</Link>
-                <Link to="/events" className="block text-sm text-foreground/65 hover:text-primary transition-colors">Events</Link>
-                <Link to="/news" className="block text-sm text-foreground/65 hover:text-primary transition-colors">News</Link>
-                <Link to="/policy" className="block text-sm text-foreground/65 hover:text-primary transition-colors">Policy library</Link>
+                <Link to="/map" className="block text-sm text-white/65 hover:text-amber-400 transition-colors">National map</Link>
+                <Link to="/counties" className="block text-sm text-white/65 hover:text-amber-400 transition-colors">County profiles</Link>
+                <Link to="/resources" className="block text-sm text-white/65 hover:text-amber-400 transition-colors">Resources</Link>
+                <Link to="/events" className="block text-sm text-white/65 hover:text-amber-400 transition-colors">Events</Link>
+                <Link to="/news" className="block text-sm text-white/65 hover:text-amber-400 transition-colors">News</Link>
+                <Link to="/policy" className="block text-sm text-white/65 hover:text-amber-400 transition-colors">Policy library</Link>
               </div>
             </div>
             <div>
-              <h4 className="text-[11px] uppercase tracking-[0.18em] text-primary mb-4 font-medium">Company</h4>
+              <h4 className="text-[11px] uppercase tracking-[0.18em] text-amber-400 mb-4 font-medium">Company</h4>
               <div className="space-y-2.5">
-                <Link to="/about" className="block text-sm text-foreground/65 hover:text-primary transition-colors">About</Link>
-                <Link to="/intelligence" className="block text-sm text-foreground/65 hover:text-primary transition-colors">Intelligence</Link>
-                <Link to="/book-demo" className="block text-sm text-foreground/65 hover:text-primary transition-colors">Book a demo</Link>
+                <Link to="/about" className="block text-sm text-white/65 hover:text-amber-400 transition-colors">About</Link>
+                <Link to="/intelligence" className="block text-sm text-white/65 hover:text-amber-400 transition-colors">Intelligence</Link>
+                <Link to="/book-demo" className="block text-sm text-white/65 hover:text-amber-400 transition-colors">Book a demo</Link>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 border-t border-border text-xs text-foreground/45">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 border-t border-white/10 text-xs text-white/45">
             <p>© {new Date().getFullYear()} CleanCookIQ. All rights reserved.</p>
             <p>Built with intention in Nairobi.</p>
           </div>

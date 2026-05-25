@@ -291,9 +291,9 @@ export default function HomePage() {
       </section>
 
       {/* ─────────── WHAT THE PLATFORM DOES ─────────── */}
-      <section className="relative py-28 lg:py-36 overflow-hidden">
+      <section className="relative py-28 lg:py-36 overflow-hidden bg-[#00712D]">
         <div className="absolute inset-0 bg-ember-grid opacity-20 pointer-events-none" />
-        <div className="absolute left-1/2 top-0 -translate-x-1/2 h-px w-1/2 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+        <div className="absolute left-1/2 top-0 -translate-x-1/2 h-px w-1/2 bg-gradient-to-r from-transparent via-amber-400/20 to-transparent" />
 
         <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -302,18 +302,18 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-primary mb-5"
+              className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-amber-400 mb-5"
             >
               <Flame className="h-3 w-3" /> The platform
             </motion.span>
             <motion.h2
               initial="hidden" whileInView="show" viewport={{ once: true }}
               variants={fadeUp} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-foreground"
+              className="font-editorial text-4xl md:text-5xl lg:text-6xl leading-[1] tracking-tight text-white"
             >
               Everything one transition needs, <span className="italic text-gradient-ignis">in one place.</span>
             </motion.h2>
-            <p className="mt-5 text-foreground/65 leading-relaxed">
+            <p className="mt-5 text-white/65 leading-relaxed">
               Six modules that move an institution from current fuel to a clean alternative — with the supply, finance, training and tracking built in.
             </p>
           </div>
@@ -326,16 +326,16 @@ export default function HomePage() {
                 variants={fadeUp} transition={{ duration: 0.6, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
                 className="group relative ignis-card p-7 hover:-translate-y-1 transition-transform duration-300"
               >
-                <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="flex items-start justify-between mb-6">
-                  <span className="relative h-12 w-12 rounded-2xl liquid-glass-strong bg-muted flex items-center justify-center">
-                    <mod.icon className="h-5 w-5 text-primary" strokeWidth={1.8} />
+                  <span className="relative h-12 w-12 rounded-2xl liquid-glass-strong bg-white/10 flex items-center justify-center">
+                    <mod.icon className="h-5 w-5 text-amber-400" strokeWidth={1.8} />
                     <span className="absolute inset-0 rounded-2xl bg-ignis/30 blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </span>
-                  <span className="font-editorial italic text-2xl text-foreground/15 group-hover:text-accent/40 transition-colors">0{i + 1}</span>
+                  <span className="font-editorial italic text-2xl text-white/15 group-hover:text-amber-400/40 transition-colors">0{i + 1}</span>
                 </div>
-                <h3 className="font-display font-bold text-lg mb-3 text-foreground">{mod.title}</h3>
-                <p className="text-sm text-foreground/60 leading-relaxed">{mod.desc}</p>
+                <h3 className="font-display font-bold text-lg mb-3 text-white">{mod.title}</h3>
+                <p className="text-sm text-white/60 leading-relaxed">{mod.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -448,7 +448,7 @@ export default function HomePage() {
       </section>
 
       {/* ─────────── HOW IT WORKS ─────────── */}
-      <section className="relative py-28 lg:py-36 overflow-hidden">
+      <section className="relative py-28 lg:py-36 overflow-hidden bg-[#FFF5E6]">
         <div className="absolute inset-0 bg-ember-grid opacity-15 pointer-events-none" />
 
         <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
@@ -524,7 +524,7 @@ export default function HomePage() {
       <SummitCountdown />
 
       {/* ─────────── PARTNERS MARQUEE ─────────── */}
-      <section className="relative py-20 lg:py-24 overflow-hidden border-t border-white/5">
+      <section className="relative py-20 lg:py-24 overflow-hidden border-t border-border">
         <div className="max-w-[1600px] mx-auto px-6 lg:px-12 mb-12">
           <div className="text-center">
             <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-primary mb-4">
@@ -552,7 +552,7 @@ export default function HomePage() {
 
       {/* ─────────── FINAL CTA ─────────── */}
       <section className="relative py-28 lg:py-36 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-background via-[hsl(141_55%_10%)] to-background" />
+        <div className="absolute inset-0 bg-[#00712D]" />
         <div className="absolute inset-0 bg-hero-glow opacity-80" />
         <div className="absolute inset-0 bg-ember-grid opacity-25" />
         {/* big ember */}
@@ -566,14 +566,14 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             className="inline-flex items-center gap-2 liquid-glass rounded-full px-4 py-1.5 mb-7"
           >
-            <Flame className="h-3.5 w-3.5 text-primary" />
-            <span className="text-xs font-medium text-foreground/85">Join the transition</span>
+            <Flame className="h-3.5 w-3.5 text-amber-400" />
+            <span className="text-xs font-medium text-white/85">Join the transition</span>
           </motion.div>
 
           <motion.h2
             initial="hidden" whileInView="show" viewport={{ once: true }}
             variants={fadeUp} transition={{ duration: 0.8 }}
-            className="font-editorial text-4xl md:text-6xl lg:text-7xl xl:text-8xl leading-[0.95] tracking-tight text-foreground max-w-5xl mx-auto"
+            className="font-editorial text-4xl md:text-6xl lg:text-7xl xl:text-8xl leading-[0.95] tracking-tight text-white max-w-5xl mx-auto"
           >
             Ready to join the <span className="italic text-gradient-ignis">transition?</span>
           </motion.h2>
@@ -581,7 +581,7 @@ export default function HomePage() {
           <motion.p
             initial="hidden" whileInView="show" viewport={{ once: true }}
             variants={fadeUp} transition={{ duration: 0.7, delay: 0.2 }}
-            className="mt-7 text-lg text-foreground/70 max-w-2xl mx-auto leading-relaxed"
+            className="mt-7 text-lg text-white/70 max-w-2xl mx-auto leading-relaxed"
           >
             Whether you are an institution, provider, funder, or researcher, there is a place for you on CleanCookIQ.
           </motion.p>
@@ -598,7 +598,7 @@ export default function HomePage() {
               </button>
             </Link>
             <Link to="/book-demo">
-              <button className="inline-flex items-center gap-2 h-12 px-8 rounded-full liquid-glass-strong text-foreground font-medium hover:bg-white/10 transition-colors">
+              <button className="inline-flex items-center gap-2 h-12 px-8 rounded-full liquid-glass-strong text-white font-medium hover:bg-white/10 transition-colors">
                 Book a Demo
               </button>
             </Link>
