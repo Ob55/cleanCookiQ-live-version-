@@ -6,9 +6,10 @@
 
 @layer base {
   :root {
-    /* Ignis palette — deep greens + ignis orange. Light surfaces stay
-       cream so existing dashboard pages remain readable; the public
-       site uses .theme-ignis (below) to flip to the dark canvas. */
+    /* Ignis palette — deep greens (#00712D, #507D2A, #0D4715, #16610E,
+       #0A400C) + ignis orange accent. Light surfaces stay cream so
+       existing dashboard pages remain readable; the public site uses
+       .theme-ignis (below) to flip to the dark canvas. */
     --background: 60 20% 97%;
     --foreground: 122 60% 8%;
 
@@ -18,7 +19,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 122 60% 8%;
 
-    --primary: 141 100% 22%;             /* rich emerald #00712D */
+    --primary: 144 100% 22%;             /* Rich Emerald #00712D */
     --primary-foreground: 60 20% 97%;
 
     --secondary: 89 50% 33%;             /* sap green #507D2A */
@@ -27,7 +28,7 @@
     --muted: 60 10% 91%;
     --muted-foreground: 122 15% 35%;
 
-    --accent: 23 97% 54%;                /* ignis orange */
+    --accent: 33 100% 50%;               /* ignis orange #FF8C00 */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
@@ -35,100 +36,98 @@
 
     --border: 60 10% 85%;
     --input: 60 10% 85%;
-    --ring: 141 100% 22%;
+    --ring: 144 100% 22%;
 
     --radius: 0.75rem;
 
     /* Ignis named tokens — locked to brand palette
-       greens: #16610E, #0E612D   orange: #FF8C00   cream: #F6F3EE */
-    --rich-emerald: 141 75% 22%;    /* #0E612D — brand emerald */
+       greens: #00712D, #507D2A, #0D4715, #16610E, #0A400C   cream: #F6F3EE */
+    --rich-emerald: 144 100% 22%;   /* #00712D — brand emerald */
     --sap-green: 89 50% 33%;        /* #507D2A */
-    --sacramento: 126 70% 16%;      /* #0D4715 */
+    --sacramento: 145 71% 16%;      /* #0D4715 */
     --la-salle: 112 75% 22%;        /* #16610E — brand green */
-    --hunter-green: 141 75% 14%;    /* deep brand green */
+    --hunter-green: 124 72% 14%;    /* #0A400C — deep brand green */
     --ignis: 33 100% 50%;           /* #FF8C00 — brand orange */
     --ignis-bright: 36 100% 64%;    /* lighter ember */
     --ignis-deep: 26 92% 42%;       /* darker burn */
     --cream: 36 27% 95%;            /* #F6F3EE — brand cream */
 
     /* Legacy alias kept so old code keeps working during the rollout */
-    --emerald: 141 75% 22%;
+    --emerald: 144 100% 22%;
     --emerald-light: 112 75% 22%;
-    --emerald-dark: 141 75% 14%;
+    --emerald-dark: 124 72% 14%;
     --amber: 33 100% 50%;
     --amber-light: 36 100% 64%;
-    --earth: 25 30% 35%;
-    --earth-light: 25 20% 55%;
+    --earth: 145 71% 16%;
+    --earth-light: 89 50% 33%;
     --sky: 200 60% 50%;
     --sage: 140 15% 75%;
     --charcoal: 141 30% 8%;
 
-    --gradient-hero: linear-gradient(135deg, hsl(141 75% 14%), hsl(141 75% 22%), hsl(112 75% 22%));
+    --gradient-hero: linear-gradient(135deg, hsl(124 72% 14%), hsl(144 100% 22%), hsl(112 75% 22%));
     --gradient-accent: linear-gradient(135deg, hsl(33 100% 50%), hsl(36 100% 64%));
     --gradient-ignis: linear-gradient(135deg, hsl(26 92% 42%), hsl(33 100% 50%) 50%, hsl(36 100% 64%));
     --gradient-card: linear-gradient(180deg, hsl(36 27% 95%), hsl(36 22% 91%));
 
-    --shadow-card: 0 4px 24px -4px hsl(141 75% 22% / 0.12);
-    --shadow-elevated: 0 12px 40px -8px hsl(141 75% 22% / 0.20);
+    --shadow-card: 0 4px 24px -4px hsl(144 100% 22% / 0.12);
+    --shadow-elevated: 0 12px 40px -8px hsl(144 100% 22% / 0.20);
     --shadow-ignis: 0 12px 40px -8px hsl(33 100% 50% / 0.40);
 
     --font-display: 'Playfair Display', Georgia, serif;
     --font-editorial: 'Instrument Serif', 'Playfair Display', Georgia, serif;
     --font-body: 'Inter', 'DM Sans', system-ui, sans-serif;
 
-    --sidebar-background: 122 73% 14%;
+    --sidebar-background: 124 72% 14%;
     --sidebar-foreground: 60 20% 92%;
-    --sidebar-primary: 23 97% 54%;
+    --sidebar-primary: 33 100% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 126 70% 16%;
+    --sidebar-accent: 145 71% 16%;
     --sidebar-accent-foreground: 60 20% 92%;
     --sidebar-border: 112 50% 22%;
-    --sidebar-ring: 23 97% 54%;
+    --sidebar-ring: 33 100% 50%;
   }
 
   .dark {
-    --background: 122 73% 14%;
+    --background: 124 72% 14%;
     --foreground: 60 20% 92%;
-    --card: 126 70% 16%;
+    --card: 145 71% 16%;
     --card-foreground: 60 20% 92%;
-    --popover: 126 70% 16%;
+    --popover: 145 71% 16%;
     --popover-foreground: 60 20% 92%;
-    --primary: 141 70% 45%;
-    --primary-foreground: 122 73% 8%;
+    --primary: 144 70% 45%;
+    --primary-foreground: 124 72% 8%;
     --secondary: 89 50% 33%;
     --secondary-foreground: 60 20% 92%;
-    --muted: 126 40% 18%;
+    --muted: 145 40% 18%;
     --muted-foreground: 60 10% 70%;
-    --accent: 23 97% 54%;
+    --accent: 33 100% 50%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
     --border: 112 40% 22%;
     --input: 112 40% 22%;
-    --ring: 23 97% 54%;
+    --ring: 33 100% 50%;
   }
 
   /* Ignis dark canvas — public pages opt into this via PublicLayout.
-     Warm-neutral espresso — sits exactly between brand-green and
-     brand-orange so both read as accents, neither dominates. Lightness
-     raised from 7%→13% so the canvas feels lifted, not heavy. */
+     Deep green canvas with orange accents. */
   .theme-ignis {
-    --background: 28 15% 20%;          /* warm espresso (brightened more) */
-    --foreground: 36 27% 95%;          /* #F6F3EE cream */
-    --card: 28 16% 23%;
+    --background: 145 50% 8%;           /* deep sacramento green */
+    --foreground: 36 27% 95%;           /* #F6F3EE cream */
+    --card: 145 45% 11%;
     --card-foreground: 36 27% 95%;
-    --popover: 28 16% 23%;
+    --popover: 145 45% 11%;
     --popover-foreground: 36 27% 95%;
-    --primary: 33 100% 50%;            /* #FF8C00 brand orange */
+    --primary: 33 100% 50%;             /* #FF8C00 brand orange */
     --primary-foreground: 0 0% 100%;
-    --secondary: 141 75% 22%;          /* #0E612D brand emerald */
+    --secondary: 144 100% 22%;          /* Rich Emerald #00712D */
     --secondary-foreground: 36 27% 95%;
-    --muted: 28 12% 25%;
-    --muted-foreground: 36 18% 84%;
+    --muted: 145 35% 13%;
+    --muted-foreground: 89 20% 70%;
     --accent: 33 100% 50%;
     --accent-foreground: 0 0% 100%;
-    --border: 28 18% 29%;
-    --input: 28 18% 29%;
+    --border: 145 30% 18%;
+    --input: 145 30% 18%;
     --ring: 33 100% 50%;
     color-scheme: dark;
   }
@@ -232,20 +231,19 @@
     box-shadow: 0 1px 2px hsl(141 30% 20% / 0.06), 0 18px 40px -16px hsl(141 30% 20% / 0.20);
   }
 
-  /* Frosted card sitting on the warm espresso canvas. */
+  /* Frosted card sitting on the deep green canvas. */
   .ignis-card {
     background: linear-gradient(180deg,
-      hsl(28 18% 11% / 0.90) 0%,
-      hsl(28 22% 8% / 0.94) 100%);
-    border: 1px solid hsl(28 22% 20% / 0.75);
+      hsl(145 40% 11% / 0.90) 0%,
+      hsl(145 50% 7% / 0.94) 100%);
+    border: 1px solid hsl(145 30% 20% / 0.75);
     border-radius: 1.25rem;
     box-shadow:
       inset 0 1px 0 hsl(36 40% 60% / 0.08),
       0 18px 40px -20px hsl(0 0% 0% / 0.70);
   }
 
-  /* Hero orange — solid, saturated, glowing. Subtle monochrome
-     orange shimmer so it stays orange the entire animation. */
+  /* Hero orange — solid, saturated, glowing shimmer. */
   .ignis-shimmer {
     color: #ff8c00;
     background-image: linear-gradient(
@@ -290,7 +288,7 @@
   /* Radial spotlight behind hero copy — green + orange in balance. */
   .bg-hero-glow {
     background: radial-gradient(60% 50% at 50% 30%, hsl(33 100% 50% / 0.18) 0%, transparent 70%),
-                radial-gradient(45% 35% at 80% 80%, hsl(141 75% 22% / 0.35) 0%, transparent 70%),
+                radial-gradient(45% 35% at 80% 80%, hsl(144 100% 22% / 0.35) 0%, transparent 70%),
                 radial-gradient(40% 40% at 15% 90%, hsl(112 75% 22% / 0.30) 0%, transparent 70%);
   }
 }
