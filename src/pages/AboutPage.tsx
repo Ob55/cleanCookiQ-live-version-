@@ -575,11 +575,11 @@ export default function AboutPage() {
                 className="group ignis-card p-7 hover:-translate-y-1 transition-transform"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-[10px] font-bold text-amber-400 tracking-[0.2em] uppercase">Step {s.step}</span>
-                  <span className="font-editorial italic text-2xl text-white/15 group-hover:text-amber-400/40 transition-colors">0{i + 1}</span>
+                  <span className="text-[10px] font-bold text-[#00712D] tracking-[0.2em] uppercase">Step {s.step}</span>
+                  <span className="font-editorial italic text-2xl text-[#00712D]/15 group-hover:text-[#FF8C00]/40 transition-colors">0{i + 1}</span>
                 </div>
-                <h3 className="font-display font-bold text-lg text-white mb-2">{s.title}</h3>
-                <p className="text-sm text-white/60 leading-relaxed">{s.desc}</p>
+                <h3 className="font-display font-bold text-lg text-[#0D4715] mb-2">{s.title}</h3>
+                <p className="text-sm text-[#0D4715]/70 leading-relaxed">{s.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -715,7 +715,7 @@ export default function AboutPage() {
 
       {/* ─────────── OUR VISION ─────────── */}
       <section className="relative py-32 lg:py-44 overflow-hidden bg-[#00712D]">
-        <div className="absolute inset-0 bg-gradient-to-br from-background via-[hsl(141_55%_10%)] to-background" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0D4715] via-[#00712D] to-[#0D4715]" />
         <div className="absolute inset-0 bg-hero-glow opacity-80" />
         <div className="absolute inset-0 bg-ember-grid opacity-25" />
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-primary/20 blur-3xl animate-glow-pulse" />

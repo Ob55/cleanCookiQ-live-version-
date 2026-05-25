@@ -328,14 +328,13 @@ export default function HomePage() {
               >
                 <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="flex items-start justify-between mb-6">
-                  <span className="relative h-12 w-12 rounded-2xl liquid-glass-strong bg-white/10 flex items-center justify-center">
-                    <mod.icon className="h-5 w-5 text-amber-400" strokeWidth={1.8} />
-                    <span className="absolute inset-0 rounded-2xl bg-ignis/30 blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <span className="relative h-12 w-12 rounded-2xl bg-[#00712D]/10 flex items-center justify-center">
+                    <mod.icon className="h-5 w-5 text-[#00712D]" strokeWidth={1.8} />
                   </span>
-                  <span className="font-editorial italic text-2xl text-white/15 group-hover:text-amber-400/40 transition-colors">0{i + 1}</span>
+                  <span className="font-editorial italic text-2xl text-[#00712D]/15 group-hover:text-[#FF8C00]/40 transition-colors">0{i + 1}</span>
                 </div>
-                <h3 className="font-display font-bold text-lg mb-3 text-white">{mod.title}</h3>
-                <p className="text-sm text-white/60 leading-relaxed">{mod.desc}</p>
+                <h3 className="font-display font-bold text-lg mb-3 text-[#0D4715]">{mod.title}</h3>
+                <p className="text-sm text-[#0D4715]/70 leading-relaxed">{mod.desc}</p>
               </motion.div>
             ))}
           </div>
