@@ -70,7 +70,7 @@ function NavGroupDropdown({
           onMouseLeave={() => setOpen(false)}
           className={cn(
             "inline-flex items-center gap-1 h-9 px-3.5 rounded-full text-[13px] font-medium transition-colors",
-            isActive || open ? "text-foreground" : "text-foreground/65 hover:text-primary",
+            isActive || open ? "text-[#D4AF37]" : "text-foreground/70 hover:text-[#D4AF37]",
           )}
         >
           {group.label}
@@ -90,8 +90,8 @@ function NavGroupDropdown({
             to={item.href ?? "#"}
             onClick={() => setOpen(false)}
             className={cn(
-              "block select-none rounded-xl px-3 py-2 text-sm leading-none transition-colors hover:bg-ignis/15 hover:text-ignis-bright",
-              isActiveItem(item.href) && "bg-ignis/20 text-primary font-medium",
+              "block select-none rounded-xl px-3 py-2 text-sm leading-none transition-colors hover:bg-[#D4AF37]/10 hover:text-[#D4AF37]",
+              isActiveItem(item.href) && "bg-[#D4AF37]/15 text-[#D4AF37] font-semibold",
             )}
           >
             {item.label}
@@ -149,8 +149,8 @@ export default function PublicLayout() {
       >
         <div
           className={cn(
-            "liquid-glass-strong rounded-full transition-all",
-            scrolled ? "bg-black/75" : "bg-black/45",
+            "liquid-glass-strong rounded-full transition-all border border-black/5",
+            scrolled ? "bg-white/95 shadow-md" : "bg-white/90 shadow-sm",
           )}
         >
           <div className="flex h-14 items-center justify-between gap-3 pl-5 pr-2">
@@ -177,7 +177,7 @@ export default function PublicLayout() {
                     to={entry.href ?? "#"}
                     className={cn(
                       "inline-flex items-center h-9 px-3.5 rounded-full text-[13px] font-medium transition-colors",
-                      isActiveItem(entry.href) ? "text-foreground" : "text-foreground/65 hover:text-primary",
+                      isActiveItem(entry.href) ? "text-[#D4AF37]" : "text-foreground/70 hover:text-[#D4AF37]",
                     )}
                   >
                     {entry.label}
@@ -191,17 +191,17 @@ export default function PublicLayout() {
                 <>
                   {isAdmin && (
                     <Link to="/admin/pipeline">
-                      <button className="h-9 px-4 rounded-full text-[13px] font-medium text-foreground/70 hover:text-primary transition-colors">Admin</button>
+                      <button className="h-9 px-4 rounded-full text-[13px] font-medium text-foreground/70 hover:text-[#D4AF37] transition-colors">Admin</button>
                     </Link>
                   )}
                   <button
                     onClick={handleSignOut}
-                    className="h-9 px-4 rounded-full text-[13px] font-medium text-foreground/70 hover:text-primary transition-colors"
+                    className="h-9 px-4 rounded-full text-[13px] font-medium text-foreground/70 hover:text-[#D4AF37] transition-colors"
                   >
                     Sign Out
                   </button>
                   <Link to="/book-demo">
-                    <button className="h-9 pl-4 pr-4 rounded-full text-[13px] font-semibold bg-white text-hunter-green hover:bg-ignis hover:text-white transition-all inline-flex items-center gap-1">
+                    <button className="h-9 pl-4 pr-4 rounded-full text-[13px] font-semibold bg-[#00712D] text-white hover:bg-[#D4AF37] hover:text-black transition-all inline-flex items-center gap-1">
                       Book a Demo <ArrowUpRight className="h-3.5 w-3.5" />
                     </button>
                   </Link>
@@ -209,10 +209,10 @@ export default function PublicLayout() {
               ) : (
                 <>
                   <Link to="/auth/login">
-                    <button className="h-9 px-4 rounded-full text-[13px] font-medium text-foreground/70 hover:text-primary transition-colors">Log in</button>
+                    <button className="h-9 px-4 rounded-full text-[13px] font-medium text-foreground/70 hover:text-[#D4AF37] transition-colors">Log in</button>
                   </Link>
                   <Link to="/auth/register">
-                    <button className="h-9 pl-4 pr-4 rounded-full text-[13px] font-semibold bg-white text-hunter-green hover:bg-ignis hover:text-white transition-all inline-flex items-center gap-1">
+                    <button className="h-9 pl-4 pr-4 rounded-full text-[13px] font-semibold bg-[#00712D] text-white hover:bg-[#D4AF37] hover:text-black transition-all inline-flex items-center gap-1">
                       Join <ArrowUpRight className="h-3.5 w-3.5" />
                     </button>
                   </Link>
@@ -258,8 +258,8 @@ export default function PublicLayout() {
                           className={cn(
                             "flex items-center px-4 h-11 text-[14px] rounded-xl transition-colors",
                             isActiveItem(item.href)
-                              ? "bg-ignis/15 text-primary font-medium"
-                              : "text-foreground/70 hover:text-primary hover:bg-muted active:bg-muted",
+                              ? "bg-[#D4AF37]/15 text-[#D4AF37] font-semibold"
+                              : "text-foreground/70 hover:text-[#D4AF37] hover:bg-muted active:bg-muted",
                           )}
                         >
                           {item.label}
@@ -275,7 +275,7 @@ export default function PublicLayout() {
                     className={cn(
                       "flex items-center px-4 h-12 text-[15px] font-medium rounded-2xl transition-colors",
                       isActiveItem(entry.href)
-                        ? "bg-ignis/15 text-primary"
+                        ? "bg-[#D4AF37]/15 text-[#D4AF37]"
                         : "text-foreground hover:bg-muted active:bg-muted",
                     )}
                   >
@@ -288,7 +288,7 @@ export default function PublicLayout() {
               <Link
                 to="/book-demo"
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-center gap-1.5 h-11 rounded-full bg-white text-hunter-green text-[14px] font-semibold hover:bg-ignis hover:text-white transition-colors"
+                className="flex items-center justify-center gap-1.5 h-11 rounded-full bg-[#00712D] text-white text-[14px] font-semibold hover:bg-[#D4AF37] hover:text-black transition-colors"
               >
                 Book a Demo <ArrowUpRight className="h-4 w-4" />
               </Link>
@@ -325,7 +325,7 @@ export default function PublicLayout() {
 
       <main className="flex-1"><Outlet /></main>
 
-      <footer className="relative overflow-hidden bg-[#00712D] text-white border-t border-white/10">
+      <footer className="relative overflow-hidden bg-[#0f0f0f] text-white border-t border-white/10">
         {/* ambient glow */}
         <div className="pointer-events-none absolute inset-x-0 -top-40 h-80 bg-gradient-to-b from-ignis/10 via-transparent to-transparent" />
         <div className="pointer-events-none absolute -left-32 top-1/3 h-72 w-72 rounded-full bg-rich-emerald/15 blur-3xl animate-glow-pulse" />

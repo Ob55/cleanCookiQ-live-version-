@@ -447,7 +447,7 @@ export default function HomePage() {
       </section>
 
       {/* ─────────── HOW IT WORKS ─────────── */}
-      <section className="relative py-28 lg:py-36 overflow-hidden bg-[#FFF5E6]">
+      <section className="relative py-28 lg:py-36 overflow-hidden bg-[#F8F5EF]">
         <div className="absolute inset-0 bg-ember-grid opacity-15 pointer-events-none" />
 
         <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">

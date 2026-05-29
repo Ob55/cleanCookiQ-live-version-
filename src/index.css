@@ -51,6 +51,8 @@
     --ignis-bright: 36 100% 64%;    /* lighter ember */
     --ignis-deep: 26 92% 42%;       /* darker burn */
     --cream: 36 27% 95%;            /* #F6F3EE — brand cream */
+    --gold: 43 92% 56%;             /* African gold accent */
+    --gold-warm: 38 85% 50%;        /* deeper warm gold */
 
     /* Legacy alias kept so old code keeps working during the rollout */
     --emerald: 144 100% 22%;
@@ -110,24 +112,24 @@
   }
 
   /* Ignis canvas — public pages opt into this via PublicLayout.
-     White canvas with green + orange accents. */
+     Warm off-white canvas (#FAF8F3) with deep green text + green/orange/gold accents. */
   .theme-ignis {
-    --background: 0 0% 100%;            /* white */
-    --foreground: 144 60% 10%;          /* dark green text */
-    --card: 0 0% 100%;
+    --background: 40 35% 97%;            /* #FAF8F3 warm off-white */
+    --foreground: 144 60% 10%;           /* deep green text */
+    --card: 42 50% 98%;                  /* #FDFCF7 lighter card */
     --card-foreground: 144 60% 10%;
-    --popover: 0 0% 100%;
+    --popover: 42 50% 98%;
     --popover-foreground: 144 60% 10%;
-    --primary: 144 100% 22%;            /* Rich Emerald #00712D */
+    --primary: 144 100% 22%;             /* Rich Emerald #00712D */
     --primary-foreground: 0 0% 100%;
-    --secondary: 89 50% 33%;            /* Sap Green #507D2A */
+    --secondary: 89 50% 33%;             /* Sap Green #507D2A */
     --secondary-foreground: 0 0% 100%;
-    --muted: 140 10% 95%;
-    --muted-foreground: 144 15% 40%;
-    --accent: 33 100% 50%;              /* ignis orange */
+    --muted: 38 30% 93%;                 /* #F8F5EF muted warm */
+    --muted-foreground: 144 15% 35%;
+    --accent: 33 100% 50%;               /* ignis orange */
     --accent-foreground: 0 0% 100%;
-    --border: 140 12% 90%;
-    --input: 140 12% 90%;
+    --border: 38 20% 88%;
+    --input: 38 20% 88%;
     --ring: 144 100% 22%;
   }
 }
@@ -240,30 +242,33 @@
       0 12px 36px -12px hsl(144 30% 20% / 0.18);
   }
 
-  /* Hero green shimmer — emerald gradient text on white. */
+  /* Hero rainbow shimmer — animated rainbow gradient sliding across the text. */
   .ignis-shimmer {
     color: #00712D;
     background-image: linear-gradient(
-      100deg,
-      hsl(144 100% 18%) 0%,
-      hsl(112 75% 28%) 35%,
-      hsl(89 50% 40%) 50%,
-      hsl(112 75% 28%) 65%,
-      hsl(144 100% 18%) 100%
+      90deg,
+      #ff2e63 0%,
+      #ff8c00 14%,
+      #f0c63a 28%,
+      #2ebd66 42%,
+      #00b3d6 57%,
+      #3a6ef0 71%,
+      #9d3df0 85%,
+      #ff2e63 100%
     );
-    background-size: 220% 100%;
-    background-position: 100% 0;
+    background-size: 200% 100%;
+    background-position: 0% 0;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: ignis-shimmer 5s linear infinite;
-    filter: drop-shadow(0 0 12px hsl(144 100% 22% / 0.30))
-            drop-shadow(0 0 30px hsl(144 100% 22% / 0.15));
+    animation: ignis-shimmer 4s linear infinite;
+    filter: drop-shadow(0 0 14px rgba(240, 198, 58, 0.35))
+            drop-shadow(0 0 28px rgba(46, 189, 102, 0.20));
     font-weight: 500;
   }
   @keyframes ignis-shimmer {
-    from { background-position: 200% 0; }
-    to   { background-position: -100% 0; }
+    from { background-position: 0% 0; }
+    to   { background-position: -200% 0; }
   }
 
   /* Gradient text — fiery ignis tone for headline accents. */

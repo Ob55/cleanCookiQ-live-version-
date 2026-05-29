@@ -384,7 +384,7 @@ export default function AboutPage() {
       )}
 
       {/* ─────────── CHALLENGES ─────────── */}
-      <section id="challenges" className="relative py-28 lg:py-36 overflow-hidden scroll-mt-24 bg-[#FFF5E6]">
+      <section id="challenges" className="relative py-28 lg:py-36 overflow-hidden scroll-mt-24 bg-[#F8F5EF]">
         <div className="absolute inset-0 bg-ember-grid opacity-15 pointer-events-none" />
         <div className="absolute left-1/2 top-0 -translate-x-1/2 h-px w-1/2 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
 
@@ -627,7 +627,7 @@ export default function AboutPage() {
       </section>
 
       {/* ─────────── WHY NOW ─────────── */}
-      <section className="relative py-28 lg:py-36 overflow-hidden bg-[#FFF5E6]">
+      <section className="relative py-28 lg:py-36 overflow-hidden bg-[#F8F5EF]">
         <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
           <div className="text-center max-w-3xl mx-auto mb-14">
             <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-primary mb-5">
