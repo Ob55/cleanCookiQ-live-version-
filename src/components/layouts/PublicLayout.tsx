@@ -1,11 +1,13 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Menu, X, ChevronDown, Flame, ArrowUpRight } from "lucide-react";
+import { Menu, X, ChevronDown, ArrowUpRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
-import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
+import AIAssistant from "@/components/assistant/AIAssistant";
+import cleancookIqWordmark from "@/assets/cleancookiq-wordmark.png";
+import cleancookIqWordmarkLight from "@/assets/cleancookiq-wordmark-light.png";
 
 interface NavItem {
   label: string;
@@ -154,12 +156,8 @@ export default function PublicLayout() {
           )}
         >
           <div className="flex h-14 items-center justify-between gap-3 pl-5 pr-2">
-            <Link to="/" className="flex items-center gap-2.5 group">
-              <span className="relative h-9 w-9 rounded-xl bg-gradient-ignis flex items-center justify-center shadow-ignis">
-                <Flame className="h-4.5 w-4.5 text-white" strokeWidth={2.5} />
-                <span className="absolute inset-0 rounded-xl bg-gradient-ignis opacity-50 blur-md -z-10 group-hover:opacity-80 transition-opacity" />
-              </span>
-              <span className="font-display font-bold text-base text-foreground tracking-tight">CleanCookIQ</span>
+            <Link to="/" className="flex items-center group" aria-label="CleanCookIQ home">
+              <img src={cleancookIqWordmark} alt="CleanCookIQ" className="h-7 w-auto object-contain" />
             </Link>
 
             <nav className="hidden lg:flex items-center gap-0.5">
@@ -335,11 +333,8 @@ export default function PublicLayout() {
           {/* Link grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-14">
             <div>
-              <div className="flex items-center gap-2 mb-5">
-                <span className="h-8 w-8 rounded-lg bg-gradient-ignis flex items-center justify-center shadow-ignis">
-                  <Flame className="h-4 w-4 text-white" strokeWidth={2.5} />
-                </span>
-                <span className="font-display font-bold text-base text-white">CleanCookIQ</span>
+              <div className="flex items-center mb-5">
+                <img src={cleancookIqWordmarkLight} alt="CleanCookIQ" className="h-8 w-auto object-contain" />
               </div>
               <p className="text-sm text-white/55 leading-relaxed">
                 The coordination and intelligence layer for clean institutional cooking.
@@ -379,6 +374,8 @@ export default function PublicLayout() {
           </div>
         </div>
       </footer>
+
+      <AIAssistant persona="public" />
     </div>
   );
 }

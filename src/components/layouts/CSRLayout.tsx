@@ -5,8 +5,9 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import AIAssistant from "@/components/assistant/AIAssistant";
 import NotificationBell from "@/components/NotificationBell";
-import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
+import cleancookIqLogo from "@/assets/cleancookiq-wordmark-light.png";
 
 const NAV_ITEMS = [
   { to: "/csr/dashboard",     label: "Dashboard",      Icon: LayoutDashboard },
@@ -36,8 +37,7 @@ export default function CSRLayout() {
     <div className="flex flex-col h-full">
       <div className="p-5 border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-2">
-          <img src={cleancookIqLogo} alt="CleanCookIQ logo" className="h-8 w-8 rounded-lg object-contain" />
-          <span className="font-display font-bold text-lg text-sidebar-foreground">CleanCookIQ</span>
+          <img src={cleancookIqLogo} alt="CleanCookIQ" className="h-8 w-auto object-contain" />
         </Link>
         <p className="text-xs text-sidebar-foreground/60 mt-1 flex items-center gap-1">
           <Heart className="h-3 w-3 text-rose-400" /> CSR Partner Portal
@@ -114,6 +114,8 @@ export default function CSRLayout() {
           <Outlet />
         </main>
       </div>
+
+      <AIAssistant persona="csr" />
     </div>
   );
 }

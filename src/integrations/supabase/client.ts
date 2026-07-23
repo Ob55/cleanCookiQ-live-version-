@@ -14,7 +14,10 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
-    storage: localStorage,
+    // Scope the session to the browser tab. Closing the tab clears the
+    // session, so reopening the site does NOT auto-redirect a previously
+    // logged-in user straight back to their dashboard.
+    storage: sessionStorage,
     persistSession: true,
     autoRefreshToken: true,
   }

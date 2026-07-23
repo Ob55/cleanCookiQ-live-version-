@@ -5,9 +5,10 @@ import {
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import AIAssistant from "@/components/assistant/AIAssistant";
 import { supabase } from "@/integrations/supabase/client";
 import NotificationBell from "@/components/NotificationBell";
-import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
+import cleancookIqLogo from "@/assets/cleancookiq-wordmark-light.png";
 
 const supplierNav = [
   { label: "Dashboard", href: "/supplier/dashboard", icon: LayoutDashboard },
@@ -51,8 +52,7 @@ export default function SupplierLayout() {
     <div className="flex flex-col h-full">
       <div className="p-5 border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-2">
-          <img src={cleancookIqLogo} alt="CleanCookIQ logo" className="h-8 w-8 rounded-lg object-contain" />
-          <span className="font-display font-bold text-lg text-sidebar-foreground">CleanCookIQ</span>
+          <img src={cleancookIqLogo} alt="CleanCookIQ" className="h-8 w-auto object-contain" />
         </Link>
         <p className="text-xs text-sidebar-foreground/60 mt-1">Supplier Portal</p>
       </div>
@@ -123,6 +123,8 @@ export default function SupplierLayout() {
           <Outlet />
         </main>
       </div>
+
+      <AIAssistant persona="supplier" />
     </div>
   );
 }

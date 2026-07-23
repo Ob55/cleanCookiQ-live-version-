@@ -2,8 +2,9 @@ import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { LayoutDashboard, LogOut, Menu, FileText, Ticket, TrendingUp, Briefcase, BarChart3, Handshake } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import AIAssistant from "@/components/assistant/AIAssistant";
 import NotificationBell from "@/components/NotificationBell";
-import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
+import cleancookIqLogo from "@/assets/cleancookiq-wordmark-light.png";
 
 export default function FunderLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -24,8 +25,7 @@ export default function FunderLayout() {
     <div className="flex flex-col h-full">
       <div className="p-5 border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-2">
-          <img src={cleancookIqLogo} alt="CleanCookIQ logo" className="h-8 w-8 rounded-lg object-contain" />
-          <span className="font-display font-bold text-lg text-sidebar-foreground">CleanCookIQ</span>
+          <img src={cleancookIqLogo} alt="CleanCookIQ" className="h-8 w-auto object-contain" />
         </Link>
         <p className="text-xs text-sidebar-foreground/60 mt-1">Funder Portal</p>
       </div>
@@ -211,6 +211,8 @@ export default function FunderLayout() {
           <Outlet />
         </main>
       </div>
+
+      <AIAssistant persona="funder" />
     </div>
   );
 }

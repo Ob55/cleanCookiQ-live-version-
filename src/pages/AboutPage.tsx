@@ -19,11 +19,11 @@ import {
   ArrowDown,
   FileText,
   Download,
-  Flame,
   Sparkles,
   Globe,
 } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
+import cleancookIqMark from "@/assets/cleancookiq-mark.png";
 import {
   Accordion,
   AccordionItem,
@@ -384,7 +384,7 @@ export default function AboutPage() {
       )}
 
       {/* ─────────── CHALLENGES ─────────── */}
-      <section id="challenges" className="relative py-28 lg:py-36 overflow-hidden scroll-mt-24 bg-[#F8F5EF]">
+      <section id="challenges" className="relative py-28 lg:py-36 overflow-hidden scroll-mt-24 bg-[#F5F5F5]">
         <div className="absolute inset-0 bg-ember-grid opacity-15 pointer-events-none" />
         <div className="absolute left-1/2 top-0 -translate-x-1/2 h-px w-1/2 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
 
@@ -627,7 +627,7 @@ export default function AboutPage() {
       </section>
 
       {/* ─────────── WHY NOW ─────────── */}
-      <section className="relative py-28 lg:py-36 overflow-hidden bg-[#F8F5EF]">
+      <section className="relative py-28 lg:py-36 overflow-hidden bg-[#F5F5F5]">
         <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
           <div className="text-center max-w-3xl mx-auto mb-14">
             <span className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-primary mb-5">
@@ -728,7 +728,7 @@ export default function AboutPage() {
             transition={{ duration: 0.6 }}
             className="inline-flex items-center gap-2 liquid-glass rounded-full px-4 py-1.5 mb-8"
           >
-            <Flame className="h-3.5 w-3.5 text-amber-400" />
+            <img src={cleancookIqMark} alt="" className="h-4 w-4 object-contain" />
             <span className="text-xs font-medium text-white/85 uppercase tracking-[0.2em]">Our vision</span>
           </motion.div>
 

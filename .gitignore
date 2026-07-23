@@ -40,5 +40,13 @@ scripts/generate_methodology_doc.py
 scripts/update_methodology_doc.py
 scripts/expand_methodology_doc.py
 scripts/rewrite_gaps_section.py
+scripts/export-institutions.mjs
+scripts/inspect-kobo.mjs
+scripts/modify-kobo.mjs
 memory.md
 instraction
+
+# Stray generated/copied images (not used by the app)
+Gemini_Generated_Image_*.png
+image copy.png
+*.xlsx

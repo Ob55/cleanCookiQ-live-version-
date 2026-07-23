@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Eye, EyeOff } from "lucide-react";
-import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
+import cleancookIqLogo from "@/assets/cleancookiq-wordmark.png";
 import BrandedLoader from "@/components/BrandedLoader";
 import AuthBackButton from "@/components/auth/AuthBackButton";
 import { checkRateLimit } from "@/lib/rateLimit";
@@ -139,8 +139,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <img src={cleancookIqLogo} alt="CleanCookIQ" className="h-12 w-auto" />
-            <span className="font-display font-bold text-xl">CleanCookIQ</span>
+            <img src={cleancookIqLogo} alt="CleanCookIQ" className="h-10 w-auto" />
           </Link>
           <h1 className="text-2xl font-display font-bold">Welcome back</h1>
           <p className="text-sm text-muted-foreground mt-1">Log in to your CleanCookIQ account</p>

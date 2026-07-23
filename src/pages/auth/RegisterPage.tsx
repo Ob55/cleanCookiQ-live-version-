@@ -17,7 +17,7 @@ import {
 } from "@/lib/emailService";
 import AuthBackButton from "@/components/auth/AuthBackButton";
 import { checkRateLimit } from "@/lib/rateLimit";
-import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
+import cleancookIqLogo from "@/assets/cleancookiq-wordmark.png";
 
 const orgTypes = [
   { value: "institution", label: "Institution", desc: "School, hospital, prison, factory", icon: Building2 },
@@ -198,8 +198,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <img src={cleancookIqLogo} alt="CleanCookIQ" className="h-12 w-auto" />
-            <span className="font-display font-bold text-xl">CleanCookIQ</span>
+            <img src={cleancookIqLogo} alt="CleanCookIQ" className="h-10 w-auto" />
           </Link>
           <h1 className="text-2xl font-display font-bold">Create your account</h1>
           <p className="text-sm text-muted-foreground mt-1">

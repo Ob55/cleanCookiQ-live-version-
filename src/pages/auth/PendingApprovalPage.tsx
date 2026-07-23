@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Clock, Phone } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import AuthBackButton from "@/components/auth/AuthBackButton";
+import AIAssistant from "@/components/assistant/AIAssistant";
 
 export default function PendingApprovalPage() {
   const { profile } = useAuth();
@@ -51,6 +52,8 @@ export default function PendingApprovalPage() {
           Return to homepage
         </Link>
       </div>
+
+      {isOther && <AIAssistant persona="other" />}
     </div>
   );
 }

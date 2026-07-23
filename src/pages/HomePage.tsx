@@ -10,6 +10,7 @@ import {
 import FuelOptionsSection from "@/components/institution/FuelOptionsSection";
 import { supabase } from "@/integrations/supabase/client";
 import kitchenTransitionBg from "@/assets/kitchen-transition.jpg";
+import cleancookIqMark from "@/assets/cleancookiq-mark.png";
 import partner1 from "@/assets/partners/partner1.png";
 import partner2 from "@/assets/partners/partner2.png";
 import partner3 from "@/assets/partners/partner3.png";
@@ -19,7 +20,7 @@ import partner6 from "@/assets/partners/partner6.png";
 import partner7 from "@/assets/partners/partner7.png";
 import { useAuth } from "@/contexts/AuthContext";
 import AnimatedNumber from "@/components/AnimatedNumber";
-import SummitCountdown from "@/components/SummitCountdown";
+
 
 const partners = [partner1, partner2, partner3, partner4, partner5, partner6, partner7];
 
@@ -144,9 +145,10 @@ export default function HomePage() {
             fetchPriority="high"
             decoding="async"
           />
-          {/* brand-green wash for text contrast (heaviest on the left,
-              fades right so the kitchen photo breathes behind the cards) */}
-          <div className="absolute inset-0 bg-gradient-to-r from-background/92 via-background/70 to-background/25" />
+          {/* dark scrim for headline contrast (heaviest on the left,
+              fades to transparent right so the kitchen photo breathes
+              behind the cards) */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/35 to-transparent" />
           {/* bottom fade into next section */}
           <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-b from-transparent to-background" />
           {/* warm + green glow + ember grid for ambience */}
@@ -163,10 +165,10 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-[1.2fr_1fr] gap-10 items-center">
             {/* Headline column */}
             <div>
-              <h1 className="font-editorial text-[3rem] sm:text-6xl lg:text-7xl xl:text-[5.5rem] leading-[0.95] tracking-tight text-foreground">
+              <h1 className="font-display font-extrabold text-[3rem] sm:text-6xl lg:text-7xl xl:text-[5.5rem] leading-[0.95] tracking-tight text-[#A5D6A7] [text-shadow:0_2px_18px_rgba(0,0,0,0.55)]">
                 <BlurWords text="Powering Kenya's" />
                 <br />
-                <span className="italic ignis-shimmer inline-block">
+                <span className="inline-block text-[#F5871F] [text-shadow:0_2px_16px_rgba(0,0,0,0.45)]">
                   clean cooking
                 </span>
                 <br />
@@ -228,37 +230,37 @@ export default function HomePage() {
               <div className="liquid-glass-strong rounded-[2rem] p-8 mb-4 bg-background/75">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-                  <span className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold">Live pipeline</span>
+                  <span className="text-xs uppercase tracking-[0.2em] text-primary font-bold">Live pipeline</span>
                 </div>
-                <p className="font-editorial italic text-6xl text-foreground leading-none">
+                <p className="font-editorial italic text-7xl text-foreground leading-none">
                   <AnimatedNumber value={totalInstitutions} />
                 </p>
-                <p className="mt-3 text-sm text-foreground/85">institutions being tracked across <span className="text-foreground font-medium">47 counties</span></p>
+                <p className="mt-3 text-base text-foreground/90">institutions being tracked across <span className="text-foreground font-semibold">47 counties</span></p>
                 <div className="mt-6 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                <div className="mt-4 grid grid-cols-2 gap-4">
+                <div className="mt-5 grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-foreground/65 mb-1">Assessed</p>
-                    <p className="font-display font-bold text-2xl text-foreground"><AnimatedNumber value={assessedCount} /></p>
+                    <p className="text-xs uppercase tracking-[0.18em] text-foreground/80 font-semibold mb-1">Assessed</p>
+                    <p className="font-display font-extrabold text-4xl text-foreground"><AnimatedNumber value={assessedCount} /></p>
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-foreground/65 mb-1">In delivery</p>
-                    <p className="font-display font-bold text-2xl text-primary"><AnimatedNumber value={inDeliveryCount} /></p>
+                    <p className="text-xs uppercase tracking-[0.18em] text-foreground/80 font-semibold mb-1">In delivery</p>
+                    <p className="font-display font-extrabold text-4xl text-primary"><AnimatedNumber value={inDeliveryCount} /></p>
                   </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="liquid-glass rounded-2xl p-5 bg-background/60">
-                  <Leaf className="h-5 w-5 text-rich-emerald mb-3" />
-                  <p className="font-display font-bold text-2xl text-foreground"><AnimatedNumber value={co2Tonnes} /></p>
-                  <p className="text-[11px] text-foreground/75 mt-1 leading-tight">Tonnes CO₂ avoided / year</p>
+                  <Leaf className="h-6 w-6 text-rich-emerald mb-3" />
+                  <p className="font-display font-extrabold text-3xl text-foreground"><AnimatedNumber value={co2Tonnes} /></p>
+                  <p className="text-xs text-foreground/85 font-medium mt-1.5 leading-tight">Tonnes CO₂ avoided / year</p>
                 </div>
                 <div className="liquid-glass rounded-2xl p-5 bg-background/60">
-                  <Flame className="h-5 w-5 text-accent mb-3" />
-                  <p className="font-display font-bold text-2xl text-foreground">
+                  <img src={cleancookIqMark} alt="" className="h-6 w-6 object-contain mb-3" />
+                  <p className="font-display font-extrabold text-3xl text-foreground">
                     KSh <AnimatedNumber value={pipelineDisplay.num} suffix={pipelineDisplay.suffix} decimals={pipelineDisplay.decimals} />
                   </p>
-                  <p className="text-[11px] text-foreground/75 mt-1 leading-tight">Pipeline value</p>
+                  <p className="text-xs text-foreground/85 font-medium mt-1.5 leading-tight">Pipeline value</p>
                 </div>
               </div>
             </motion.div>
@@ -304,7 +306,7 @@ export default function HomePage() {
               transition={{ duration: 0.5 }}
               className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-amber-400 mb-5"
             >
-              <Flame className="h-3 w-3" /> The platform
+              <img src={cleancookIqMark} alt="" className="h-3.5 w-3.5 object-contain" /> The platform
             </motion.span>
             <motion.h2
               initial="hidden" whileInView="show" viewport={{ once: true }}
@@ -447,7 +449,7 @@ export default function HomePage() {
       </section>
 
       {/* ─────────── HOW IT WORKS ─────────── */}
-      <section className="relative py-28 lg:py-36 overflow-hidden bg-[#F8F5EF]">
+      <section className="relative py-28 lg:py-36 overflow-hidden bg-[#F5F5F5]">
         <div className="absolute inset-0 bg-ember-grid opacity-15 pointer-events-none" />
 
         <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12">
@@ -520,7 +522,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <SummitCountdown />
 
       {/* ─────────── PARTNERS MARQUEE ─────────── */}
       <section className="relative py-20 lg:py-24 overflow-hidden border-t border-border">
@@ -565,7 +566,7 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             className="inline-flex items-center gap-2 liquid-glass rounded-full px-4 py-1.5 mb-7"
           >
-            <Flame className="h-3.5 w-3.5 text-amber-400" />
+            <img src={cleancookIqMark} alt="" className="h-4 w-4 object-contain" />
             <span className="text-xs font-medium text-white/85">Join the transition</span>
           </motion.div>
 

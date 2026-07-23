@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:wght@300;400;500;600;700&family=Instrument+Serif:ital,wght@0,400;1,400&family=Playfair+Display:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -10,7 +10,7 @@
        #0A400C) + ignis orange accent. Light surfaces stay cream so
        existing dashboard pages remain readable; the public site uses
        .theme-ignis (below) to flip to the dark canvas. */
-    --background: 0 0% 100%;
+    --background: 0 0% 99%;              /* #FCFCFC simple soft white */
     --foreground: 144 60% 10%;
 
     --card: 0 0% 100%;
@@ -25,7 +25,7 @@
     --secondary: 89 50% 33%;             /* sap green #507D2A */
     --secondary-foreground: 60 20% 97%;
 
-    --muted: 140 10% 95%;
+    --muted: 0 0% 96%;
     --muted-foreground: 144 15% 40%;
 
     --accent: 33 100% 50%;               /* ignis orange #FF8C00 */
@@ -34,8 +34,8 @@
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 140 12% 90%;
-    --input: 140 12% 90%;
+    --border: 0 0% 91%;
+    --input: 0 0% 91%;
     --ring: 144 100% 22%;
 
     --radius: 0.75rem;
@@ -75,9 +75,10 @@
     --shadow-elevated: 0 12px 40px -8px hsl(144 100% 22% / 0.14);
     --shadow-ignis: 0 12px 40px -8px hsl(33 100% 50% / 0.40);
 
-    --font-display: 'Playfair Display', Georgia, serif;
-    --font-editorial: 'Instrument Serif', 'Playfair Display', Georgia, serif;
-    --font-body: 'Inter', 'DM Sans', system-ui, sans-serif;
+    /* One font for all headings, one for all body text. */
+    --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-editorial: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
 
     --sidebar-background: 144 45% 18%;
     --sidebar-foreground: 60 20% 92%;
@@ -112,24 +113,24 @@
   }
 
   /* Ignis canvas — public pages opt into this via PublicLayout.
-     Warm off-white canvas (#FAF8F3) with deep green text + green/orange/gold accents. */
+     Simple soft-white canvas with deep green text + green/orange/gold accents. */
   .theme-ignis {
-    --background: 40 35% 97%;            /* #FAF8F3 warm off-white */
+    --background: 0 0% 99%;              /* #FCFCFC simple soft white */
     --foreground: 144 60% 10%;           /* deep green text */
-    --card: 42 50% 98%;                  /* #FDFCF7 lighter card */
+    --card: 0 0% 100%;                   /* crisp white card */
     --card-foreground: 144 60% 10%;
-    --popover: 42 50% 98%;
+    --popover: 0 0% 100%;
     --popover-foreground: 144 60% 10%;
     --primary: 144 100% 22%;             /* Rich Emerald #00712D */
     --primary-foreground: 0 0% 100%;
     --secondary: 89 50% 33%;             /* Sap Green #507D2A */
     --secondary-foreground: 0 0% 100%;
-    --muted: 38 30% 93%;                 /* #F8F5EF muted warm */
+    --muted: 0 0% 96%;                   /* #F5F5F5 neutral muted */
     --muted-foreground: 144 15% 35%;
     --accent: 33 100% 50%;               /* ignis orange */
     --accent-foreground: 0 0% 100%;
-    --border: 38 20% 88%;
-    --input: 38 20% 88%;
+    --border: 0 0% 91%;
+    --input: 0 0% 91%;
     --ring: 144 100% 22%;
   }
 }
@@ -240,35 +241,6 @@
     box-shadow:
       0 2px 8px hsl(144 30% 20% / 0.10),
       0 12px 36px -12px hsl(144 30% 20% / 0.18);
-  }
-
-  /* Hero rainbow shimmer — animated rainbow gradient sliding across the text. */
-  .ignis-shimmer {
-    color: #00712D;
-    background-image: linear-gradient(
-      90deg,
-      #ff2e63 0%,
-      #ff8c00 14%,
-      #f0c63a 28%,
-      #2ebd66 42%,
-      #00b3d6 57%,
-      #3a6ef0 71%,
-      #9d3df0 85%,
-      #ff2e63 100%
-    );
-    background-size: 200% 100%;
-    background-position: 0% 0;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: ignis-shimmer 4s linear infinite;
-    filter: drop-shadow(0 0 14px rgba(240, 198, 58, 0.35))
-            drop-shadow(0 0 28px rgba(46, 189, 102, 0.20));
-    font-weight: 500;
-  }
-  @keyframes ignis-shimmer {
-    from { background-position: 0% 0; }
-    to   { background-position: -200% 0; }
   }
 
   /* Gradient text — fiery ignis tone for headline accents. */

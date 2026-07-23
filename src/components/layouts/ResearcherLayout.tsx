@@ -2,8 +2,9 @@ import { Outlet, Link, useLocation, useNavigate, Navigate } from "react-router-d
 import { LayoutDashboard, LogOut, Menu, Ticket } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import AIAssistant from "@/components/assistant/AIAssistant";
 import NotificationBell from "@/components/NotificationBell";
-import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
+import cleancookIqLogo from "@/assets/cleancookiq-wordmark-light.png";
 
 const navItems = [
   { label: "Dashboard", href: "/researcher/dashboard", icon: LayoutDashboard },
@@ -34,8 +35,7 @@ export default function ResearcherLayout() {
     <div className="flex flex-col h-full">
       <div className="p-5 border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-2">
-          <img src={cleancookIqLogo} alt="CleanCookIQ logo" className="h-8 w-8 rounded-lg object-contain" />
-          <span className="font-display font-bold text-lg text-sidebar-foreground">CleanCookIQ</span>
+          <img src={cleancookIqLogo} alt="CleanCookIQ" className="h-8 w-auto object-contain" />
         </Link>
         <p className="text-xs text-sidebar-foreground/60 mt-1">Researcher Portal</p>
       </div>
@@ -106,6 +106,8 @@ export default function ResearcherLayout() {
           <Outlet />
         </main>
       </div>
+
+      <AIAssistant persona="researcher" />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
+import cleancookIqLogo from "@/assets/cleancookiq-mark.png";
 
 interface Props {
   message?: string;

@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import cleancookIqLogo from "@/assets/cleancookiq-logo.png";
+import cleancookIqLogo from "@/assets/cleancookiq-mark.png";
 import { DownloadReportButton, filterSubtitle } from "@/components/admin/DownloadReportButton";
 
 type Row = {
