@@ -612,6 +612,55 @@ function sharePieOption(items: { name: string; value: number }[], unit: string) 
   };
 }
 
+// 100%-stacked bar (one stack per category, one series per fuel). Used for the
+// fuel-mix chart: each category column sums to ~100% of that category.
+function stackedBarOption(
+  categories: string[],
+  series: { name: string; color: string; data: number[] }[],
+) {
+  return {
+    textStyle: { fontFamily: "'DM Sans', system-ui, sans-serif" },
+    grid: { top: 40, right: 16, bottom: 28, left: 40, containLabel: true },
+    tooltip: {
+      trigger: "axis",
+      axisPointer: { type: "shadow" },
+      backgroundColor: "rgba(20, 40, 30, 0.92)",
+      borderColor: "transparent",
+      textStyle: { color: "#fff", fontSize: 12 },
+      valueFormatter: (v: number) => `${Number(v).toFixed(1)}%`,
+    },
+    legend: { top: 0, left: "center", icon: "circle", itemWidth: 9, itemHeight: 9, textStyle: { fontSize: 12, color: "#475569" } },
+    xAxis: {
+      type: "category",
+      data: categories,
+      axisTick: { show: false },
+      axisLine: { lineStyle: { color: "#cbd5e1" } },
+      axisLabel: { fontSize: 12, color: "#475569" },
+    },
+    yAxis: {
+      type: "value", max: 100,
+      splitLine: { lineStyle: { type: "dashed", color: "#e5e7eb" } },
+      axisLabel: { fontSize: 11, color: "#94a3b8", formatter: "{value}%" },
+    },
+    series: series.map((s, i) => ({
+      name: s.name,
+      type: "bar",
+      stack: "fuel",
+      barWidth: "52%",
+      data: s.data,
+      itemStyle: {
+        color: s.color,
+        // Round only the top segment of each column.
+        borderRadius: i === series.length - 1 ? [6, 6, 0, 0] : [0, 0, 0, 0],
+      },
+    })),
+  };
+}
+
+// Fuel colours for the mix chart — semantic and distinct, drawn from the app's
+// palette. Firewood (earth), charcoal (slate), LPG (blue), other (muted).
+const FUEL_MIX_COLORS = { firewood: "#a16207", charcoal: "#334155", lpg: "#2563eb", other: "#94a3b8" };
+
 // Overview = at-a-glance programme summary: headline counts, the derived energy
 // baseline (for the IRENA – Taita Taveta programme), and the current cooking-fuel
 // mix. The full institution roster lives on its own tab.
@@ -632,6 +681,19 @@ function OverviewTab({ programmeId }: { programmeId: string }) {
   // Geographic distribution across all 409 records (workbook Figure 8).
   const geoData = (baseline?.geoDistribution ?? []).map((g) => ({
     name: g.subCounty, value: g.records,
+  }));
+  // Fuel mix by category (workbook Figure 4) — one stacked column per category.
+  const fuelMixCategories = (baseline?.fuelMixByCategory ?? []).map(
+    (f) => ENERGY_SHORT[f.category] ?? f.category);
+  const fuelMixSeries = [
+    { name: "Firewood", color: FUEL_MIX_COLORS.firewood, data: (baseline?.fuelMixByCategory ?? []).map((f) => f.firewood) },
+    { name: "Charcoal", color: FUEL_MIX_COLORS.charcoal, data: (baseline?.fuelMixByCategory ?? []).map((f) => f.charcoal) },
+    { name: "LPG", color: FUEL_MIX_COLORS.lpg, data: (baseline?.fuelMixByCategory ?? []).map((f) => f.lpg) },
+    { name: "Other", color: FUEL_MIX_COLORS.other, data: (baseline?.fuelMixByCategory ?? []).map((f) => f.other) },
+  ];
+  // Electricity access by category (workbook Figure 2).
+  const elecAccessData = (baseline?.electricityAccessByCategory ?? []).map((e) => ({
+    name: ENERGY_SHORT[e.category] ?? e.category, value: e.accessPct,
   }));
 
   const handleExport = () => {
@@ -661,6 +723,19 @@ function OverviewTab({ programmeId }: { programmeId: string }) {
       count,
     }))
     .sort((a, b) => b.count - a.count);
+
+  // Live "current cooking method" bar — shown for every programme (standalone
+  // for non-baseline ones, paired with the fuel-mix chart for the baseline).
+  const cookingMethodCard = (
+    <div className="rounded-xl border border-border bg-card p-5 shadow-card">
+      <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground mb-3">Institutions by current cooking method</p>
+      {!institutions?.length ? (
+        <p className="text-sm text-muted-foreground text-center py-10">No institutions yet.</p>
+      ) : (
+        <ReactECharts style={{ height: 320 }} option={categoryBarOption(fuelData.map((f) => ({ name: f.name, value: f.count })), { unit: "institutions" })} notMerge lazyUpdate />
+      )}
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -700,24 +775,33 @@ function OverviewTab({ programmeId }: { programmeId: string }) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {baseline && (
-          <div className="rounded-xl border border-border bg-card p-5 shadow-card">
-            <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Geographic distribution</p>
-            <p className="text-xs text-muted-foreground mb-1">By sub-county across all {baseline.meta.totalRecords.toLocaleString()} records.</p>
-            <ReactECharts style={{ height: 320 }} option={sharePieOption(geoData, "records")} notMerge lazyUpdate />
+      {baseline ? (
+        <>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="rounded-xl border border-border bg-card p-5 shadow-card">
+              <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Geographic distribution</p>
+              <p className="text-xs text-muted-foreground mb-1">By sub-county across all {baseline.meta.totalRecords.toLocaleString()} records.</p>
+              <ReactECharts style={{ height: 320 }} option={sharePieOption(geoData, "records")} notMerge lazyUpdate />
+            </div>
+            <div className="rounded-xl border border-border bg-card p-5 shadow-card">
+              <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Electricity access</p>
+              <p className="text-xs text-muted-foreground mb-1">Share of each category connected to the grid.</p>
+              <ReactECharts style={{ height: 320 }} option={categoryBarOption(elecAccessData, { unit: "electrified", valueFmt: (v) => `${v.toFixed(0)}%` })} notMerge lazyUpdate />
+            </div>
           </div>
-        )}
 
-        <div className="rounded-xl border border-border bg-card p-5 shadow-card">
-          <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground mb-3">Institutions by current cooking method</p>
-          {!institutions?.length ? (
-            <p className="text-sm text-muted-foreground text-center py-10">No institutions yet.</p>
-          ) : (
-            <ReactECharts style={{ height: 320 }} option={categoryBarOption(fuelData.map((f) => ({ name: f.name, value: f.count })), { unit: "institutions" })} notMerge lazyUpdate />
-          )}
-        </div>
-      </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="rounded-xl border border-border bg-card p-5 shadow-card">
+              <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Primary fuel mix by category</p>
+              <p className="text-xs text-muted-foreground mb-1">Share of each fuel within a category (% of category).</p>
+              <ReactECharts style={{ height: 320 }} option={stackedBarOption(fuelMixCategories, fuelMixSeries)} notMerge lazyUpdate />
+            </div>
+            {cookingMethodCard}
+          </div>
+        </>
+      ) : (
+        cookingMethodCard
+      )}
     </div>
   );
 }

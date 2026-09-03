@@ -121,6 +121,28 @@ export const GEO_DISTRIBUTION: { subCounty: string; records: number }[] = [
   { subCounty: "Unspecified", records: 7 },
 ];
 
+/**
+ * Figure 4 — primary cooking fuel type by institutional category (% of each
+ * category). Drives the Overview 100%-stacked fuel-mix chart. Category names
+ * match the four group titles (and the ENERGY_SHORT map in ProgrammeDetail).
+ */
+export const FUEL_MIX_BY_CATEGORY: {
+  category: string; firewood: number; charcoal: number; lpg: number; other: number;
+}[] = [
+  { category: "Learning Institutions", firewood: 90.36, charcoal: 3.05, lpg: 1.02, other: 5.58 },
+  { category: "Catering Outlets (SMEs)", firewood: 22.05, charcoal: 58.46, lpg: 6.67, other: 12.82 },
+  { category: "Health Facilities", firewood: 0, charcoal: 16.67, lpg: 66.67, other: 16.67 },
+  { category: "Correctional Institutions", firewood: 100, charcoal: 0, lpg: 0, other: 0 },
+];
+
+/** Figure 2 — electricity access rate by category (% electrified). */
+export const ELECTRICITY_ACCESS_BY_CATEGORY: { category: string; accessPct: number }[] = [
+  { category: "Learning Institutions", accessPct: 83.76 },
+  { category: "Catering Outlets (SMEs)", accessPct: 65.64 },
+  { category: "Health Facilities", accessPct: 100 },
+  { category: "Correctional Institutions", accessPct: 100 },
+];
+
 /** Table 18 — price coefficients used for the derived consumption estimates. */
 export const ENERGY_COEFFICIENTS: { fuel: string; price: string; source: string }[] = [
   { fuel: "Firewood", price: "KES 7.50 / kg", source: "A2CT Survey Report, Table 3" },
@@ -218,6 +240,8 @@ export const BASELINE_META = {
 export type TaitaTavetaBaseline = {
   groups: BaselineGroup[];
   geoDistribution: typeof GEO_DISTRIBUTION;
+  fuelMixByCategory: typeof FUEL_MIX_BY_CATEGORY;
+  electricityAccessByCategory: typeof ELECTRICITY_ACCESS_BY_CATEGORY;
   energyByCategory: EnergyCategory[];
   energyTotals: typeof ENERGY_TOTALS;
   energyCoefficients: typeof ENERGY_COEFFICIENTS;
@@ -230,6 +254,8 @@ export type TaitaTavetaBaseline = {
 const TAITA_TAVETA_BASELINE: TaitaTavetaBaseline = {
   groups: DATASET_GROUPS,
   geoDistribution: GEO_DISTRIBUTION,
+  fuelMixByCategory: FUEL_MIX_BY_CATEGORY,
+  electricityAccessByCategory: ELECTRICITY_ACCESS_BY_CATEGORY,
   energyByCategory: ENERGY_BY_CATEGORY,
   energyTotals: ENERGY_TOTALS,
   energyCoefficients: ENERGY_COEFFICIENTS,
