@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode, type PointerEvent as ReactPointerEvent } from "react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { Send, X, Sparkles } from "lucide-react";
+import { motion, AnimatePresence, useDragControls } from "framer-motion";
+import { Send, X, Sparkles, GripVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import RobotAvatar from "./RobotAvatar";
@@ -105,6 +105,15 @@ export default function AIAssistant({ persona: personaId }: { persona: PersonaId
   const idRef = useRef(0);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  // Draggable positioning: a full-viewport (pointer-events-none) boundary keeps
+  // the widget on-screen; drag only starts from the explicit handles below, so
+  // taps, typing and scrolling the transcript still work normally.
+  const dragControls = useDragControls();
+  const boundaryRef = useRef<HTMLDivElement>(null);
+  // Distinguishes a drag from a tap so releasing a drag on the launcher doesn't
+  // also fire its "open" click.
+  const movedRef = useRef(false);
+  const startDrag = (e: ReactPointerEvent) => { movedRef.current = false; dragControls.start(e); };
 
   // One-time gentle nudge bubble a few seconds after load.
   useEffect(() => {
@@ -151,7 +160,17 @@ export default function AIAssistant({ persona: personaId }: { persona: PersonaId
   const lastFollowups = messages.length ? messages[messages.length - 1].followups ?? [] : [];
 
   return (
-    <div className="fixed bottom-5 right-5 z-[60] flex flex-col items-end print:hidden">
+    <div ref={boundaryRef} className="fixed inset-0 z-[60] pointer-events-none print:hidden">
+    <motion.div
+      drag
+      dragListener={false}
+      dragControls={dragControls}
+      dragConstraints={boundaryRef}
+      dragMomentum={false}
+      dragElastic={0.04}
+      onDrag={() => { movedRef.current = true; }}
+      className="absolute bottom-5 right-5 flex flex-col items-end pointer-events-auto"
+    >
       <AnimatePresence>
         {open && (
           <motion.div
@@ -163,14 +182,21 @@ export default function AIAssistant({ persona: personaId }: { persona: PersonaId
             aria-label={`${persona.name}, ${persona.role}`}
             className="mb-3 w-[calc(100vw-2.5rem)] max-w-[380px] h-[min(70vh,560px)] flex flex-col rounded-3xl bg-white border border-black/10 shadow-2xl overflow-hidden"
           >
-            {/* header */}
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-black/10" style={{ background: `${persona.accent}10` }}>
+            {/* header — doubles as the drag handle */}
+            <div
+              onPointerDown={startDrag}
+              className="flex items-center gap-2.5 px-4 py-3 border-b border-black/10 cursor-move select-none touch-none"
+              style={{ background: `${persona.accent}10` }}
+              title="Drag to move"
+            >
+              <GripVertical className="h-4 w-4 shrink-0 text-foreground/30" aria-hidden />
               <div className="shrink-0"><RobotAvatar accent={persona.accent} size={40} state={thinking ? "thinking" : "idle"} /></div>
               <div className="flex-1 min-w-0">
                 <p className="font-display font-bold text-sm text-foreground leading-tight">{persona.name}</p>
                 <p className="text-[11px] text-foreground/55 leading-tight">{persona.role}</p>
               </div>
               <button
+                onPointerDown={(e) => e.stopPropagation()}
                 onClick={() => setOpen(false)}
                 aria-label="Close assistant"
                 className="h-8 w-8 grid place-items-center rounded-full text-foreground/50 hover:bg-black/5 hover:text-foreground transition-colors"
@@ -272,13 +298,14 @@ export default function AIAssistant({ persona: personaId }: { persona: PersonaId
         )}
       </AnimatePresence>
 
-      {/* launcher */}
+      {/* launcher — tap to open, drag to reposition */}
       {!open && (
         <button
-          onClick={() => setOpen(true)}
-          aria-label={`Open ${persona.name}, the ${persona.role}`}
+          onPointerDown={startDrag}
+          onClick={() => { if (movedRef.current) { movedRef.current = false; return; } setOpen(true); }}
+          aria-label={`Open ${persona.name}, the ${persona.role}. Drag to reposition.`}
           aria-expanded={open}
-          className="relative h-16 w-16 grid place-items-center rounded-full bg-white border border-black/10 shadow-xl hover:shadow-2xl transition-shadow"
+          className="relative h-16 w-16 grid place-items-center rounded-full bg-white border border-black/10 shadow-xl hover:shadow-2xl transition-shadow cursor-grab active:cursor-grabbing touch-none"
         >
           <RobotAvatar accent={persona.accent} size={52} />
           <span className="absolute -top-0.5 -right-0.5 h-4 w-4 grid place-items-center">
@@ -286,6 +313,7 @@ export default function AIAssistant({ persona: personaId }: { persona: PersonaId
           </span>
         </button>
       )}
+    </motion.div>
     </div>
   );
 }

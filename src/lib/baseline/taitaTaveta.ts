@@ -108,6 +108,19 @@ export const ENERGY_BY_CATEGORY: EnergyCategory[] = [
 
 export const ENERGY_TOTALS = { fuelTonnes: 4025.93, elecKwh: 1760230.96 };
 
+/**
+ * Figure 8 — geographic distribution by sub-county across all 409 records
+ * (Cross-Cutting Analysis sheet, canonicalised sub-county names). Drives the
+ * Overview pie chart.
+ */
+export const GEO_DISTRIBUTION: { subCounty: string; records: number }[] = [
+  { subCounty: "Voi", records: 132 },
+  { subCounty: "Taveta", records: 113 },
+  { subCounty: "Mwatate", records: 92 },
+  { subCounty: "Wundanyi", records: 65 },
+  { subCounty: "Unspecified", records: 7 },
+];
+
 /** Table 18 — price coefficients used for the derived consumption estimates. */
 export const ENERGY_COEFFICIENTS: { fuel: string; price: string; source: string }[] = [
   { fuel: "Firewood", price: "KES 7.50 / kg", source: "A2CT Survey Report, Table 3" },
@@ -204,6 +217,7 @@ export const BASELINE_META = {
 
 export type TaitaTavetaBaseline = {
   groups: BaselineGroup[];
+  geoDistribution: typeof GEO_DISTRIBUTION;
   energyByCategory: EnergyCategory[];
   energyTotals: typeof ENERGY_TOTALS;
   energyCoefficients: typeof ENERGY_COEFFICIENTS;
@@ -215,6 +229,7 @@ export type TaitaTavetaBaseline = {
 
 const TAITA_TAVETA_BASELINE: TaitaTavetaBaseline = {
   groups: DATASET_GROUPS,
+  geoDistribution: GEO_DISTRIBUTION,
   energyByCategory: ENERGY_BY_CATEGORY,
   energyTotals: ENERGY_TOTALS,
   energyCoefficients: ENERGY_COEFFICIENTS,

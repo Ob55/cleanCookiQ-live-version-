@@ -577,6 +577,41 @@ const ENERGY_SHORT: Record<string, string> = {
   "Correctional Institutions": "Correctional",
 };
 
+// Solid slice colours drawn from the same blue → green family as the bars, so
+// the pie sits in the same palette as the rest of the programme dashboard.
+const PIE_COLORS = ["#2563eb", "#0ea5e9", "#0d9488", "#16a34a", "#94a3b8"];
+
+// Donut chart mirroring the workbook's Cross-Cutting Analysis pies (Figure 8):
+// each slice labelled with its name and share on the outside, legend on top.
+function sharePieOption(items: { name: string; value: number }[], unit: string) {
+  return {
+    textStyle: { fontFamily: "'DM Sans', system-ui, sans-serif" },
+    color: PIE_COLORS,
+    tooltip: {
+      trigger: "item",
+      backgroundColor: "rgba(20, 40, 30, 0.92)",
+      borderColor: "transparent",
+      textStyle: { color: "#fff", fontSize: 12 },
+      formatter: (p: { name: string; value: number; percent: number }) =>
+        `${p.name}<br/><b>${Number(p.value).toLocaleString()}</b> ${unit} (${p.percent}%)`,
+    },
+    legend: { top: 0, left: "center", icon: "circle", itemWidth: 9, itemHeight: 9, textStyle: { fontSize: 12, color: "#475569" } },
+    series: [{
+      type: "pie",
+      radius: ["42%", "68%"],
+      center: ["50%", "58%"],
+      avoidLabelOverlap: true,
+      itemStyle: { borderColor: "#fff", borderWidth: 2 },
+      label: {
+        show: true, position: "outside", lineHeight: 15,
+        formatter: "{b}\n{d}%", fontSize: 12, fontWeight: "bold", color: "#334155",
+      },
+      labelLine: { show: true, length: 12, length2: 10 },
+      data: items,
+    }],
+  };
+}
+
 // Overview = at-a-glance programme summary: headline counts, the derived energy
 // baseline (for the IRENA – Taita Taveta programme), and the current cooking-fuel
 // mix. The full institution roster lives on its own tab.
@@ -593,6 +628,10 @@ function OverviewTab({ programmeId }: { programmeId: string }) {
   }));
   const energyElec = (baseline?.energyByCategory ?? []).map((e) => ({
     name: ENERGY_SHORT[e.category] ?? e.category, value: e.elecKwh,
+  }));
+  // Geographic distribution across all 409 records (workbook Figure 8).
+  const geoData = (baseline?.geoDistribution ?? []).map((g) => ({
+    name: g.subCounty, value: g.records,
   }));
 
   const handleExport = () => {
@@ -661,13 +700,23 @@ function OverviewTab({ programmeId }: { programmeId: string }) {
         </div>
       )}
 
-      <div className="rounded-xl border border-border bg-card p-5 shadow-card">
-        <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground mb-3">Institutions by current cooking method</p>
-        {!institutions?.length ? (
-          <p className="text-sm text-muted-foreground text-center py-10">No institutions yet.</p>
-        ) : (
-          <ReactECharts style={{ height: 340 }} option={categoryBarOption(fuelData.map((f) => ({ name: f.name, value: f.count })), { unit: "institutions" })} notMerge lazyUpdate />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {baseline && (
+          <div className="rounded-xl border border-border bg-card p-5 shadow-card">
+            <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Geographic distribution</p>
+            <p className="text-xs text-muted-foreground mb-1">By sub-county across all {baseline.meta.totalRecords.toLocaleString()} records.</p>
+            <ReactECharts style={{ height: 320 }} option={sharePieOption(geoData, "records")} notMerge lazyUpdate />
+          </div>
         )}
+
+        <div className="rounded-xl border border-border bg-card p-5 shadow-card">
+          <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground mb-3">Institutions by current cooking method</p>
+          {!institutions?.length ? (
+            <p className="text-sm text-muted-foreground text-center py-10">No institutions yet.</p>
+          ) : (
+            <ReactECharts style={{ height: 320 }} option={categoryBarOption(fuelData.map((f) => ({ name: f.name, value: f.count })), { unit: "institutions" })} notMerge lazyUpdate />
+          )}
+        </div>
       </div>
     </div>
   );
