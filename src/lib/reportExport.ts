@@ -30,10 +30,10 @@ export interface ReportOptions {
   subtitle?: string;
 }
 
-const BRAND_NAME = "CleanCookIQ";
-const BRAND_GREEN: [number, number, number] = [26, 60, 46]; // #1a3c2e
+export const BRAND_NAME = "CleanCookIQ";
+export const BRAND_GREEN: [number, number, number] = [26, 60, 46]; // #1a3c2e
 
-function todayStamp(): string {
+export function todayStamp(): string {
   const d = new Date();
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth() + 1).padStart(2, "0");
@@ -41,7 +41,7 @@ function todayStamp(): string {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-function safeFilename(base: string): string {
+export function safeFilename(base: string): string {
   return base.replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").toLowerCase();
 }
 
