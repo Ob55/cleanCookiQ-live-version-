@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState, lazy, Suspense, type ReactNode, type ComponentProps } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   useProgramme,
@@ -26,10 +26,24 @@ import { useProgrammeRecommendedScenarios } from "@/hooks/useScenarios";
 import { useAuth } from "@/contexts/AuthContext";
 import InstitutionCombobox, { MultiInstitutionCombobox } from "@/components/programme/InstitutionCombobox";
 import InstitutionMap from "@/components/programme/InstitutionMap";
-import ReactECharts from "echarts-for-react";
 import { FUEL_PROPERTIES, type FuelKey } from "@/lib/cookingCost";
 import { getProgrammeBaseline, type BaselineGroup } from "@/lib/baseline/taitaTaveta";
-import { exportIrenaReport } from "@/lib/irenaReport";
+
+// ECharts is heavy (~380 KB gzip). Load it lazily so the programme shell —
+// stats, tables, cards — paints instantly and the charts stream in after,
+// instead of blocking the whole page behind the charting bundle.
+const ReactECharts = lazy(() => import("echarts-for-react"));
+
+// Chart wrapper: renders the ECharts lazily with a light placeholder so there's
+// no layout shift while the bundle loads.
+function Chart(props: ComponentProps<typeof ReactECharts>) {
+  const height = (props.style as { height?: number | string } | undefined)?.height ?? 300;
+  return (
+    <Suspense fallback={<div style={{ height }} className="grid place-items-center text-xs text-muted-foreground">Loading chart…</div>}>
+      <ReactECharts {...props} />
+    </Suspense>
+  );
+}
 import steamImg from "@/assets/fuels/steam.webp";
 import lpgImg from "@/assets/fuels/lpg-tank.jpg";
 import electricImg from "@/assets/fuels/electric-induction.webp";
@@ -696,8 +710,11 @@ function OverviewTab({ programmeId }: { programmeId: string }) {
     name: ENERGY_SHORT[e.category] ?? e.category, value: e.accessPct,
   }));
 
-  const handleExport = () => {
+  // Load the PDF/xlsx report generator (jspdf + xlsx, ~200 KB gzip) only on
+  // click, so viewing a programme never pays for the export bundle upfront.
+  const handleExport = async () => {
     if (!baseline || !programme || !institutions) return;
+    const { exportIrenaReport } = await import("@/lib/irenaReport");
     exportIrenaReport({ programme: { name: programme.name }, institutions, baseline });
   };
 
@@ -732,7 +749,7 @@ function OverviewTab({ programmeId }: { programmeId: string }) {
       {!institutions?.length ? (
         <p className="text-sm text-muted-foreground text-center py-10">No institutions yet.</p>
       ) : (
-        <ReactECharts style={{ height: 320 }} option={categoryBarOption(fuelData.map((f) => ({ name: f.name, value: f.count })), { unit: "institutions" })} notMerge lazyUpdate />
+        <Chart style={{ height: 320 }} option={categoryBarOption(fuelData.map((f) => ({ name: f.name, value: f.count })), { unit: "institutions" })} notMerge lazyUpdate />
       )}
     </div>
   );
@@ -765,11 +782,11 @@ function OverviewTab({ programmeId }: { programmeId: string }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
             <div>
               <p className="text-xs font-medium text-muted-foreground mb-1">Cooking fuel — tonnes / year</p>
-              <ReactECharts style={{ height: 260 }} option={categoryBarOption(energyFuel, { unit: "tonnes / yr", valueFmt: (v) => Number(v).toLocaleString(undefined, { maximumFractionDigits: 0 }) })} notMerge lazyUpdate />
+              <Chart style={{ height: 260 }} option={categoryBarOption(energyFuel, { unit: "tonnes / yr", valueFmt: (v) => Number(v).toLocaleString(undefined, { maximumFractionDigits: 0 }) })} notMerge lazyUpdate />
             </div>
             <div>
               <p className="text-xs font-medium text-muted-foreground mb-1">Electricity — kWh / year</p>
-              <ReactECharts style={{ height: 260 }} option={categoryBarOption(energyElec, { unit: "kWh / yr", valueFmt: (v) => `${(v / 1000).toFixed(0)}k` })} notMerge lazyUpdate />
+              <Chart style={{ height: 260 }} option={categoryBarOption(energyElec, { unit: "kWh / yr", valueFmt: (v) => `${(v / 1000).toFixed(0)}k` })} notMerge lazyUpdate />
             </div>
           </div>
         </div>
@@ -781,12 +798,12 @@ function OverviewTab({ programmeId }: { programmeId: string }) {
             <div className="rounded-xl border border-border bg-card p-5 shadow-card">
               <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Geographic distribution</p>
               <p className="text-xs text-muted-foreground mb-1">By sub-county across all {baseline.meta.totalRecords.toLocaleString()} records.</p>
-              <ReactECharts style={{ height: 320 }} option={sharePieOption(geoData, "records")} notMerge lazyUpdate />
+              <Chart style={{ height: 320 }} option={sharePieOption(geoData, "records")} notMerge lazyUpdate />
             </div>
             <div className="rounded-xl border border-border bg-card p-5 shadow-card">
               <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Electricity access</p>
               <p className="text-xs text-muted-foreground mb-1">Share of each category connected to the grid.</p>
-              <ReactECharts style={{ height: 320 }} option={categoryBarOption(elecAccessData, { unit: "electrified", valueFmt: (v) => `${v.toFixed(0)}%` })} notMerge lazyUpdate />
+              <Chart style={{ height: 320 }} option={categoryBarOption(elecAccessData, { unit: "electrified", valueFmt: (v) => `${v.toFixed(0)}%` })} notMerge lazyUpdate />
             </div>
           </div>
 
@@ -794,7 +811,7 @@ function OverviewTab({ programmeId }: { programmeId: string }) {
             <div className="rounded-xl border border-border bg-card p-5 shadow-card">
               <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Primary fuel mix by category</p>
               <p className="text-xs text-muted-foreground mb-1">Share of each fuel within a category (% of category).</p>
-              <ReactECharts style={{ height: 320 }} option={stackedBarOption(fuelMixCategories, fuelMixSeries)} notMerge lazyUpdate />
+              <Chart style={{ height: 320 }} option={stackedBarOption(fuelMixCategories, fuelMixSeries)} notMerge lazyUpdate />
             </div>
             {cookingMethodCard}
           </div>
