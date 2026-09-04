@@ -91,10 +91,22 @@ export default function HomePage() {
   const { data: institutionRows } = useQuery({
     queryKey: ["home-stats-institutions"],
     queryFn: async (): Promise<StatRow[]> => {
-      const { data } = await supabase
-        .from("institutions")
-        .select("pipeline_stage, assessment_score, annual_savings_ksh, co2_reduction_tonnes_pa");
-      return (data as StatRow[] | null) ?? [];
+      // PostgREST caps a single response at ~1,000 rows, which silently
+      // truncated the pipeline totals once the roster grew past 1k. Page through
+      // in 1,000-row windows so every institution is counted.
+      const PAGE = 1000;
+      const all: StatRow[] = [];
+      for (let from = 0; ; from += PAGE) {
+        const { data, error } = await supabase
+          .from("institutions")
+          .select("pipeline_stage, assessment_score, annual_savings_ksh, co2_reduction_tonnes_pa")
+          .range(from, from + PAGE - 1);
+        if (error) break;
+        const rows = (data as StatRow[] | null) ?? [];
+        all.push(...rows);
+        if (rows.length < PAGE) break; // last page reached
+      }
+      return all;
     },
     staleTime: 5 * 60 * 1000,
   });
