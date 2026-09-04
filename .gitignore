@@ -50,3 +50,11 @@ instraction
 Gemini_Generated_Image_*.png
 image copy.png
 *.xlsx
+
+# Python one-off import scripts (Makueni survey extraction/geocoding)
+scripts/.venv/
+scripts/__pycache__/
+
+# Obsidian / scratch files
+.obsidian/
+*.base

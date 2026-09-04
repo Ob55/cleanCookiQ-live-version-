@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Loader2, FlaskConical, TrendingDown, Leaf, DollarSign, Flame, Zap } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Sourced } from "@/components/Sourced";
 import { useActiveDataPoints } from "@/hooks/useDataPoints";
 import { resolveDataPoint, type FuelKey } from "@/lib/dataPoints";
+import { cleanFuelEquivalent, TARGET_TO_FUEL, FUEL_PROPERTIES } from "@/lib/cookingCost";
+import { TRANSITION_TARGET_LABELS } from "@/components/institution/TransitionTarget";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood", charcoal: "Charcoal", lpg: "LPG",
@@ -20,6 +23,7 @@ interface InstitutionData {
   consumption_unit: string | null;
   meals_per_day: number | null;
   cooking_time_minutes: number | null;
+  transition_target_fuel: string | null;
 }
 
 export default function CookingAlchemy() {
@@ -40,7 +44,7 @@ export default function CookingAlchemy() {
     (async () => {
       let { data } = await supabase
         .from("institutions")
-        .select("name, current_fuel, consumption_per_term, consumption_unit, meals_per_day, cooking_time_minutes")
+        .select("name, current_fuel, consumption_per_term, consumption_unit, meals_per_day, cooking_time_minutes, transition_target_fuel")
         .eq("created_by", user.id)
         .limit(1)
         .maybeSingle();
@@ -54,7 +58,7 @@ export default function CookingAlchemy() {
         if (profile?.organisation_id) {
           const { data: orgInst } = await supabase
             .from("institutions")
-            .select("name, current_fuel, consumption_per_term, consumption_unit, meals_per_day, cooking_time_minutes")
+            .select("name, current_fuel, consumption_per_term, consumption_unit, meals_per_day, cooking_time_minutes, transition_target_fuel")
             .eq("organisation_id", profile.organisation_id)
             .limit(1)
             .maybeSingle();
@@ -78,7 +82,7 @@ export default function CookingAlchemy() {
     return (
       <div className="space-y-6">
         <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-          <FlaskConical className="h-6 w-6 text-primary" /> Cooking Counting
+          <FlaskConical className="h-6 w-6 text-primary" /> Cost Calculator
         </h1>
         <Card>
           <CardContent className="py-12 text-center">
@@ -108,31 +112,74 @@ export default function CookingAlchemy() {
 
   const costPerUnit = costPoint?.value_numeric ?? 100;
   const co2PerUnit = co2Point?.value_numeric ?? 1;
-  const cleanMultiplier = cleanMultiplierPoint?.value_numeric ?? 0.4;
   const co2ReductionFraction = co2ReductionPoint?.value_numeric ?? 0.85;
   const timeSavingsFraction = timeSavingsPoint?.value_numeric ?? 0.5;
 
   const currentCostPerTerm = consumption * costPerUnit;
   const currentCostPerYear = currentCostPerTerm * termsPerYear;
-  const cleanCostPerYear = currentCostPerYear * cleanMultiplier;
-  const annualSavings = currentCostPerYear - cleanCostPerYear;
   const co2PerTerm = consumption * co2PerUnit;
   const co2PerYear = co2PerTerm * termsPerYear;
-  const co2Reduction = co2PerYear * co2ReductionFraction;
+
+  // Target fuel comes from the institution's chosen transition method. When it
+  // maps to a priced fuel we compute the clean cost by ENERGY EQUIVALENCE (the
+  // right way — the answer differs per target fuel). When there's no target yet
+  // or no priced data for it, we fall back to the generic clean-cost multiplier.
+  const targetFuel = institution.transition_target_fuel
+    ? TARGET_TO_FUEL[institution.transition_target_fuel] ?? null
+    : null;
+  const targetCostPoint = targetFuel
+    ? resolveDataPoint(dataPoints, { metricKey: "fuel.cost_per_unit", fuel: targetFuel })
+    : null;
+  const targetCo2Point = targetFuel
+    ? resolveDataPoint(dataPoints, { metricKey: "fuel.co2_factor", fuel: targetFuel })
+    : null;
+
+  let cleanCostPerYear: number;
+  let co2Reduction: number;
+  let usesEnergyModel = false;
+  let cleanSourcePoint = cleanMultiplierPoint;
+
+  if (targetFuel && targetCostPoint?.value_numeric != null && targetCo2Point?.value_numeric != null) {
+    const eq = cleanFuelEquivalent({
+      currentFuel: fuel,
+      currentConsumption: consumption,
+      targetFuel,
+      targetCostPerUnit: targetCostPoint.value_numeric,
+      targetCo2PerUnit: targetCo2Point.value_numeric,
+    });
+    cleanCostPerYear = eq.targetCost * termsPerYear;
+    const cleanCo2PerYear = eq.targetCo2 * termsPerYear;
+    co2Reduction = Math.max(co2PerYear - cleanCo2PerYear, 0);
+    usesEnergyModel = true;
+    cleanSourcePoint = targetCostPoint;
+  } else {
+    const cleanMultiplier = cleanMultiplierPoint?.value_numeric ?? 0.4;
+    cleanCostPerYear = currentCostPerYear * cleanMultiplier;
+    co2Reduction = co2PerYear * co2ReductionFraction;
+  }
+
+  const annualSavings = Math.max(currentCostPerYear - cleanCostPerYear, 0);
   const cookingTimeSaved = institution.cooking_time_minutes
     ? Math.round(institution.cooking_time_minutes * timeSavingsFraction * termsPerYear * 90)
     : null;
 
   const formatKSh = (v: number) => `KSh ${v.toLocaleString("en-KE", { maximumFractionDigits: 0 })}`;
-  const reductionPct = Math.round((1 - cleanMultiplier) * 100);
+  const reductionPct = currentCostPerYear > 0 ? Math.round((annualSavings / currentCostPerYear) * 100) : 0;
+  const targetLabel = institution.transition_target_fuel
+    ? TRANSITION_TARGET_LABELS[institution.transition_target_fuel] ?? null
+    : null;
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-          <FlaskConical className="h-6 w-6 text-primary" /> Cooking Counting
+          <FlaskConical className="h-6 w-6 text-primary" /> Cost Calculator
         </h1>
-        <p className="text-muted-foreground mt-1">See how much you could save by transitioning to clean cooking</p>
+        <p className="text-muted-foreground mt-1">
+          {targetLabel
+            ? `What you spend now vs after switching to ${targetLabel}`
+            : "See how much you could save by transitioning to clean cooking"}
+        </p>
       </div>
 
       <Card className="border-destructive/30 bg-destructive/5">
@@ -173,8 +220,15 @@ export default function CookingAlchemy() {
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Zap className="h-5 w-5 text-primary" /> With Clean Cooking
+            {targetLabel && <Badge variant="secondary" className="ml-1">{targetLabel}</Badge>}
           </CardTitle>
-          <CardDescription>Projected savings after transitioning</CardDescription>
+          <CardDescription>
+            {usesEnergyModel
+              ? `Energy-equivalent cost of delivering the same cooking with ${FUEL_PROPERTIES[targetFuel!].label}`
+              : targetLabel
+                ? `Estimate for ${targetLabel} (no priced data yet — using a generic clean-cost benchmark)`
+                : "Projected savings — set your Preferred Transition Method on the dashboard for a fuel-specific figure"}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -182,14 +236,14 @@ export default function CookingAlchemy() {
               <DollarSign className="h-6 w-6 mx-auto mb-1 text-primary" />
               <p className="text-sm text-muted-foreground">Annual Savings</p>
               <p className="text-2xl font-bold text-primary">
-                <Sourced point={cleanMultiplierPoint}>{formatKSh(annualSavings)}</Sourced>
+                <Sourced point={cleanSourcePoint}>{formatKSh(annualSavings)}</Sourced>
               </p>
             </div>
             <div className="text-center p-4 rounded-lg bg-background">
               <TrendingDown className="h-6 w-6 mx-auto mb-1 text-primary" />
               <p className="text-sm text-muted-foreground">Cost Reduction</p>
               <p className="text-2xl font-bold text-primary">
-                <Sourced point={cleanMultiplierPoint}>{reductionPct}%</Sourced>
+                <Sourced point={cleanSourcePoint}>{reductionPct}%</Sourced>
               </p>
             </div>
             <div className="text-center p-4 rounded-lg bg-background">

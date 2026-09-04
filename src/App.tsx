@@ -56,6 +56,10 @@ const ResetPasswordPage = lazy(() => import("@/pages/auth/ResetPasswordPage"));
 
 // Lazy loaded admin pages
 const PipelineDashboard = lazy(() => import("@/pages/admin/PipelineDashboard"));
+const ProgramManagement = lazy(() => import("@/pages/admin/ProgramManagement"));
+const ProgrammeDetail = lazy(() => import("@/pages/admin/ProgrammeDetail"));
+const ProgrammePipelinePage = lazy(() => import("@/pages/programme/ProgrammePipelinePage"));
+const ProgrammeMemberPage = lazy(() => import("@/pages/programme/ProgrammeMemberPage"));
 const InstitutionManagement = lazy(() => import("@/pages/admin/InstitutionManagement"));
 const InstitutionDetail = lazy(() => import("@/pages/admin/InstitutionDetail"));
 const UserManagement = lazy(() => import("@/pages/admin/UserManagement"));
@@ -326,9 +330,15 @@ const App = () => (
                 <Route path="/csr/account/organisation" element={<OrganisationProfilePage />} />
               </Route>
 
+              {/* Programme (tenant) scoped portal — non-admin members */}
+              <Route path="/programme/:id/pipeline" element={<ProgrammePipelinePage />} />
+              <Route path="/programme/:id" element={<ProgrammeMemberPage />} />
+
               {/* Admin pages (protected) */}
               <Route element={<ProtectedRoute requireAdmin><AdminLayout /></ProtectedRoute>}>
                 <Route path="/admin/pipeline" element={<PipelineDashboard />} />
+                <Route path="/admin/programmes" element={<ProgramManagement />} />
+                <Route path="/admin/programmes/:id" element={<ProgrammeDetail />} />
                 <Route path="/admin/institutions" element={<InstitutionManagement />} />
                 <Route path="/admin/institutions/import" element={<InstitutionImport />} />
                 <Route path="/admin/institutions/:id" element={<InstitutionDetail />} />

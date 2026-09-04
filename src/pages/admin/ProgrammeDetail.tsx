@@ -27,7 +27,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import InstitutionCombobox, { MultiInstitutionCombobox } from "@/components/programme/InstitutionCombobox";
 import InstitutionMap from "@/components/programme/InstitutionMap";
 import { FUEL_PROPERTIES, type FuelKey } from "@/lib/cookingCost";
-import { getProgrammeBaseline, type BaselineGroup } from "@/lib/baseline/taitaTaveta";
+import { getProgrammeBaseline, type BaselineGroup } from "@/lib/baseline";
 
 // ECharts is heavy (~380 KB gzip). Load it lazily so the programme shell —
 // stats, tables, cards — paints instantly and the charts stream in after,
@@ -62,6 +62,7 @@ import {
   Phone, Pencil, Building2, MapPin, Utensils, Search, ChevronLeft, ChevronRight,
   Handshake, CalendarDays, MessageSquarePlus, CornerDownRight, Send,
   Download, GraduationCap, Stethoscope, Landmark, Fuel, Zap, Users2, ArrowRight,
+  Sun, BedDouble, School, Flame, Coins,
 } from "lucide-react";
 
 // Turns a resend-invite summary into a single human-readable toast line.
@@ -390,7 +391,12 @@ const GROUP_STYLE: Record<string, { Icon: typeof GraduationCap; tint: string; ri
   catering: { Icon: Utensils, tint: "text-amber-600 bg-amber-100", ring: "hover:border-amber-300" },
   health: { Icon: Stethoscope, tint: "text-rose-600 bg-rose-100", ring: "hover:border-rose-300" },
   correctional: { Icon: Landmark, tint: "text-emerald-700 bg-emerald-100", ring: "hover:border-emerald-300" },
+  // Makueni — dataset cards grouped by boarding type.
+  day: { Icon: Sun, tint: "text-amber-600 bg-amber-100", ring: "hover:border-amber-300" },
+  boarding: { Icon: BedDouble, tint: "text-indigo-600 bg-indigo-100", ring: "hover:border-indigo-300" },
+  day_boarding: { Icon: School, tint: "text-teal-600 bg-teal-100", ring: "hover:border-teal-300" },
 };
+const DEFAULT_GROUP_STYLE = { Icon: GraduationCap, tint: "text-slate-600 bg-slate-100", ring: "hover:border-slate-300" };
 
 // A single dataset-overview card (from the workbook Executive Dashboard). The
 // big number is the live DB count for the group (which equals the workbook
@@ -402,7 +408,7 @@ function DatasetCard({
   liveCount: number;
   onSelect: () => void;
 }) {
-  const style = GROUP_STYLE[group.key];
+  const style = GROUP_STYLE[group.key] ?? DEFAULT_GROUP_STYLE;
   const Icon = style.Icon;
   return (
     <button
@@ -429,9 +435,16 @@ function DatasetCard({
 
       <dl className="mt-4 space-y-2.5">
         <StatLine icon={<Fuel className="h-3.5 w-3.5" />} label="Primary cooking fuel" value={group.primaryFuel} />
-        <StatLine icon={<Zap className="h-3.5 w-3.5" />} label="Electricity access" value={group.electricityAccess} />
+        {group.electricityAccess && (
+          <StatLine icon={<Zap className="h-3.5 w-3.5" />} label="Electricity access" value={group.electricityAccess} />
+        )}
         <StatLine icon={<Users2 className="h-3.5 w-3.5" />} label="Key population metric" value={group.keyPopulation} />
-        <StatLine icon={<Handshake className="h-3.5 w-3.5" />} label="Data collection funder / implementers" value={group.funders} />
+        {group.extraStat && (
+          <StatLine icon={<Flame className="h-3.5 w-3.5" />} label={group.extraStat.label} value={group.extraStat.value} />
+        )}
+        {group.funders && (
+          <StatLine icon={<Handshake className="h-3.5 w-3.5" />} label="Data collection funder / implementers" value={group.funders} />
+        )}
       </dl>
 
       <span className="mt-auto pt-4 inline-flex items-center gap-1 text-xs font-medium text-primary">
@@ -478,9 +491,14 @@ export function ProgrammeInstitutions({ programmeId }: { programmeId: string }) 
     return <InstitutionTable rows={all} recommended={recommended} />;
   }
 
+  // How a group buckets the live roster: by institution_type (Taita) or any
+  // other institution field (Makueni groups by sub_type = boarding type).
+  const inGroup = (g: BaselineGroup, i: ProgrammeInstitution) =>
+    g.institutionTypes.includes(String((i as Record<string, unknown>)[g.matchField ?? "institution_type"] ?? ""));
+
   // Baseline drill-down: a selected group's roster with a back button.
   if (group) {
-    const groupRows = all.filter((i) => group.institutionTypes.includes(i.institution_type));
+    const groupRows = all.filter((i) => inGroup(group, i));
     return (
       <div className="space-y-4">
         <div className="flex items-center gap-3">
@@ -501,7 +519,7 @@ export function ProgrammeInstitutions({ programmeId }: { programmeId: string }) 
         <DatasetCard
           key={g.key}
           group={g}
-          liveCount={all.filter((i) => g.institutionTypes.includes(i.institution_type)).length}
+          liveCount={all.filter((i) => inGroup(g, i)).length}
           onSelect={() => setGroup(g)}
         />
       ))}
@@ -709,13 +727,18 @@ function OverviewTab({ programmeId }: { programmeId: string }) {
   const elecAccessData = (baseline?.electricityAccessByCategory ?? []).map((e) => ({
     name: ENERGY_SHORT[e.category] ?? e.category, value: e.accessPct,
   }));
+  // Makueni-specific survey-derived series (level mix + firewood demand/spend by
+  // sub-county). Rendered only when the baseline supplies them.
+  const levelData = (baseline?.levelDistribution ?? []).map((l) => ({ name: l.level, value: l.records }));
+  const firewoodTonnesData = (baseline?.firewoodBySubCounty ?? []).map((f) => ({ name: f.subCounty, value: f.tonnesPerMonth }));
+  const firewoodCostData = (baseline?.firewoodBySubCounty ?? []).map((f) => ({ name: f.subCounty, value: f.costKshPerMonth }));
 
   // Load the PDF/xlsx report generator (jspdf + xlsx, ~200 KB gzip) only on
   // click, so viewing a programme never pays for the export bundle upfront.
   const handleExport = async () => {
     if (!baseline || !programme || !institutions) return;
-    const { exportIrenaReport } = await import("@/lib/irenaReport");
-    exportIrenaReport({ programme: { name: programme.name }, institutions, baseline });
+    const { exportBaselineReport } = await import("@/lib/irenaReport");
+    exportBaselineReport({ programme: { name: programme.name }, institutions, baseline });
   };
 
   // Totals across every institution in the programme (students or, for
@@ -759,8 +782,9 @@ function OverviewTab({ programmeId }: { programmeId: string }) {
       {baseline && (
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <p className="text-sm text-muted-foreground max-w-2xl">
-            Baseline figures are drawn from the A2CT survey of {baseline.meta.totalRecords.toLocaleString()} institutions
+            Baseline figures are drawn from the survey of {baseline.meta.totalRecords.toLocaleString()} institutions
             across {baseline.meta.subCounties} ({baseline.meta.period}).
+            {baseline.totals?.dataCompleteness ? ` ${baseline.totals.dataCompleteness}` : ""}
           </p>
           <Button size="sm" onClick={handleExport} disabled={!institutions}>
             <Download className="h-4 w-4 mr-2" /> Export report
@@ -775,7 +799,7 @@ function OverviewTab({ programmeId }: { programmeId: string }) {
         <BudgetStat label="Members" value={(members?.length ?? 0).toLocaleString()} />
       </div>
 
-      {baseline && (
+      {baseline?.energyByCategory && (
         <div className="rounded-xl border border-border bg-card p-5 shadow-card">
           <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Estimated annual energy consumption</p>
           <p className="text-xs text-muted-foreground mb-4">Derived (Tier 3) from the A2CT baseline — per category, by fuel and electricity.</p>
@@ -800,21 +824,52 @@ function OverviewTab({ programmeId }: { programmeId: string }) {
               <p className="text-xs text-muted-foreground mb-1">By sub-county across all {baseline.meta.totalRecords.toLocaleString()} records.</p>
               <Chart style={{ height: 320 }} option={sharePieOption(geoData, "records")} notMerge lazyUpdate />
             </div>
-            <div className="rounded-xl border border-border bg-card p-5 shadow-card">
-              <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Electricity access</p>
-              <p className="text-xs text-muted-foreground mb-1">Share of each category connected to the grid.</p>
-              <Chart style={{ height: 320 }} option={categoryBarOption(elecAccessData, { unit: "electrified", valueFmt: (v) => `${v.toFixed(0)}%` })} notMerge lazyUpdate />
-            </div>
+            {baseline.electricityAccessByCategory ? (
+              <div className="rounded-xl border border-border bg-card p-5 shadow-card">
+                <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Electricity access</p>
+                <p className="text-xs text-muted-foreground mb-1">Share of each category connected to the grid.</p>
+                <Chart style={{ height: 320 }} option={categoryBarOption(elecAccessData, { unit: "electrified", valueFmt: (v) => `${v.toFixed(0)}%` })} notMerge lazyUpdate />
+              </div>
+            ) : baseline.levelDistribution ? (
+              <div className="rounded-xl border border-border bg-card p-5 shadow-card">
+                <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Institutions by education level</p>
+                <p className="text-xs text-muted-foreground mb-1">Across all {baseline.meta.totalRecords.toLocaleString()} surveyed institutions.</p>
+                <Chart style={{ height: 320 }} option={categoryBarOption(levelData, { unit: "institutions" })} notMerge lazyUpdate />
+              </div>
+            ) : null}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="rounded-xl border border-border bg-card p-5 shadow-card">
-              <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Primary fuel mix by category</p>
-              <p className="text-xs text-muted-foreground mb-1">Share of each fuel within a category (% of category).</p>
-              <Chart style={{ height: 320 }} option={stackedBarOption(fuelMixCategories, fuelMixSeries)} notMerge lazyUpdate />
+          {baseline.firewoodBySubCounty && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="rounded-xl border border-border bg-card p-5 shadow-card">
+                <p className="flex items-center gap-1.5 text-sm font-bold uppercase tracking-wide text-muted-foreground">
+                  <Flame className="h-4 w-4 text-amber-600" /> Firewood demand by sub-county
+                </p>
+                <p className="text-xs text-muted-foreground mb-1">Reported firewood consumption (tonnes / month).</p>
+                <Chart style={{ height: 320 }} option={categoryBarOption(firewoodTonnesData, { unit: "tonnes / mo", valueFmt: (v) => Number(v).toLocaleString(undefined, { maximumFractionDigits: 0 }) })} notMerge lazyUpdate />
+              </div>
+              <div className="rounded-xl border border-border bg-card p-5 shadow-card">
+                <p className="flex items-center gap-1.5 text-sm font-bold uppercase tracking-wide text-muted-foreground">
+                  <Coins className="h-4 w-4 text-emerald-600" /> Firewood spend by sub-county
+                </p>
+                <p className="text-xs text-muted-foreground mb-1">Reported monthly firewood cost (KES / month).</p>
+                <Chart style={{ height: 320 }} option={categoryBarOption(firewoodCostData, { unit: "KES / mo", valueFmt: (v) => `${(v / 1e6).toFixed(1)}M` })} notMerge lazyUpdate />
+              </div>
             </div>
-            {cookingMethodCard}
-          </div>
+          )}
+
+          {baseline.fuelMixByCategory ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="rounded-xl border border-border bg-card p-5 shadow-card">
+                <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Primary fuel mix by category</p>
+                <p className="text-xs text-muted-foreground mb-1">Share of each fuel within a category (% of category).</p>
+                <Chart style={{ height: 320 }} option={stackedBarOption(fuelMixCategories, fuelMixSeries)} notMerge lazyUpdate />
+              </div>
+              {cookingMethodCard}
+            </div>
+          ) : (
+            cookingMethodCard
+          )}
         </>
       ) : (
         cookingMethodCard

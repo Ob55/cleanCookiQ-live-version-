@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import ContentLoader from "@/components/ContentLoader";
 import { Outlet, Link, useLocation, useNavigate, Navigate } from "react-router-dom";
 import { LayoutDashboard, LogOut, Menu, Ticket } from "lucide-react";
 import { useState } from "react";
@@ -103,7 +105,9 @@ export default function ResearcherLayout() {
         </header>
 
         <main className="p-4 lg:p-6">
-          <Outlet />
+          <Suspense fallback={<ContentLoader />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
 

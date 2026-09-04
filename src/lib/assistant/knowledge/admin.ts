@@ -16,6 +16,38 @@ export const adminKnowledge: KnowledgeEntry[] = [
     followups: ["Where do I approve new accounts?", "Where's the pipeline?", "How do I import institutions?"],
   },
   {
+    id: "projects",
+    topic: "Projects (programmes / tenants)",
+    keywords: ["project", "projects", "programme", "programmes", "tenant", "engagement", "advisory", "portfolio"],
+    answer:
+      "**[Projects](/admin/programmes)** runs each programme / engagement as its own scoped tenant (e.g. an IRENA county programme). Ignis (you) sees every project; the people you add to a project see only that project. Open a project for four tabs:\n\n- **Overview** — budget at a glance (Total / Allocated / Remaining) with an allocation chart.\n- **Budget** — add items (name, amount, funding source, assignee); each draws down the total.\n- **Members** — add users by email and a role.\n- **Suppliers** — the project's vendor contacts.\n\nCreate one with **New Project** (you can add a first institution inline), and delete one from its card's trash icon (with confirmation).",
+    followups: ["How do I add a user to a project?", "What can each project role do?", "How does the project budget work?"],
+  },
+  {
+    id: "project-invite",
+    topic: "Adding users to a project",
+    keywords: ["invite", "add user", "add member", "set password", "onboard user", "give access", "email invite"],
+    answer:
+      "Open the project → **Members** → **Add user**. Enter their name, organization, email and role. If they don't have an account yet, one is created and they're **emailed a link to set their own password**. Once they set it, they land straight in this project and see nothing else. Existing users are added immediately and notified by email. Email goes out over the platform's normal SMTP.",
+    followups: ["What can each project role do?", "Where do I see project members?"],
+  },
+  {
+    id: "project-roles",
+    topic: "Project roles & permissions",
+    keywords: ["role", "roles", "permission", "permissions", "lead", "editor", "viewer", "county", "read-only", "can edit"],
+    answer:
+      "Access inside a project is set by role:\n\n- **Lead** — manages everything: budget, suppliers and members.\n- **Editor** — edits budget and suppliers (can't manage members).\n- **Viewer** — read-only across the project.\n- **County pipeline viewer** — sees only the project's pipeline funnel, nothing else.\n\nThese are enforced in the database, not just hidden in the UI, so a viewer genuinely cannot change anything.",
+    followups: ["How do I add a user to a project?", "How does the project budget work?"],
+  },
+  {
+    id: "project-budget",
+    topic: "Project budget",
+    keywords: ["budget", "allocated", "remaining", "funding source", "funder", "cost", "spend", "allocation"],
+    answer:
+      "A project's **Budget** tab lists items that each draw down the project's total budget. Add an item with a name/type, amount, an optional **funding source** (e.g. IRENA grant, partner cash) and who it's assigned to. The **Overview** tab shows Total / Allocated / Remaining and a chart; Remaining turns red if you over-allocate.",
+    followups: ["How do I add a user to a project?", "What can each project role do?"],
+  },
+  {
     id: "approvals",
     topic: "Approving accounts",
     keywords: ["approve", "approval", "pending", "verify", "activate", "review", "registration", "accept", "reject"],

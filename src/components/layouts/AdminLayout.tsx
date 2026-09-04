@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import ContentLoader from "@/components/ContentLoader";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Building2, Users, ClipboardCheck,
@@ -5,7 +7,7 @@ import {
   Briefcase, Ticket, FlaskConical, Upload, HelpCircle, ScrollText,
   Calculator, Truck, ShieldAlert, Activity, Leaf,
   Calendar, Newspaper, Library, Database, Banknote, ClipboardList,
-  Wrench, Tag, ShieldCheck, Zap, Link2,
+  Wrench, Tag, ShieldCheck, Zap, Link2, FolderKanban,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +18,9 @@ import AIAssistant from "@/components/assistant/AIAssistant";
 
 
 const adminNav = [
+  { section: "Programmes" },
+  { label: "All Programmes", href: "/admin/programmes", icon: FolderKanban },
+
   { section: "Operations" },
   { label: "Pipeline", href: "/admin/pipeline", icon: TrendingUp },
   { label: "Assessments", href: "/admin/assessments", icon: ClipboardCheck },
@@ -192,7 +197,9 @@ export default function AdminLayout() {
         </header>
 
         <main className="p-4 lg:p-6">
-          <Outlet />
+          <Suspense fallback={<ContentLoader />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
 

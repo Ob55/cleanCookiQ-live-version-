@@ -213,6 +213,15 @@ export function resolve(
     return { text, matched: true, followups };
   }
 
+  // 1.5) Privacy guard — no legitimate answer matched, so check whether the
+  // user is asking about data private to another role and deflect politely.
+  if (persona.guard) {
+    const guarded = persona.guard(q);
+    if (guarded) {
+      return { text: guarded, matched: true, followups: persona.suggestions };
+    }
+  }
+
   // 2) No knowledge match — keep the conversation human.
   if (COMPLIMENT_RE.test(q)) {
     return {

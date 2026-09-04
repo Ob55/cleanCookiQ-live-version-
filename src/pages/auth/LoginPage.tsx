@@ -89,7 +89,24 @@ export default function LoginPage() {
     } else if (isResearcher) {
       navigate("/researcher/dashboard");
     } else {
-      navigate("/auth/pending");
+      // Tenant-only users (project members) have no platform portal of their
+      // own — land them on their project. County pipeline viewers get the
+      // read-only pipeline screen; everyone else gets the project workspace.
+      const { data: memberships } = await (supabase as unknown as {
+        from: (t: string) => {
+          select: (s: string) => { eq: (c: string, v: string) => Promise<{ data: { programme_id: string; role: string }[] | null }> };
+        };
+      }).from("programme_members").select("programme_id, role").eq("user_id", userId);
+      const membership = memberships?.[0];
+      if (membership) {
+        navigate(
+          membership.role === "county_pipeline_viewer"
+            ? `/programme/${membership.programme_id}/pipeline`
+            : `/programme/${membership.programme_id}`,
+        );
+      } else {
+        navigate("/auth/pending");
+      }
     }
   };
 

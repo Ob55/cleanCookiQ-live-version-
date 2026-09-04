@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import nodemailer from "npm:nodemailer@6.9.9";
 import { buildCorsHeaders } from "../_shared/cors.ts";
+import { smtpTransport, smtpFrom } from "../_shared/smtp.ts";
 
 const NOTIFY_TO = "bmwangi@ignis-innovation.com";
 
@@ -152,17 +152,8 @@ serve(async (req) => {
 
   // Email delivery is best-effort — never block success on it.
   try {
-    const transporter = nodemailer.createTransport({
-      host: Deno.env.get("SMTP_HOST") || "smtp.office365.com",
-      port: parseInt(Deno.env.get("SMTP_PORT") || "587"),
-      secure: false,
-      auth: {
-        user: Deno.env.get("SMTP_USERNAME"),
-        pass: Deno.env.get("SMTP_PASSWORD"),
-      },
-      tls: { ciphers: "SSLv3" },
-    });
-    const from = `"CleanCookIQ" <${Deno.env.get("SMTP_FROM") || "info@ignis-innovation.com"}>`;
+    const transporter = smtpTransport();
+    const from = smtpFrom();
     const submittedAt = new Date(inserted.created_at).toUTCString();
     const safeName = escape(name);
     const safeEmail = escape(email);

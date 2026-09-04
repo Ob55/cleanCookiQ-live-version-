@@ -11,31 +11,15 @@
  * live DB counts (both derived from the same survey), so the Records shown on
  * screen come from the live query and will match these figures.
  *
- * Scope: only the "IRENA – Taita Taveta" programme has a baseline. Other
- * programmes fall back to the generic programme views — see getProgrammeBaseline().
+ * Scope: only the "IRENA – Taita Taveta" programme matches this baseline — see
+ * matchesTaita() and the resolver in ./index.ts. Types are shared across all
+ * county baselines (see ./types.ts).
  */
+import type {
+  BaselineGroup, EnergyCategory, AggregateCostRow, ProgrammeBaseline,
+} from "@/lib/baseline/types";
 
-export type BaselineGroupKey = "learning" | "catering" | "health" | "correctional";
-
-export type BaselineGroup = {
-  key: BaselineGroupKey;
-  /** Display title used on the dataset cards and report. */
-  title: string;
-  /** DB institution_type values that roll up into this group. */
-  institutionTypes: string[];
-  /** Workbook record count (equals the live DB count for this group). */
-  records: number;
-  /** Primary cooking fuel, exact % as published. */
-  primaryFuel: string;
-  /** Electricity access, exact % as published. */
-  electricityAccess: string;
-  /** Headline survey population metric. */
-  keyPopulation: string;
-  /** Data-collection funder / implementers. */
-  funders: string;
-  /** Companion workbook source sheet. */
-  source: string;
-};
+export type { BaselineGroup } from "@/lib/baseline/types";
 
 /** Shared funder / implementer line across all four datasets. */
 const FUNDERS = "UK-PACT (funder); SNV, Gamos East Africa, CCAK (implementers)";
@@ -91,14 +75,6 @@ export const DATASET_GROUPS: BaselineGroup[] = [
  * Table 19 — estimated annual fuel and electricity consumption, by category
  * (Derived Energy Consumption sheet). Drives the Overview energy charts.
  */
-export type EnergyCategory = {
-  category: string;
-  nFuel: number;
-  fuelTonnes: number;
-  nElec: number;
-  elecKwh: number;
-};
-
 export const ENERGY_BY_CATEGORY: EnergyCategory[] = [
   { category: "Learning Institutions", nFuel: 128, fuelTonnes: 2585.21, nElec: 161, elecKwh: 717143.48 },
   { category: "Catering Outlets (SMEs)", nFuel: 170, fuelTonnes: 503.73, nElec: 124, elecKwh: 163174.43 },
@@ -155,13 +131,6 @@ export const ENERGY_COEFFICIENTS: { fuel: string; price: string; source: string 
  * Table 20 — aggregate current annual operating cost across the 17 named
  * shortlisted candidate institutions (portfolio sizing). Report only.
  */
-export type AggregateCostRow = {
-  institution: string;
-  fuelMonthly: number;
-  elecMonthly: number;
-  combinedAnnual: number;
-};
-
 export const AGGREGATE_COST: AggregateCostRow[] = [
   { institution: "St Mary's High School Lushangonyi", fuelMonthly: 160000, elecMonthly: 30000, combinedAnnual: 2280000 },
   { institution: "Mwaghogho Secondary School", fuelMonthly: 120000, elecMonthly: 17000, combinedAnnual: 1644000 },
@@ -235,23 +204,10 @@ export const BASELINE_META = {
   confidentiality: "CONFIDENTIAL",
   totalRecords: 409,
   rawVariables: 1262,
+  reportHeading: "IRENA Clean Cooking Baseline",
 };
 
-export type TaitaTavetaBaseline = {
-  groups: BaselineGroup[];
-  geoDistribution: typeof GEO_DISTRIBUTION;
-  fuelMixByCategory: typeof FUEL_MIX_BY_CATEGORY;
-  electricityAccessByCategory: typeof ELECTRICITY_ACCESS_BY_CATEGORY;
-  energyByCategory: EnergyCategory[];
-  energyTotals: typeof ENERGY_TOTALS;
-  energyCoefficients: typeof ENERGY_COEFFICIENTS;
-  aggregateCost: AggregateCostRow[];
-  aggregateCostTotal: typeof AGGREGATE_COST_TOTAL;
-  keyFindings: typeof KEY_FINDINGS;
-  meta: typeof BASELINE_META;
-};
-
-const TAITA_TAVETA_BASELINE: TaitaTavetaBaseline = {
+export const TAITA_TAVETA_BASELINE: ProgrammeBaseline = {
   groups: DATASET_GROUPS,
   geoDistribution: GEO_DISTRIBUTION,
   fuelMixByCategory: FUEL_MIX_BY_CATEGORY,
@@ -265,14 +221,9 @@ const TAITA_TAVETA_BASELINE: TaitaTavetaBaseline = {
   meta: BASELINE_META,
 };
 
-/**
- * Returns the baseline for a programme by name, or null if none exists.
- * Only the IRENA – Taita Taveta programme (seeded as "IRENA – Taita Taveta")
- * has a baseline; the match is tolerant of dash/spacing variants.
- */
-export function getProgrammeBaseline(name: string | null | undefined): TaitaTavetaBaseline | null {
-  if (!name) return null;
+/** Matches the IRENA – Taita Taveta programme (tolerant of dash/spacing). */
+export function matchesTaita(name: string | null | undefined): boolean {
+  if (!name) return false;
   const n = name.toLowerCase();
-  if (n.includes("irena") && n.includes("taita")) return TAITA_TAVETA_BASELINE;
-  return null;
+  return n.includes("irena") && n.includes("taita");
 }

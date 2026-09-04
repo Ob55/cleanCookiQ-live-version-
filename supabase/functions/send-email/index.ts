@@ -13,8 +13,8 @@
 //   - Method-checked; OPTIONS handled.
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import nodemailer from "npm:nodemailer@6.9.9";
 import { buildCorsHeaders } from "../_shared/cors.ts";
+import { smtpTransport, smtpFrom } from "../_shared/smtp.ts";
 
 const SUBJECT_MAX = 200;
 const BODY_MAX = 50_000;
@@ -115,19 +115,10 @@ serve(async (req) => {
 
     if (!recipientEmail) return json({ error: "Could not resolve recipient" }, 400);
 
-    const transporter = nodemailer.createTransport({
-      host: Deno.env.get("SMTP_HOST") || "smtp.office365.com",
-      port: parseInt(Deno.env.get("SMTP_PORT") || "587"),
-      secure: false,
-      auth: {
-        user: Deno.env.get("SMTP_USERNAME"),
-        pass: Deno.env.get("SMTP_PASSWORD"),
-      },
-      tls: { ciphers: "SSLv3" },
-    });
+    const transporter = smtpTransport();
 
     await transporter.sendMail({
-      from: `"CleanCookIQ" <${Deno.env.get("SMTP_FROM") || "info@ignis-innovation.com"}>`,
+      from: smtpFrom(),
       to: recipientEmail,
       subject,
       html: rawHtml || undefined,

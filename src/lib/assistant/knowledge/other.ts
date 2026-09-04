@@ -8,6 +8,30 @@ import type { KnowledgeEntry } from "../types";
 
 export const otherKnowledge: KnowledgeEntry[] = [
   {
+    id: "your-project",
+    topic: "Your project",
+    keywords: ["project", "workspace", "programme", "what can i do", "overview", "budget", "members", "suppliers", "pipeline", "see"],
+    answer:
+      "You've been added to a **project** on CleanCookIQ, and you'll only ever see that project. Depending on your role you'll see some of these tabs:\n\n- **Overview** — the budget picture (total, allocated, remaining).\n- **Budget** — the project's budget items.\n- **Members** — the people on the project.\n- **Suppliers** — the project's vendor contacts.\n\nIf you're a **Viewer**, everything is read-only. If you're an **Editor** or **Lead**, you can add and change budget items and suppliers.",
+    followups: ["How do I set my password?", "Why can't I edit anything?"],
+  },
+  {
+    id: "first-login",
+    topic: "Signing in the first time",
+    keywords: ["password", "first", "login", "log in", "invite", "set password", "sign in", "link"],
+    answer:
+      "When you're added to a project, you're emailed a **link to set your password**. Click it, choose your own password (enter it twice to confirm), then sign in with your **email and that password** — you'll go straight to your project. If the link has expired, use **Forgot password** on the sign-in page to get a fresh one.",
+    followups: ["What can I do in my project?", "Why can't I edit anything?"],
+  },
+  {
+    id: "why-readonly",
+    topic: "Why you can't edit",
+    keywords: ["can't edit", "cannot edit", "read only", "read-only", "no button", "permission", "role", "view only", "greyed"],
+    answer:
+      "Access is set by your **role** on the project. **Viewers** can see everything but not change it; **Editors** and **Leads** can add and edit budget items and suppliers; only a **Lead** (or the Ignis team) can add or remove members. If you need a different level of access, ask the person who added you to the project.",
+    followups: ["What can I do in my project?", "How do I set my password?"],
+  },
+  {
     id: "status",
     topic: "Your account status",
     keywords: ["status", "pending", "approve", "approval", "review", "waiting", "wait", "activate", "when", "long"],

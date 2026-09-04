@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import ContentLoader from "@/components/ContentLoader";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Building2, FlaskConical, FileText, LifeBuoy, Menu, LogOut,
@@ -17,7 +19,7 @@ import AIAssistant from "@/components/assistant/AIAssistant";
 const institutionNav = [
   { label: "Dashboard", href: "/institution/dashboard", icon: LayoutDashboard },
   { label: "My Institution", href: "/institution/profile", icon: Building2 },
-  { label: "Cooking Counting", href: "/institution/alchemy", icon: FlaskConical },
+  { label: "Cost Calculator", href: "/institution/alchemy", icon: FlaskConical },
   { label: "Documents", href: "/institution/documents", icon: FileText },
   { label: "IPA", href: "/institution/ipa", icon: ScrollText },
   { label: "Supplier Details", href: "/institution/supplier-details", icon: Factory, gated: true as const },
@@ -173,7 +175,9 @@ export default function InstitutionLayout() {
         </header>
 
         <main className="p-4 lg:p-6">
-          <Outlet />
+          <Suspense fallback={<ContentLoader />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
 

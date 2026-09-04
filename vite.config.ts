@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => ({
           // its ~700kB doesn't bloat the IntelligencePage chunk.
           "vendor-echarts": ["echarts", "echarts-for-react"],
           // Map library (heavy, only used on map page)
-          "vendor-map": ["leaflet", "react-leaflet"],
+          "vendor-map": ["leaflet", "react-leaflet", "leaflet.markercluster"],
           // UI framework
           "vendor-ui": ["@radix-ui/react-dialog", "@radix-ui/react-dropdown-menu", "@radix-ui/react-tabs", "@radix-ui/react-select", "@radix-ui/react-tooltip", "@radix-ui/react-popover"],
         },

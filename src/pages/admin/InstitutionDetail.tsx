@@ -17,6 +17,7 @@ import {
   BarChart3, Gauge, Plus, Bell, Factory, ShoppingCart,
 } from "lucide-react";
 import TransitionProductSelector from "@/components/institution/TransitionProductSelector";
+import ScenarioSection from "@/components/institution/ScenarioSection";
 import { TRANSITION_TARGET_LABELS } from "@/components/institution/TransitionTarget";
 
 const FUEL_LABELS: Record<string, string> = {
@@ -196,6 +197,9 @@ export default function InstitutionDetail() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Transition Scenarios — costed pathways (admin is host → can edit) */}
+      <ScenarioSection institutionId={inst.id} programmeId={(inst as { programme_id?: string | null }).programme_id ?? null} canEdit />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Energy & Fuel */}

@@ -16,6 +16,8 @@ import { researcherKnowledge } from "./knowledge/researcher";
 import { kplcKnowledge } from "./knowledge/kplc";
 import { csrKnowledge } from "./knowledge/csr";
 import { otherKnowledge } from "./knowledge/other";
+import { sharedKnowledge, dataPrivacyEntry } from "./knowledge/shared";
+import { makeGuard } from "./privacy";
 
 export { getAnswer, greeting } from "./engine";
 export type { PersonaConfig, PersonaId, AnswerResult } from "./types";
@@ -209,6 +211,34 @@ const PERSONAS: Partial<Record<PersonaId, PersonaConfig>> = {
       "I'm not sure about that one — I'm best on your account status, what CleanCookIQ is, who it's for, and what happens next. Try rephrasing, or [book a demo](/book-demo) to talk to the team. Here's what I can help with:",
   },
 };
+
+// Per-role data-privacy wiring: where "contact us about your data" points, and
+// a one-line, accurate description of who can see this role's data.
+const PRIVACY: Record<PersonaId, { support: string; roleLine: string }> = {
+  public: { support: "/book-demo", roleLine: "As a visitor you only see public information about CleanCookIQ." },
+  admin: { support: "/admin/tickets", roleLine: "As an admin you can see the full platform record, and that access is logged." },
+  institution: { support: "/institution/support", roleLine: "Only you and the CleanCookIQ admin team can see your institution's full record; suppliers and funders see only what's explicitly shared with them for a matched project." },
+  supplier: { support: "/supplier/support", roleLine: "Only you and the CleanCookIQ admin team see your supplier record; institutions and funders see only what's shared for a matched opportunity." },
+  funder: { support: "/funder/support", roleLine: "Only you and the CleanCookIQ admin team see your portfolio; institution and supplier records are shared with you only for deals you're evaluating or backing." },
+  researcher: { support: "/researcher/support", roleLine: "You work with aggregated, anonymised data — never personal contacts or private deal terms." },
+  kplc: { support: "/kplc/support", roleLine: "You see institutions and electric-cooking demand in your service area; funder, supplier and personal details stay private." },
+  csr: { support: "/csr/support", roleLine: "You see sponsorship opportunities and your own sponsorships; funder terms and personal details stay private." },
+  other: { support: "/book-demo", roleLine: "While your account is under review you only see public information about CleanCookIQ." },
+};
+
+// Compose the shared, platform-wide knowledge and a role-specific data-privacy
+// answer into every persona, and attach the role-aware privacy guard. Done once
+// here so each bot "knows the whole system" while still answering in-role.
+for (const key of Object.keys(PERSONAS) as PersonaId[]) {
+  const p = PERSONAS[key];
+  if (!p) continue;
+  const existing = new Set(p.knowledge.map((k) => k.id));
+  const extras = sharedKnowledge.filter((k) => !existing.has(k.id));
+  const priv = PRIVACY[key];
+  const privacyEntry = priv && !existing.has("data-privacy") ? [dataPrivacyEntry(priv.support, priv.roleLine)] : [];
+  p.knowledge = [...p.knowledge, ...extras, ...privacyEntry];
+  p.guard = makeGuard(key);
+}
 
 /** Get a persona config, or undefined if that bot isn't built yet. */
 export function getPersona(id: PersonaId): PersonaConfig | undefined {

@@ -58,6 +58,12 @@ export interface PersonaConfig {
   knowledge: KnowledgeEntry[];
   /** Shown when nothing matches confidently. */
   fallback: string;
+  /**
+   * Optional role-aware privacy guard. Given the raw question, returns a polite
+   * deflection string when the user asks about data private to another role, or
+   * null to let the engine answer normally. Runs after the knowledge match.
+   */
+  guard?: (query: string) => string | null;
 }
 
 /** The result of answering a question. */

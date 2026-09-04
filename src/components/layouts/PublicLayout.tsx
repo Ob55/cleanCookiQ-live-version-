@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import ContentLoader from "@/components/ContentLoader";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -321,7 +323,7 @@ export default function PublicLayout() {
         </>
       )}
 
-      <main className="flex-1"><Outlet /></main>
+      <main className="flex-1"><Suspense fallback={<ContentLoader />}><Outlet /></Suspense></main>
 
       <footer className="relative overflow-hidden bg-[#0f0f0f] text-white border-t border-white/10">
         {/* ambient glow */}
