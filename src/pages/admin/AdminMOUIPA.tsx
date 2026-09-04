@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows } from "@/lib/fetchAllRows";
 import { sendEmail, emailSignAgreement } from "@/lib/emailService";
 import { Loader2, ExternalLink, Mail, Filter, ClipboardCheck, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
@@ -120,12 +121,12 @@ export default function AdminMOUIPA() {
   };
 
   const loadOrgs = async () => {
-    const [{ data: insts }, { data: provs }] = await Promise.all([
-      supabase.from("institutions").select("id, name, contact_email").order("name"),
-      supabase.from("providers").select("id, company_name, contact_email").order("company_name"),
+    const [insts, provs] = await Promise.all([
+      fetchAllRows((f, t) => supabase.from("institutions").select("id, name, contact_email").order("name").range(f, t)),
+      fetchAllRows((f, t) => supabase.from("providers").select("id, company_name, contact_email").order("company_name").range(f, t)),
     ]);
-    setInstitutions(insts ?? []);
-    setProviders(provs ?? []);
+    setInstitutions(insts);
+    setProviders(provs);
   };
 
   const loadCscc = async () => {

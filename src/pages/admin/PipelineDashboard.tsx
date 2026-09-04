@@ -1,23 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows } from "@/lib/fetchAllRows";
 import { TrendingUp, Building2, Factory, BarChart3, FileText, Loader2 } from "lucide-react";
 import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 
 export default function PipelineDashboard() {
   const { data: institutions } = useQuery({
     queryKey: ["institutions"],
-    queryFn: async () => {
-      const { data } = await supabase.from("institutions").select("*");
-      return data ?? [];
-    },
+    // Page past the ~1,000-row cap so the pipeline totals count every
+    // institution (see src/lib/fetchAllRows.ts).
+    queryFn: () => fetchAllRows((from, to) => supabase.from("institutions").select("*").range(from, to)),
   });
 
   const { data: providers } = useQuery({
     queryKey: ["providers"],
-    queryFn: async () => {
-      const { data } = await supabase.from("providers").select("id");
-      return data ?? [];
-    },
+    queryFn: () => fetchAllRows((from, to) => supabase.from("providers").select("id").range(from, to)),
   });
 
   const total = institutions?.length ?? 0;

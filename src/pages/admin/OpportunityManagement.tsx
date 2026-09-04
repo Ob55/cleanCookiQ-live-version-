@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows } from "@/lib/fetchAllRows";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -39,11 +40,8 @@ export default function OpportunityManagement() {
 
   const { data: institutions } = useQuery({
     queryKey: ["institutions-list"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("institutions").select("id, name, county").order("name");
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () =>
+      fetchAllRows((from, to) => supabase.from("institutions").select("id, name, county").order("name").range(from, to)),
   });
 
   const createOpp = useMutation({

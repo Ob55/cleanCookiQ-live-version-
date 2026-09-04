@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows } from "@/lib/fetchAllRows";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -66,15 +67,16 @@ export default function InstitutionManagement() {
 
   const { data: institutions, isLoading } = useQuery({
     queryKey: ["institutions", countyFilter, typeFilter, stageFilter],
-    queryFn: async () => {
-      let q = supabase.from("institutions").select("*").order("created_at", { ascending: false });
-      if (countyFilter !== "all") q = q.eq("county", countyFilter);
-      if (typeFilter !== "all") q = q.eq("institution_type", typeFilter as any);
-      if (stageFilter !== "all") q = q.eq("pipeline_stage", stageFilter as any);
-      const { data, error } = await q;
-      if (error) throw error;
-      return data;
-    },
+    // Page past the ~1,000-row cap so the full roster is listed, not just the
+    // first 1k (see src/lib/fetchAllRows.ts).
+    queryFn: () =>
+      fetchAllRows((from, to) => {
+        let q = supabase.from("institutions").select("*").order("created_at", { ascending: false });
+        if (countyFilter !== "all") q = q.eq("county", countyFilter);
+        if (typeFilter !== "all") q = q.eq("institution_type", typeFilter as any);
+        if (stageFilter !== "all") q = q.eq("pipeline_stage", stageFilter as any);
+        return q.range(from, to);
+      }),
   });
 
   const filtered = institutions?.filter(i =>

@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { sbAny as supabase } from "@/lib/sbAny";
+import { fetchAllRows } from "@/lib/fetchAllRows";
 import { DownloadReportButton, dateColumn, listColumn } from "@/components/admin/DownloadReportButton";
 
 type Crew = {
@@ -74,10 +75,8 @@ export default function AdminInstallationCrews() {
 
   const { data: providers } = useQuery({
     queryKey: ["providers-list"],
-    queryFn: async () => {
-      const { data } = await supabase.from("providers").select("id, name").order("name");
-      return (data ?? []) as { id: string; name: string }[];
-    },
+    queryFn: async () =>
+      (await fetchAllRows((f, t) => supabase.from("providers").select("id, name").order("name").range(f, t))) as { id: string; name: string }[],
   });
 
   const upsert = useMutation({

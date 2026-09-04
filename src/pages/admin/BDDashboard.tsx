@@ -1,44 +1,31 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows } from "@/lib/fetchAllRows";
 import { Loader2, TrendingUp, MapPin, Users, Factory, DollarSign } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 
 export default function BDDashboard() {
+  // All reads page past the ~1,000-row cap so BD metrics count every row
+  // (see src/lib/fetchAllRows.ts).
   const { data: institutions, isLoading: loadingInst } = useQuery({
     queryKey: ["bd-institutions"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("institutions").select("*");
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => fetchAllRows((from, to) => supabase.from("institutions").select("*").range(from, to)),
   });
 
   const { data: providers } = useQuery({
     queryKey: ["bd-providers"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("providers").select("*");
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => fetchAllRows((from, to) => supabase.from("providers").select("*").range(from, to)),
   });
 
   const { data: scores } = useQuery({
     queryKey: ["bd-scores"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("readiness_scores").select("*");
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => fetchAllRows((from, to) => supabase.from("readiness_scores").select("*").range(from, to)),
   });
 
   const { data: opportunities } = useQuery({
     queryKey: ["bd-opportunities"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("opportunities").select("*");
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => fetchAllRows((from, to) => supabase.from("opportunities").select("*").range(from, to)),
   });
 
   if (loadingInst) return <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows } from "@/lib/fetchAllRows";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -75,11 +76,8 @@ export default function ProviderManagement() {
 
   const { data: providers, isLoading } = useQuery({
     queryKey: ["admin-providers"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("providers").select("*").order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () =>
+      fetchAllRows((from, to) => supabase.from("providers").select("*").order("created_at", { ascending: false }).range(from, to)),
   });
 
   const updateVerified = useMutation({

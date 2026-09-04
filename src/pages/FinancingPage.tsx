@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows } from "@/lib/fetchAllRows";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -42,10 +43,8 @@ export default function FinancingPage() {
 
   const { data: institutions } = useQuery({
     queryKey: ["financing-institutions"],
-    queryFn: async () => {
-      const { data } = await supabase.from("institutions").select("id, name, county");
-      return data ?? [];
-    },
+    queryFn: () =>
+      fetchAllRows((from, to) => supabase.from("institutions").select("id, name, county").range(from, to)),
   });
 
   const applyMutation = useMutation({
