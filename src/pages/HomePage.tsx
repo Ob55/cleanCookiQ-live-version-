@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import FuelOptionsSection from "@/components/institution/FuelOptionsSection";
 import { supabase } from "@/integrations/supabase/client";
-import { fetchAllRows } from "@/lib/fetchAllRows";
+import { fetchAllRows, countRows } from "@/lib/fetchAllRows";
 import kitchenTransitionBg from "@/assets/kitchen-transition.jpg";
 import cleancookIqMark from "@/assets/cleancookiq-mark.png";
 import partner1 from "@/assets/partners/partner1.png";
@@ -24,13 +24,6 @@ import AnimatedNumber from "@/components/AnimatedNumber";
 
 
 const partners = [partner1, partner2, partner3, partner4, partner5, partner6, partner7];
-
-type StatRow = {
-  pipeline_stage: string | null;
-  assessment_score: number | null;
-  annual_savings_ksh: number | null;
-  co2_reduction_tonnes_pa: number | null;
-};
 
 function formatPipelineValue(totalKsh: number): { num: number; suffix: string; decimals: number } {
   if (totalKsh >= 1_000_000_000) return { num: totalKsh / 1_000_000_000, suffix: "B", decimals: 1 };
@@ -89,30 +82,37 @@ const fadeUp = {
 export default function HomePage() {
   const { user, profile, roles, loading } = useAuth();
 
-  const { data: institutionRows } = useQuery({
-    queryKey: ["home-stats-institutions"],
-    queryFn: (): Promise<StatRow[]> =>
-      // Page past PostgREST's ~1,000-row cap so the pipeline totals count every
-      // institution, not just the first 1k (see src/lib/fetchAllRows.ts).
-      fetchAllRows<StatRow>((from, to) =>
-        supabase
-          .from("institutions")
-          .select("pipeline_stage, assessment_score, annual_savings_ksh, co2_reduction_tonnes_pa")
-          .range(from, to),
-      ),
+  // Pipeline stats: counts come back as DB-side head counts (no rows shipped,
+  // no 1k cap); only the two numeric columns needed for the sums are fetched.
+  // Much lighter than pulling the whole table to count it in the browser.
+  const { data: pipelineStats } = useQuery({
+    queryKey: ["home-pipeline-stats"],
     staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const [total, assessed, inDelivery, sumRows] = await Promise.all([
+        countRows(() => supabase.from("institutions").select("*", { count: "exact", head: true })),
+        countRows(() => supabase.from("institutions").select("*", { count: "exact", head: true })
+          .or("pipeline_stage.in.(assessed,scored),assessment_score.gt.0")),
+        countRows(() => supabase.from("institutions").select("*", { count: "exact", head: true })
+          .in("pipeline_stage", ["contracted", "installed", "in_delivery"])),
+        fetchAllRows<{ annual_savings_ksh: number | null; co2_reduction_tonnes_pa: number | null }>((from, to) =>
+          supabase.from("institutions").select("annual_savings_ksh, co2_reduction_tonnes_pa").range(from, to)),
+      ]);
+      return {
+        totalInstitutions: total,
+        assessedCount: assessed,
+        inDeliveryCount: inDelivery,
+        pipelineValueKsh: sumRows.reduce((s, r) => s + Number(r.annual_savings_ksh ?? 0), 0),
+        co2Tonnes: sumRows.reduce((s, r) => s + Number(r.co2_reduction_tonnes_pa ?? 0), 0),
+      };
+    },
   });
 
-  const totalInstitutions = institutionRows?.length ?? 0;
-  const assessedCount = institutionRows?.filter(r =>
-    r.pipeline_stage === "assessed" || r.pipeline_stage === "scored" ||
-    (r.assessment_score != null && Number(r.assessment_score) > 0)
-  ).length ?? 0;
-  const inDeliveryCount = institutionRows?.filter(r =>
-    r.pipeline_stage === "contracted" || r.pipeline_stage === "installed" || r.pipeline_stage === "in_delivery"
-  ).length ?? 0;
-  const pipelineValueKsh = institutionRows?.reduce((s, r) => s + Number(r.annual_savings_ksh ?? 0), 0) ?? 0;
-  const co2Tonnes = institutionRows?.reduce((s, r) => s + Number(r.co2_reduction_tonnes_pa ?? 0), 0) ?? 0;
+  const totalInstitutions = pipelineStats?.totalInstitutions ?? 0;
+  const assessedCount = pipelineStats?.assessedCount ?? 0;
+  const inDeliveryCount = pipelineStats?.inDeliveryCount ?? 0;
+  const pipelineValueKsh = pipelineStats?.pipelineValueKsh ?? 0;
+  const co2Tonnes = pipelineStats?.co2Tonnes ?? 0;
   const pipelineDisplay = formatPipelineValue(pipelineValueKsh);
 
   const stats = [

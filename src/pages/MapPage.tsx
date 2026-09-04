@@ -21,10 +21,15 @@ export default function MapPage() {
   // Fetch institutions
   const { data: institutions, isLoading } = useQuery({
     queryKey: ["map-institutions"],
-    // Page past PostgREST's ~1,000-row cap so every institution is plotted, not
-    // just the first 1k (see src/lib/fetchAllRows.ts).
+    // Fetch only the columns the markers + popups use (not select *), paged past
+    // the ~1,000-row cap — every institution is plotted, at a fraction of the
+    // payload (see src/lib/mapMarkers.ts MapInstitution).
     queryFn: () =>
-      fetchAllRows((from, to) => supabase.from("institutions").select("*").range(from, to)),
+      fetchAllRows((from, to) => supabase.from("institutions").select(
+        "latitude, longitude, institution_type, institution_code, county, sub_county, pipeline_stage, " +
+        "current_fuel, fuel_of_choice, meals_per_day, meals_served_per_day, recommended_solution, " +
+        "annual_savings_ksh, co2_reduction_tonnes_pa",
+      ).range(from, to)),
   });
 
   const filtered = institutions?.filter(i => {

@@ -1,31 +1,31 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { fetchAllRows } from "@/lib/fetchAllRows";
+import { fetchAllRows, countRows } from "@/lib/fetchAllRows";
 import { TrendingUp, Building2, Factory, BarChart3, FileText, Loader2 } from "lucide-react";
 import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
 
 export default function PipelineDashboard() {
-  const { data: institutions } = useQuery({
-    queryKey: ["institutions"],
-    // Page past the ~1,000-row cap so the pipeline totals count every
-    // institution (see src/lib/fetchAllRows.ts).
-    queryFn: () => fetchAllRows((from, to) => supabase.from("institutions").select("*").range(from, to)),
+  // Count on the DB, not the browser: the funnel needs only the pipeline_stage
+  // column, and the assessed / provider tallies come back as head counts (no
+  // rows shipped, no 1k cap). Keeps this dashboard light and accurate.
+  const { data: stageRows } = useQuery({
+    queryKey: ["pipeline-stage-rows"],
+    queryFn: () => fetchAllRows<{ pipeline_stage: string }>((from, to) =>
+      supabase.from("institutions").select("pipeline_stage").range(from, to)),
+  });
+  const { data: assessedCount = 0 } = useQuery({
+    queryKey: ["pipeline-assessed-count"],
+    queryFn: () => countRows(() => supabase.from("institutions").select("*", { count: "exact", head: true })
+      .or("pipeline_stage.in.(assessed,scored),assessment_score.gt.0")),
+  });
+  const { data: providersCount = 0 } = useQuery({
+    queryKey: ["pipeline-providers-count"],
+    queryFn: () => countRows(() => supabase.from("providers").select("*", { count: "exact", head: true })),
   });
 
-  const { data: providers } = useQuery({
-    queryKey: ["providers"],
-    queryFn: () => fetchAllRows((from, to) => supabase.from("providers").select("id").range(from, to)),
-  });
-
-  const total = institutions?.length ?? 0;
+  const total = stageRows?.length ?? 0;
   const stageCounts: Record<string, number> = {};
-  institutions?.forEach(i => { stageCounts[i.pipeline_stage] = (stageCounts[i.pipeline_stage] || 0) + 1; });
-
-  // Count institutions that have been assessed (have a score > 0 OR are in assessed+ stages)
-  const assessedCount = institutions?.filter(i => 
-    i.pipeline_stage === "assessed" || i.pipeline_stage === "scored" || 
-    (i.assessment_score && Number(i.assessment_score) > 0)
-  ).length ?? 0;
+  stageRows?.forEach(i => { stageCounts[i.pipeline_stage] = (stageCounts[i.pipeline_stage] || 0) + 1; });
 
   const stages = [
     { stage: "Identified", key: "identified" },
@@ -41,7 +41,7 @@ export default function PipelineDashboard() {
     { label: "Total Institutions", value: total.toLocaleString(), icon: Building2 },
     { label: "Assessed", value: assessedCount.toString(), icon: BarChart3 },
     { label: "In Delivery", value: ((stageCounts["contracted"] || 0) + (stageCounts["installed"] || 0) + (stageCounts["in_delivery"] || 0)).toString(), icon: TrendingUp },
-    { label: "Providers", value: (providers?.length ?? 0).toString(), icon: Factory },
+    { label: "Providers", value: providersCount.toLocaleString(), icon: Factory },
   ];
 
   return (
@@ -56,7 +56,7 @@ export default function PipelineDashboard() {
             ...stages.map(s => ({ stage: s.stage, count: s.count, pct: `${s.pct}%` })),
             { stage: "Total Institutions", count: total, pct: "100%" },
             { stage: "Assessed", count: assessedCount, pct: total ? `${Math.round((assessedCount/total)*100)}%` : "0%" },
-            { stage: "Providers", count: providers?.length ?? 0, pct: "—" },
+            { stage: "Providers", count: providersCount, pct: "—" },
           ]}
           columns={[
             { key: "stage", label: "Pipeline Stage" },

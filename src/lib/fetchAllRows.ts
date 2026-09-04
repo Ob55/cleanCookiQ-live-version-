@@ -17,6 +17,25 @@
  */
 const PAGE_SIZE = 1000;
 
+/**
+ * Return just the COUNT of matching rows without transferring any of them.
+ *
+ * Uses PostgREST's `count: 'exact', head: true` (the count comes back in a
+ * Content-Range header, `data` is null). This is both uncapped and featherweight
+ * — the right tool whenever a screen only needs a number, not the rows. Pass a
+ * builder that ends in `.select('*', { count: 'exact', head: true })` plus any
+ * filters. Returns 0 on error.
+ *
+ *   const total = await countRows(() =>
+ *     supabase.from('institutions').select('*', { count: 'exact', head: true }));
+ */
+export async function countRows(
+  build: () => PromiseLike<{ count: number | null; error: unknown }>,
+): Promise<number> {
+  const { count, error } = await build();
+  return error ? 0 : count ?? 0;
+}
+
 export async function fetchAllRows<T = unknown>(
   page: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: unknown }>,
 ): Promise<T[]> {
