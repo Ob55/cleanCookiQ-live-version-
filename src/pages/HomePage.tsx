@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import FuelOptionsSection from "@/components/institution/FuelOptionsSection";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows } from "@/lib/fetchAllRows";
 import kitchenTransitionBg from "@/assets/kitchen-transition.jpg";
 import cleancookIqMark from "@/assets/cleancookiq-mark.png";
 import partner1 from "@/assets/partners/partner1.png";
@@ -90,24 +91,15 @@ export default function HomePage() {
 
   const { data: institutionRows } = useQuery({
     queryKey: ["home-stats-institutions"],
-    queryFn: async (): Promise<StatRow[]> => {
-      // PostgREST caps a single response at ~1,000 rows, which silently
-      // truncated the pipeline totals once the roster grew past 1k. Page through
-      // in 1,000-row windows so every institution is counted.
-      const PAGE = 1000;
-      const all: StatRow[] = [];
-      for (let from = 0; ; from += PAGE) {
-        const { data, error } = await supabase
+    queryFn: (): Promise<StatRow[]> =>
+      // Page past PostgREST's ~1,000-row cap so the pipeline totals count every
+      // institution, not just the first 1k (see src/lib/fetchAllRows.ts).
+      fetchAllRows<StatRow>((from, to) =>
+        supabase
           .from("institutions")
           .select("pipeline_stage, assessment_score, annual_savings_ksh, co2_reduction_tonnes_pa")
-          .range(from, from + PAGE - 1);
-        if (error) break;
-        const rows = (data as StatRow[] | null) ?? [];
-        all.push(...rows);
-        if (rows.length < PAGE) break; // last page reached
-      }
-      return all;
-    },
+          .range(from, to),
+      ),
     staleTime: 5 * 60 * 1000,
   });
 

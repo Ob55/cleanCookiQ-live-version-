@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows } from "@/lib/fetchAllRows";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,10 +21,10 @@ export default function MapPage() {
   // Fetch institutions
   const { data: institutions, isLoading } = useQuery({
     queryKey: ["map-institutions"],
-    queryFn: async () => {
-      const { data } = await supabase.from("institutions").select("*");
-      return data ?? [];
-    },
+    // Page past PostgREST's ~1,000-row cap so every institution is plotted, not
+    // just the first 1k (see src/lib/fetchAllRows.ts).
+    queryFn: () =>
+      fetchAllRows((from, to) => supabase.from("institutions").select("*").range(from, to)),
   });
 
   const filtered = institutions?.filter(i => {

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { sbAny } from "@/lib/sbAny";
+import { fetchAllRows } from "@/lib/fetchAllRows";
 import type { Database } from "@/integrations/supabase/types";
 
 // Institution row + the tenancy/finance columns added by the 2026-08-08/11
@@ -106,16 +107,18 @@ export type ProgrammeVendor = {
 // Best-effort count maps; any failure (e.g. column/table not migrated yet)
 // resolves to empty so the project list still renders.
 async function loadCounts() {
+  // Paginate each read so the per-programme tallies aren't truncated by the
+  // ~1,000-row response cap (which otherwise mis-counts once the roster > 1k).
   const [inst, members, rfqs] = await Promise.all([
-    sbAny.from("institutions").select("programme_id, pipeline_stage").not("programme_id", "is", null)
-      .then((r: { data: { programme_id: string; pipeline_stage: string }[] | null }) => r.data ?? [])
-      .catch(() => []),
-    sbAny.from("programme_members").select("programme_id")
-      .then((r: { data: { programme_id: string }[] | null }) => r.data ?? [])
-      .catch(() => []),
-    sbAny.from("procurement_rfqs").select("programme_id")
-      .then((r: { data: { programme_id: string }[] | null }) => r.data ?? [])
-      .catch(() => []),
+    fetchAllRows<{ programme_id: string; pipeline_stage: string }>((f, t) =>
+      sbAny.from("institutions").select("programme_id, pipeline_stage").not("programme_id", "is", null).range(f, t),
+    ).catch(() => []),
+    fetchAllRows<{ programme_id: string }>((f, t) =>
+      sbAny.from("programme_members").select("programme_id").range(f, t),
+    ).catch(() => []),
+    fetchAllRows<{ programme_id: string }>((f, t) =>
+      sbAny.from("procurement_rfqs").select("programme_id").range(f, t),
+    ).catch(() => []),
   ]);
 
   const institutionCount: Record<string, number> = {};
