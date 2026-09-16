@@ -28,6 +28,8 @@ import InstitutionCombobox, { MultiInstitutionCombobox } from "@/components/prog
 import InstitutionMap from "@/components/programme/InstitutionMap";
 import { FUEL_PROPERTIES, type FuelKey } from "@/lib/cookingCost";
 import { getProgrammeBaseline, type BaselineGroup } from "@/lib/baseline";
+import { deriveBaseline } from "@/lib/baseline/derived";
+import { missingFields } from "@/lib/programmeImport";
 
 // ECharts is heavy (~380 KB gzip). Load it lazily so the programme shell —
 // stats, tables, cards — paints instantly and the charts stream in after,
@@ -317,7 +319,11 @@ function InstitutionTable({
                     <span className="inline-flex items-center gap-2">
                       <span
                         className={`h-2 w-2 rounded-full shrink-0 ${VERIFY_TONE[i.verification_status] ?? VERIFY_TONE.unverified}`}
-                        title={`Data ${i.verification_status ?? "unverified"}`}
+                        title={
+                          i.verification_status === "flagged"
+                            ? `Data missing: ${missingFields(i).join(", ") || "see notes"}`
+                            : `Data ${i.verification_status ?? "unverified"}`
+                        }
                       />
                       {i.name}
                       {i.women_led && (
@@ -475,7 +481,9 @@ export function ProgrammeInstitutions({ programmeId }: { programmeId: string }) 
   const { data: institutions, isLoading } = useProgrammeInstitutions(programmeId);
   const { data: recommended = {} } = useProgrammeRecommendedScenarios(programmeId);
   const all = institutions ?? [];
-  const baseline = getProgrammeBaseline(programme?.name);
+  // Static baseline by name (Makueni / Taita) wins; otherwise derive the dataset
+  // cards live from this programme's own rows so uploaded projects look the same.
+  const baseline = getProgrammeBaseline(programme?.name) ?? deriveBaseline(all);
   const [group, setGroup] = useState<BaselineGroup | null>(null);
 
   if (isLoading) {
@@ -700,7 +708,9 @@ function OverviewTab({ programmeId }: { programmeId: string }) {
   const { data: programme } = useProgramme(programmeId);
   const { data: institutions } = useProgrammeInstitutions(programmeId);
   const { data: members } = useProgrammeMembers(programmeId);
-  const baseline = getProgrammeBaseline(programme?.name);
+  // Static baseline by name wins; otherwise derive the charts live from this
+  // programme's own institutions (uploaded projects → same rich Overview).
+  const baseline = getProgrammeBaseline(programme?.name) ?? deriveBaseline(institutions ?? []);
 
   // Derived annual energy consumption by category (workbook Table 19), split
   // into two compact charts so neither axis has to mix tonnes with kWh.
@@ -779,7 +789,12 @@ function OverviewTab({ programmeId }: { programmeId: string }) {
 
   return (
     <div className="space-y-6">
-      {baseline && (
+      {baseline && (baseline.meta.derived ? (
+        <p className="text-sm text-muted-foreground max-w-2xl">
+          Figures are computed live from this programme's {baseline.meta.totalRecords.toLocaleString()} institutions
+          across {baseline.meta.subCounties}.
+        </p>
+      ) : (
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <p className="text-sm text-muted-foreground max-w-2xl">
             Baseline figures are drawn from the survey of {baseline.meta.totalRecords.toLocaleString()} institutions
@@ -790,7 +805,7 @@ function OverviewTab({ programmeId }: { programmeId: string }) {
             <Download className="h-4 w-4 mr-2" /> Export report
           </Button>
         </div>
-      )}
+      ))}
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <BudgetStat label="Institutions" value={(institutions?.length ?? 0).toLocaleString()} />

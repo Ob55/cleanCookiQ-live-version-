@@ -95,6 +95,13 @@ export type BaselineMeta = {
   rawVariables?: number;
   /** Cover heading for the PDF report (defaults to a generic baseline title). */
   reportHeading?: string;
+  /**
+   * True when this baseline was computed live from the programme's uploaded
+   * institution rows (see ./derived.ts) rather than transcribed from a published
+   * survey. Lets the Overview swap the "survey of N…" copy / hide the PDF export,
+   * which are specific to the hand-authored baselines.
+   */
+  derived?: boolean;
 };
 
 export type ProgrammeBaseline = {

@@ -41,9 +41,51 @@
       "logo": "https://cleancookiq.com/cleancookiq-og-logo.png"
     }
   </script>
+
+  <!-- Brand intro / splash — paints instantly on load, ahead of the React
+       bundle, then auto-clears and reveals the app. Script lives in
+       /public/cc-intro.js so it satisfies the CSP (script-src 'self'). -->
+  <style id="cc-style">
+:root {
+  --cc-ink: #1C2934;
+  --cc-bg-1: #ffffff;
+  --cc-bg-2: #e7eef4;
+  --cc-skip: rgba(28,41,52,.42);
+  --cc-skip-hover: rgba(28,41,52,.80);
+}
+[data-theme="dark"] {
+  --cc-ink: #f4f8fa;
+  --cc-bg-1: #131c24;
+  --cc-bg-2: #080c11;
+  --cc-skip: rgba(244,248,250,.45);
+  --cc-skip-hover: rgba(244,248,250,.85);
+}
+.cc-splash {
+  position: fixed; inset: 0; z-index: 9999;
+  display: grid; place-items: center;
+  background: radial-gradient(118% 128% at 50% 8%, var(--cc-bg-1) 0%, var(--cc-bg-2) 100%);
+  transition: opacity .62s ease, visibility .62s;
+}
+.cc-splash[data-state="out"] { opacity: 0; visibility: hidden; pointer-events: none; }
+.cc-inner {
+  display: flex; flex-direction: column; align-items: center;
+  gap: clamp(18px, 2.8vw, 34px);
+  width: min(80vw, 900px);
+}
+.cc-mark { display: block; width: 100%; aspect-ratio: 1556 / 412; }
+@media (max-width: 560px) { .cc-inner { width: 88vw; gap: 22px; } }
+  </style>
 </head>
 
   <body>
+    <!-- ============================== the intro ============================== -->
+    <div class="cc-splash" id="ccSplash" role="status" aria-label="Loading cleancookiq">
+      <div class="cc-inner">
+        <canvas class="cc-mark" id="ccCanvas" role="img" aria-label="cleancookiq"></canvas>
+      </div>
+    </div>
+    <script src="/cc-intro.js"></script>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

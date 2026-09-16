@@ -11,7 +11,12 @@ export default function PipelineDashboard() {
   const { data: stageRows } = useQuery({
     queryKey: ["pipeline-stage-rows"],
     queryFn: () => fetchAllRows<{ pipeline_stage: string }>((from, to) =>
-      supabase.from("institutions").select("pipeline_stage").range(from, to)),
+      supabase.from("institutions").select("pipeline_stage").order("id").range(from, to)),
+  });
+  const { data: totalCount = 0 } = useQuery({
+    queryKey: ["pipeline-total-count"],
+    queryFn: () => countRows(() =>
+      supabase.from("institutions").select("*", { count: "exact", head: true })),
   });
   const { data: assessedCount = 0 } = useQuery({
     queryKey: ["pipeline-assessed-count"],
@@ -23,7 +28,7 @@ export default function PipelineDashboard() {
     queryFn: () => countRows(() => supabase.from("providers").select("*", { count: "exact", head: true })),
   });
 
-  const total = stageRows?.length ?? 0;
+  const total = totalCount;
   const stageCounts: Record<string, number> = {};
   stageRows?.forEach(i => { stageCounts[i.pipeline_stage] = (stageCounts[i.pipeline_stage] || 0) + 1; });
 
