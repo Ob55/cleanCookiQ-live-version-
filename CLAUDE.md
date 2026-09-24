@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-Package manager is Bun (`bun.lockb`/`bun.lock` present) but npm/yarn work too since there's no Bun-specific tooling in scripts.
+Package manager is npm (`package-lock.json` is the only lockfile; the stale Bun lockfiles were removed).
 
 - `npm run dev` — start Vite dev server on port 8080
 - `npm run build` — production build
