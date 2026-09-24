@@ -43,6 +43,7 @@ export default function PortfolioAggregation() {
       const { data, error } = await supabase
         .from("institutions")
         .select("id, name, county, institution_type, current_fuel, number_of_students, monthly_fuel_spend, annual_savings_ksh, co2_reduction_tonnes_pa, recommended_solution")
+        .eq("verification_status", "verified")
         .order("name");
       if (error) throw error;
       return data;

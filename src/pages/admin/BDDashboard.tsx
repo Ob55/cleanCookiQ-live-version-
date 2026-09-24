@@ -10,7 +10,7 @@ export default function BDDashboard() {
   // (see src/lib/fetchAllRows.ts).
   const { data: institutions, isLoading: loadingInst } = useQuery({
     queryKey: ["bd-institutions"],
-    queryFn: () => fetchAllRows((from, to) => supabase.from("institutions").select("*").range(from, to)),
+    queryFn: () => fetchAllRows((from, to) => supabase.from("institutions").select("*").eq("verification_status", "verified").range(from, to)),
   });
 
   const { data: providers } = useQuery({

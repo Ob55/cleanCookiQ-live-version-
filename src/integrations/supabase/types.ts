@@ -663,6 +663,15 @@ export type Database = {
           transition_needs: string | null
           transition_target_fuel: string | null
           updated_at: string
+          programme_id: string | null
+          recommendation_reason: string | null
+          recommended_providers: string[]
+          validation_checked_at: string | null
+          validation_issues: Json
+          verification_note: string | null
+          verification_status: "unverified" | "verified" | "flagged"
+          verified_at: string | null
+          verified_by: string | null
           wishes_to_transition_steam: boolean | null
         }
         Insert: {
@@ -719,6 +728,15 @@ export type Database = {
           transition_needs?: string | null
           transition_target_fuel?: string | null
           updated_at?: string
+          programme_id?: string | null
+          recommendation_reason?: string | null
+          recommended_providers?: string[]
+          validation_checked_at?: string | null
+          validation_issues?: Json
+          verification_note?: string | null
+          verification_status?: "unverified" | "verified" | "flagged"
+          verified_at?: string | null
+          verified_by?: string | null
           wishes_to_transition_steam?: boolean | null
         }
         Update: {
@@ -775,6 +793,15 @@ export type Database = {
           transition_needs?: string | null
           transition_target_fuel?: string | null
           updated_at?: string
+          programme_id?: string | null
+          recommendation_reason?: string | null
+          recommended_providers?: string[]
+          validation_checked_at?: string | null
+          validation_issues?: Json
+          verification_note?: string | null
+          verification_status?: "unverified" | "verified" | "flagged"
+          verified_at?: string | null
+          verified_by?: string | null
           wishes_to_transition_steam?: boolean | null
         }
         Relationships: [

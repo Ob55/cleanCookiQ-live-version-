@@ -84,7 +84,7 @@ export const adminKnowledge: KnowledgeEntry[] = [
     topic: "Organisations & imports",
     keywords: ["institution", "institutions", "provider", "providers", "supplier", "import", "link", "depot", "kplc", "organisation", "org"],
     answer:
-      "Manage every organisation here:\n\n- **[Institutions](/admin/institutions)** — and **[Import Institutions](/admin/institutions/import)** for bulk uploads.\n- **[Providers](/admin/providers)** — suppliers and service partners.\n- **[Link Institution ↔ Supplier](/admin/link-institution-supplier)** — connect the two (this unlocks the institution's Supplier Details view).\n- **[KPLC Depots](/admin/kplc-depots)** — utility depots.",
+      "Manage every organisation here:\n\n- **[Validation](/admin/validation)** — upload Kobo exports; each institution is checked and marked Passed or Flagged.\n- **[Institutions](/admin/institutions)** — passed institutions as profile cards: proposed cooking method, suppliers, funder allocation and logins.\n- **[Providers](/admin/providers)** — suppliers and service partners.\n- **[KPLC Depots](/admin/kplc-depots)** — utility depots.",
     followups: ["How do I import institutions?", "Where do I approve accounts?"],
   },
   {

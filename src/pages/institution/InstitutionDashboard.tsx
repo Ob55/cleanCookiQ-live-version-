@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Flame, UtensilsCrossed, Droplets, BarChart3, Loader2, User, Phone, Mail, MapPin } from "lucide-react";
 import TransitionTarget, { TRANSITION_TARGET_LABELS } from "@/components/institution/TransitionTarget";
 import { DownloadReportButton } from "@/components/admin/DownloadReportButton";
+import TransitionStatusCard from "@/components/institution/TransitionStatusCard";
 
 
 const FUEL_LABELS: Record<string, string> = {
@@ -177,6 +178,8 @@ export default function InstitutionDashboard() {
         </div>
         <Progress value={completion} className="h-2.5" />
       </div>
+
+      <TransitionStatusCard institution={institution as never} />
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

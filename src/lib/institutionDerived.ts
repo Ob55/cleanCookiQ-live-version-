@@ -81,3 +81,108 @@ export function deriveStoredImpact(input: DerivedImpactInputs): DerivedImpact {
 
   return { annual_savings_ksh, co2_reduction_tonnes_pa, recommended_solution };
 }
+
+// ---------------------------------------------------------------------------
+// Cooking-method proposal (admin pipeline step 2) + provider suggestion.
+// ---------------------------------------------------------------------------
+
+export interface MethodInputs {
+  current_fuel?: string | null;
+  grid_connected?: boolean | null;
+  outages_per_month?: string | number | null;
+  meals_per_day?: number | null;
+  meals_served_per_day?: number | null;
+  number_of_students?: number | null;
+}
+
+export interface MethodProposal { method: string; reason: string }
+
+export const METHOD_LABELS: Record<string, string> = {
+  steam: "Steam institutional cooker",
+  electric: "Induction institutional cooker",
+};
+
+/** Grid counts as reliable for induction at or below this many outages/month. */
+const RELIABLE_GRID_MAX_OUTAGES = 7;
+/** Above this many meals/day a steam system beats induction (power demand). */
+const INDUCTION_MAX_MEALS = 3000;
+
+/**
+ * Outages/month as recorded (Kobo buckets like "Less than once", "1-7",
+ * "8-14", or a plain number). Ranges resolve to their upper bound so the
+ * reliability check stays conservative.
+ */
+export function parseOutages(v: string | number | null | undefined): number | null {
+  if (v == null || v === "") return null;
+  if (typeof v === "number") return Number.isFinite(v) ? v : null;
+  if (/less than|never|none|rare/i.test(v)) return 0;
+  const nums = v.match(/\d+/g);
+  return nums ? Math.max(...nums.map(Number)) : null;
+}
+
+/**
+ * Best institutional cooker for an institution — steam or induction — with a
+ * plain-English reason.
+ */
+export function recommendCookingMethod(i: MethodInputs): MethodProposal {
+  const fuel = (i.current_fuel ?? "").toLowerCase();
+  const meals = i.meals_per_day || i.meals_served_per_day || 0;
+  const outages = parseOutages(i.outages_per_month);
+  const mealsTxt = meals ? `${meals.toLocaleString()} meals/day` : "meal load not recorded";
+
+  const reliableGrid = i.grid_connected === true && (outages === null || outages <= RELIABLE_GRID_MAX_OUTAGES);
+  if ((reliableGrid || fuel === "electric") && meals <= INDUCTION_MAX_MEALS) {
+    const grid = fuel === "electric" && !reliableGrid ? "Already cooks with electricity"
+      : outages === null ? "Grid-connected (outage frequency not recorded — confirm)"
+      : `Grid-connected with ${i.outages_per_month} outage(s)/month`;
+    return {
+      method: "electric",
+      reason: `${grid}; ${mealsTxt}. Induction institutional cookers have the lowest running cost, cook fast and produce no smoke.`,
+    };
+  }
+
+  const why = meals > INDUCTION_MAX_MEALS && reliableGrid
+    ? `${mealsTxt} is more than induction can handle without a very large 3-phase supply`
+    : i.grid_connected === true ? `grid is unreliable (${i.outages_per_month} outages/month)`
+    : i.grid_connected === false ? "no grid connection"
+    : "grid access not recorded";
+  return {
+    method: "steam",
+    reason: `${why[0].toUpperCase()}${why.slice(1)}${why.includes("meals/day") ? "" : `; ${mealsTxt}`}. A steam institutional cooker works off-grid on briquettes/pellets, suits bulk boarding meals and cuts fuel use and smoke sharply.`,
+  };
+}
+
+/** Provider technology keywords that count as offering each method. */
+const METHOD_KEYWORDS: Record<string, string[]> = {
+  electric: ["induction", "electric", "ecook", "e-cook"],
+  steam: ["steam", "boiler"],
+};
+
+export interface ProviderForMatch {
+  id: string;
+  name: string;
+  technology_types?: string[] | null;
+  counties_served?: string[] | null;
+  verified?: boolean | null;
+}
+
+/** Top providers for a method + county: tech match 50, county 40, verified 10. */
+export function suggestProviders<P extends ProviderForMatch>(
+  county: string | null | undefined,
+  method: string,
+  providers: P[],
+  limit = 3,
+): (P & { score: number })[] {
+  const kws = METHOD_KEYWORDS[method] ?? [method];
+  const c = (county ?? "").toLowerCase();
+  return providers
+    .map((p) => {
+      const tech = (p.technology_types ?? []).some((t) => kws.some((k) => t.toLowerCase().includes(k)));
+      const inCounty = !!c && (p.counties_served ?? []).some((s) => s.toLowerCase() === c);
+      return { ...p, score: (tech ? 50 : 0) + (inCounty ? 40 : 0) + (p.verified ? 10 : 0), tech };
+    })
+    .filter((p) => p.tech)
+    .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
+    .slice(0, limit)
+    .map(({ tech: _tech, ...p }) => p as P & { score: number });
+}

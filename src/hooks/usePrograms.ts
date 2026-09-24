@@ -111,7 +111,7 @@ async function loadCounts() {
   // ~1,000-row response cap (which otherwise mis-counts once the roster > 1k).
   const [inst, members, rfqs] = await Promise.all([
     fetchAllRows<{ programme_id: string; pipeline_stage: string }>((f, t) =>
-      sbAny.from("institutions").select("programme_id, pipeline_stage").not("programme_id", "is", null).range(f, t),
+      sbAny.from("institutions").select("programme_id, pipeline_stage").eq("verification_status", "verified").not("programme_id", "is", null).range(f, t),
     ).catch(() => []),
     fetchAllRows<{ programme_id: string }>((f, t) =>
       sbAny.from("programme_members").select("programme_id").range(f, t),

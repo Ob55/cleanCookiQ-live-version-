@@ -11,16 +11,16 @@ export default function PipelineDashboard() {
   const { data: stageRows } = useQuery({
     queryKey: ["pipeline-stage-rows"],
     queryFn: () => fetchAllRows<{ pipeline_stage: string }>((from, to) =>
-      supabase.from("institutions").select("pipeline_stage").order("id").range(from, to)),
+      supabase.from("institutions").select("pipeline_stage").eq("verification_status", "verified").order("id").range(from, to)),
   });
   const { data: totalCount = 0 } = useQuery({
     queryKey: ["pipeline-total-count"],
     queryFn: () => countRows(() =>
-      supabase.from("institutions").select("*", { count: "exact", head: true })),
+      supabase.from("institutions").select("*", { count: "exact", head: true }).eq("verification_status", "verified")),
   });
   const { data: assessedCount = 0 } = useQuery({
     queryKey: ["pipeline-assessed-count"],
-    queryFn: () => countRows(() => supabase.from("institutions").select("*", { count: "exact", head: true })
+    queryFn: () => countRows(() => supabase.from("institutions").select("*", { count: "exact", head: true }).eq("verification_status", "verified")
       .or("pipeline_stage.in.(assessed,scored),assessment_score.gt.0")),
   });
   const { data: providersCount = 0 } = useQuery({

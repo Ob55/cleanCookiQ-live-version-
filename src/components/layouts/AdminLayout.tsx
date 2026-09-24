@@ -4,10 +4,10 @@ import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Building2, Users, ClipboardCheck,
   BarChart3, FileText, TrendingUp, Factory, Menu, X, LogOut,
-  Briefcase, Ticket, FlaskConical, Upload, HelpCircle, ScrollText,
+  Briefcase, Ticket, FlaskConical, HelpCircle, ScrollText,
   Calculator, Truck, ShieldAlert, Activity, Leaf,
-  Calendar, Newspaper, Library, Database, Banknote, ClipboardList,
-  Wrench, Tag, ShieldCheck, Zap, Link2, FolderKanban,
+  Library, Database, Banknote, ClipboardList,
+  Wrench, Tag, ShieldCheck, Zap, FolderKanban,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -28,9 +28,8 @@ const adminNav = [
 
   { section: "Organisations" },
   { label: "Institutions", href: "/admin/institutions", icon: Building2 },
-  { label: "Import Institutions", href: "/admin/institutions/import", icon: Upload },
+  { label: "Validation", href: "/admin/validation", icon: ShieldCheck },
   { label: "Providers", href: "/admin/providers", icon: Factory },
-  { label: "Link Institution ↔ Supplier", href: "/admin/link-institution-supplier", icon: Link2 },
   { label: "KPLC Depots", href: "/admin/kplc-depots", icon: Zap },
 
   { section: "Delivery" },
@@ -49,11 +48,6 @@ const adminNav = [
   { label: "Financing Instruments", href: "/admin/reference/financing-instruments", icon: Banknote },
   { label: "Commissioning Templates", href: "/admin/reference/commissioning-templates", icon: ClipboardList },
   { label: "Product Categories", href: "/admin/reference/product-categories", icon: Tag },
-
-  { section: "Content" },
-  { label: "Events", href: "/admin/content/events", icon: Calendar },
-  { label: "News", href: "/admin/content/news", icon: Newspaper },
-  { label: "Resources", href: "/admin/content/resources", icon: Library },
 
   { section: "Finance" },
   { label: "BD Dashboard", href: "/admin/bd", icon: BarChart3 },

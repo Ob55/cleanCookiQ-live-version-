@@ -21,6 +21,7 @@ import partner6 from "@/assets/partners/partner6.png";
 import partner7 from "@/assets/partners/partner7.png";
 import { useAuth } from "@/contexts/AuthContext";
 import AnimatedNumber from "@/components/AnimatedNumber";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 
 const partners = [partner1, partner2, partner3, partner4, partner5, partner6, partner7];
@@ -80,6 +81,10 @@ const fadeUp = {
 };
 
 export default function HomePage() {
+  usePageMeta({
+    description: "Track Kenya's institutional transition to clean cooking — pipeline, county intelligence, financing, and a certified supplier marketplace for schools, hospitals and prisons.",
+    path: "/",
+  });
   const { user, profile, roles, loading } = useAuth();
 
   // Pipeline stats: counts come back as DB-side head counts (no rows shipped,
@@ -90,13 +95,13 @@ export default function HomePage() {
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const [total, assessed, inDelivery, sumRows] = await Promise.all([
-        countRows(() => supabase.from("institutions").select("*", { count: "exact", head: true })),
-        countRows(() => supabase.from("institutions").select("*", { count: "exact", head: true })
+        countRows(() => supabase.from("institutions").select("*", { count: "exact", head: true }).eq("verification_status", "verified")),
+        countRows(() => supabase.from("institutions").select("*", { count: "exact", head: true }).eq("verification_status", "verified")
           .or("pipeline_stage.in.(assessed,scored),assessment_score.gt.0")),
-        countRows(() => supabase.from("institutions").select("*", { count: "exact", head: true })
+        countRows(() => supabase.from("institutions").select("*", { count: "exact", head: true }).eq("verification_status", "verified")
           .in("pipeline_stage", ["contracted", "installed", "in_delivery"])),
         fetchAllRows<{ annual_savings_ksh: number | null; co2_reduction_tonnes_pa: number | null }>((from, to) =>
-          supabase.from("institutions").select("annual_savings_ksh, co2_reduction_tonnes_pa").range(from, to)),
+          supabase.from("institutions").select("annual_savings_ksh, co2_reduction_tonnes_pa").eq("verification_status", "verified").range(from, to)),
       ]);
       return {
         totalInstitutions: total,

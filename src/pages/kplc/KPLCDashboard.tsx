@@ -26,7 +26,8 @@ export default function KPLCDashboard() {
         const { count } = await supabase
           .from("institutions")
           .select("id", { count: "exact", head: true })
-          .eq("county", data.county);
+          .eq("county", data.county)
+          .eq("verification_status", "verified");
         setInstitutionCount(count || 0);
       }
     })();

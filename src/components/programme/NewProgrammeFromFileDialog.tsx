@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { runInstitutionValidation } from "@/lib/runInstitutionValidation";
+import { proposeForInstitutions } from "@/lib/runRecommendation";
 import { useNavigate } from "react-router-dom";
 import { read, utils } from "xlsx";
 import { useQueryClient } from "@tanstack/react-query";
@@ -173,7 +175,6 @@ export default function NewProgrammeFromFileDialog({
       createdBy: user?.id,
       coordsByRowIndex,
     });
-    const flagged = payloads.filter((p) => p.verification_status === "flagged").length;
     let inserted = 0;
     let insertErr: string | null = null;
     for (let i = 0; i < payloads.length; i += CHUNK) {
@@ -184,13 +185,25 @@ export default function NewProgrammeFromFileDialog({
       setProgress((p) => ({ ...p, done: inserted }));
     }
 
+    // Same checks as the Validation page: Passed rows count, flagged wait for review.
+    let flagged = 0;
+    if (inserted > 0) {
+      try {
+        const v = await runInstitutionValidation();
+        flagged = v.flagged;
+        if (v.passedIds.length) await proposeForInstitutions(v.passedIds);
+      } catch (e) {
+        toast.error(`Imported, but validation failed: ${e instanceof Error ? e.message : e}. Run it from Validation.`);
+      }
+    }
+
     queryClient.invalidateQueries({ queryKey: ["programmes_overview"] });
     if (insertErr) {
       toast.error(`Programme created, but import stopped at ${inserted}/${result.rows.length}: ${insertErr}`);
     } else {
       const bits = [`${inserted} institutions`];
       if (geocoded > 0) bits.push(`${geocoded} GPS located`);
-      if (flagged > 0) bits.push(`${flagged} flagged for missing data`);
+      if (flagged > 0) bits.push(`${flagged} flagged — review in Validation`);
       toast.success(`Created “${name.trim()}” — ${bits.join(", ")}`);
     }
     setStep(null);

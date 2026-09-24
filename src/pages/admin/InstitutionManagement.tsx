@@ -1,97 +1,124 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { sbAny } from "@/lib/sbAny";
 import { fetchAllRows } from "@/lib/fetchAllRows";
+import { KENYA_COUNTIES } from "@/lib/counties";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Building2, Plus, Search, Filter, MapPin, Loader2, Eye, Pencil, Trash2, Target, ClipboardCheck } from "lucide-react";
-import { Link } from "react-router-dom";
-import { TRANSITION_TARGET_LABELS } from "@/components/institution/TransitionTarget";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Building2, Plus, Search, Filter, Loader2, Lightbulb } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { DownloadReportButton, dateColumn, filterSubtitle } from "@/components/admin/DownloadReportButton";
+import { InstitutionCard, type InstitutionCardData } from "@/components/admin/InstitutionCard";
+import { runInstitutionValidation } from "@/lib/runInstitutionValidation";
+import { proposeForInstitutions } from "@/lib/runRecommendation";
 
-const counties = ["Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret", "Nyeri", "Machakos", "Kiambu", "Uasin Gishu", "Kakamega", "Bungoma", "Kilifi", "Garissa", "Turkana", "Marsabit"];
 const institutionTypes = ["school", "hospital", "prison", "factory", "hotel", "restaurant", "other"];
 const pipelineStages = ["identified", "assessed", "matched", "negotiation", "contracted", "installed", "monitoring"];
 const fuelTypes = ["firewood", "charcoal", "lpg", "biogas", "electric", "other"];
+const PAGE = 60;
+const READINESS = ["all", "ready", "needs_method", "needs_funder"] as const;
+const STATUS_LABELS: Record<string, string> = { verified: "Passed", flagged: "Flagged", unverified: "Not validated" };
 
-const stageColors: Record<string, string> = {
-  identified: "bg-muted text-muted-foreground",
-  assessed: "bg-sky/20 text-sky",
-  matched: "bg-accent/20 text-accent",
-  negotiation: "bg-amber/20 text-amber",
-  contracted: "bg-primary/20 text-primary",
-  installed: "bg-primary text-primary-foreground",
-  monitoring: "bg-emerald-light/20 text-emerald-light",
-};
+type Row = InstitutionCardData & Record<string, any>;
 
 export default function InstitutionManagement() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [countyFilter, setCountyFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [stageFilter, setStageFilter] = useState("all");
+  const [readiness, setReadiness] = useState<(typeof READINESS)[number]>("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [shown, setShown] = useState(PAGE);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editing, setEditing] = useState<any | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
+  const [proposing, setProposing] = useState(false);
   const queryClient = useQueryClient();
 
-  const assessMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("institutions").update({ pipeline_stage: "assessed" }).eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Institution marked as assessed");
-      queryClient.invalidateQueries({ queryKey: ["institutions"] });
-    },
-    onError: (err: any) => toast.error(err.message || "Failed to assess"),
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("institutions").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Institution deleted");
-      queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      setDeleteTarget(null);
-    },
-    onError: (err: any) => toast.error(err.message || "Failed to delete"),
-  });
-
+  // Every institution is listed; each card is labelled Passed / Flagged / Not validated.
   const { data: institutions, isLoading } = useQuery({
-    queryKey: ["institutions", countyFilter, typeFilter, stageFilter],
-    // Page past the ~1,000-row cap so the full roster is listed, not just the
-    // first 1k (see src/lib/fetchAllRows.ts).
+    queryKey: ["institutions", "all", countyFilter, typeFilter, stageFilter],
     queryFn: () =>
-      fetchAllRows((from, to) => {
-        let q = supabase.from("institutions").select("*").order("created_at", { ascending: false });
+      fetchAllRows<Row>((from, to) => {
+        let q = sbAny.from("institutions").select("*").order("created_at", { ascending: false });
         if (countyFilter !== "all") q = q.eq("county", countyFilter);
-        if (typeFilter !== "all") q = q.eq("institution_type", typeFilter as any);
-        if (stageFilter !== "all") q = q.eq("pipeline_stage", stageFilter as any);
+        if (typeFilter !== "all") q = q.eq("institution_type", typeFilter);
+        if (stageFilter !== "all") q = q.eq("pipeline_stage", stageFilter);
         return q.range(from, to);
       }),
   });
 
-  const filtered = institutions?.filter(i =>
-    i.name.toLowerCase().includes(search.toLowerCase()) ||
-    i.county.toLowerCase().includes(search.toLowerCase())
-  ) ?? [];
+  // Allocated funder per institution (one read for the whole roster).
+  const { data: funderByInst } = useQuery({
+    queryKey: ["institution-funder-map"],
+    queryFn: async () => {
+      const rows = await fetchAllRows<{ institution_id: string; funder_profiles: { organisation_name: string | null; full_name: string | null } | null }>(
+        (from, to) => supabase.from("funder_institution_links")
+          .select("institution_id, funder_profiles(organisation_name, full_name)")
+          .eq("status", "active").range(from, to) as never);
+      return new Map(rows.map((r) => [r.institution_id, r.funder_profiles?.organisation_name || r.funder_profiles?.full_name || "Funder"]));
+    },
+  });
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return (institutions ?? []).filter((i) => {
+      if (q && ![i.name, i.institution_code, i.county].some((v) => v?.toLowerCase().includes(q))) return false;
+      if (statusFilter !== "all" && (i.verification_status ?? "unverified") !== statusFilter) return false;
+      const funded = funderByInst?.has(i.id);
+      if (readiness === "ready") return i.verification_status === "verified" && !!i.recommended_solution && funded;
+      if (readiness === "needs_method") return !i.recommended_solution;
+      if (readiness === "needs_funder") return !funded;
+      return true;
+    });
+  }, [institutions, search, readiness, statusFilter, funderByInst]);
+
+  const counts = useMemo(() => {
+    const c: Record<string, number> = { verified: 0, flagged: 0, unverified: 0, ready: 0 };
+    for (const i of institutions ?? []) {
+      const st = i.verification_status ?? "unverified";
+      c[st] = (c[st] ?? 0) + 1;
+      if (st === "verified" && i.recommended_solution && funderByInst?.has(i.id)) c.ready++;
+    }
+    return c;
+  }, [institutions, funderByInst]);
+  // Methods are only proposed for institutions that passed validation.
+  const needMethod = (institutions ?? [])
+    .filter((i) => i.verification_status === "verified" && !i.recommended_solution).map((i) => i.id);
+
+  async function proposeMissing() {
+    setProposing(true);
+    try {
+      const n = await proposeForInstitutions(needMethod);
+      toast.success(`Proposed a cooking method for ${n} institutions`);
+      queryClient.invalidateQueries({ queryKey: ["institutions"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to propose methods");
+    } finally { setProposing(false); }
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-2xl font-display font-bold">Institutions</h1>
-          <p className="text-sm text-muted-foreground">{filtered.length} institutions in pipeline</p>
+          <p className="text-sm text-muted-foreground">
+            {(institutions?.length ?? 0).toLocaleString()} institutions · {counts.verified.toLocaleString()} passed ·{" "}
+            {counts.flagged.toLocaleString()} flagged · {counts.unverified.toLocaleString()} not validated ·{" "}
+            {counts.ready.toLocaleString()} ready for transition
+          </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          {needMethod.length > 0 && (
+            <Button variant="outline" onClick={proposeMissing} disabled={proposing}>
+              {proposing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Lightbulb className="h-4 w-4 mr-2" />}
+              Propose methods ({needMethod.length.toLocaleString()})
+            </Button>
+          )}
           <DownloadReportButton
             rows={filtered}
             columns={[
@@ -108,7 +135,8 @@ export default function InstitutionManagement() {
               { key: "assessment_score", label: "Readiness Score" },
               { key: "annual_savings_ksh", label: "Annual Savings (KSh)" },
               { key: "co2_reduction_tonnes_pa", label: "CO₂ Reduction (t/yr)" },
-              { key: "recommended_solution", label: "Recommended Solution" },
+              { key: "recommended_solution", label: "Proposed Method" },
+              { key: "recommendation_reason", label: "Why" },
               { key: "contact_person", label: "Contact" },
               { key: "contact_phone", label: "Phone" },
               { key: "contact_email", label: "Email" },
@@ -124,12 +152,21 @@ export default function InstitutionManagement() {
                 <Plus className="h-4 w-4 mr-2" /> Add Institution
               </Button>
             </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="font-display">Add New Institution</DialogTitle>
-            </DialogHeader>
-            <InstitutionForm onSuccess={() => { setDialogOpen(false); queryClient.invalidateQueries({ queryKey: ["institutions"] }); }} />
-          </DialogContent>
+            <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="font-display">Add New Institution</DialogTitle>
+              </DialogHeader>
+              <InstitutionForm onSuccess={async (id) => {
+                setDialogOpen(false);
+                // New records go through the same checks as uploads.
+                if (id) {
+                  const r = await runInstitutionValidation([id]).catch(() => null);
+                  if (r?.passed) await proposeForInstitutions([id]).catch(() => undefined);
+                  if (r && !r.passed) toast.warning("Flagged by validation — see the Validation page");
+                }
+                queryClient.invalidateQueries({ queryKey: ["institutions"] });
+              }} />
+            </DialogContent>
           </Dialog>
         </div>
       </div>
@@ -138,32 +175,48 @@ export default function InstitutionManagement() {
       <div className="flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search institutions..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
+          <Input placeholder="Search by name, code or county..." value={search}
+            onChange={e => { setSearch(e.target.value); setShown(PAGE); }} className="pl-10" />
         </div>
-        <Select value={countyFilter} onValueChange={setCountyFilter}>
+        <Select value={countyFilter} onValueChange={(v) => { setCountyFilter(v); setShown(PAGE); }}>
           <SelectTrigger className="w-[160px]"><Filter className="h-4 w-4 mr-2" /><SelectValue placeholder="County" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Counties</SelectItem>
-            {counties.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            {KENYA_COUNTIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
           </SelectContent>
         </Select>
-        <Select value={typeFilter} onValueChange={setTypeFilter}>
+        <Select value={typeFilter} onValueChange={(v) => { setTypeFilter(v); setShown(PAGE); }}>
           <SelectTrigger className="w-[140px]"><SelectValue placeholder="Type" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Types</SelectItem>
             {institutionTypes.map(t => <SelectItem key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</SelectItem>)}
           </SelectContent>
         </Select>
-        <Select value={stageFilter} onValueChange={setStageFilter}>
+        <Select value={stageFilter} onValueChange={(v) => { setStageFilter(v); setShown(PAGE); }}>
           <SelectTrigger className="w-[160px]"><SelectValue placeholder="Stage" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Stages</SelectItem>
             {pipelineStages.map(s => <SelectItem key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</SelectItem>)}
           </SelectContent>
         </Select>
+        <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setShown(PAGE); }}>
+          <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All statuses</SelectItem>
+            {Object.entries(STATUS_LABELS).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={readiness} onValueChange={(v) => { setReadiness(v as typeof readiness); setShown(PAGE); }}>
+          <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All readiness</SelectItem>
+            <SelectItem value="ready">Ready for transition</SelectItem>
+            <SelectItem value="needs_method">Needs method</SelectItem>
+            <SelectItem value="needs_funder">Needs funder</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
-      {/* Table */}
       {isLoading ? (
         <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
       ) : filtered.length === 0 ? (
@@ -172,136 +225,27 @@ export default function InstitutionManagement() {
           <p className="text-muted-foreground">No institutions found</p>
         </div>
       ) : (
-        <div className="bg-card border border-border rounded-xl overflow-hidden shadow-card">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border bg-muted/50">
-                  <th className="text-left text-xs font-medium text-muted-foreground p-3">Code</th>
-                  <th className="text-left text-xs font-medium text-muted-foreground p-3">Name</th>
-                  <th className="text-left text-xs font-medium text-muted-foreground p-3">Type</th>
-                  <th className="text-left text-xs font-medium text-muted-foreground p-3">County</th>
-                  <th className="text-left text-xs font-medium text-muted-foreground p-3">Stage</th>
-                  <th className="text-left text-xs font-medium text-muted-foreground p-3">Meals/Day</th>
-                  <th className="text-left text-xs font-medium text-muted-foreground p-3">Fuel</th>
-                  <th className="text-left text-xs font-medium text-muted-foreground p-3">Wants to Transition To</th>
-                  <th className="text-right text-xs font-medium text-muted-foreground p-3">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map(inst => (
-                  <tr key={inst.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                    <td className="p-3">
-                      <span className="font-mono text-xs text-muted-foreground">{inst.institution_code ?? "—"}</span>
-                    </td>
-                    <td className="p-3">
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <Building2 className="h-4 w-4 text-primary" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium">{inst.name}</p>
-                          {inst.contact_person && <p className="text-xs text-muted-foreground">{inst.contact_person}</p>}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-3 text-sm capitalize">{inst.institution_type}</td>
-                    <td className="p-3">
-                      <div className="flex items-center gap-1 text-sm">
-                        <MapPin className="h-3 w-3 text-muted-foreground" />{inst.county}
-                      </div>
-                    </td>
-                    <td className="p-3">
-                      <Badge variant="secondary" className={stageColors[inst.pipeline_stage] || ""}>
-                        {inst.pipeline_stage}
-                      </Badge>
-                    </td>
-                    <td className="p-3 text-sm">{inst.meals_per_day}</td>
-                    <td className="p-3 text-sm capitalize">{inst.current_fuel}</td>
-                    <td className="p-3">
-                      {inst.transition_target_fuel ? (
-                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
-                          <Target className="h-3 w-3 mr-1" />
-                          {TRANSITION_TARGET_LABELS[inst.transition_target_fuel] ?? inst.transition_target_fuel}
-                        </Badge>
-                      ) : (
-                        <span className="text-xs text-muted-foreground italic">not selected</span>
-                      )}
-                    </td>
-                    <td className="p-3">
-                      <div className="flex justify-end gap-1">
-                        <Link to={`/admin/institutions/${inst.id}`}>
-                          <Button variant="ghost" size="sm" title="View"><Eye className="h-4 w-4" /></Button>
-                        </Link>
-                        {inst.pipeline_stage === "identified" || inst.pipeline_stage === "contacted" ? (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            title="Mark as Assessed"
-                            onClick={() => assessMutation.mutate(inst.id)}
-                            disabled={assessMutation.isPending}
-                            className="text-sky-600 hover:text-sky-700"
-                          >
-                            <ClipboardCheck className="h-4 w-4" />
-                          </Button>
-                        ) : null}
-                        <Button variant="ghost" size="sm" title="Edit" onClick={() => setEditing(inst)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" title="Delete" onClick={() => setDeleteTarget(inst)} className="text-destructive hover:text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <>
+          <div className="grid gap-2.5 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
+            {filtered.slice(0, shown).map((inst) => (
+              <InstitutionCard key={inst.id} inst={inst} funderName={funderByInst?.get(inst.id)}
+                onClick={() => navigate(`/admin/institutions/${inst.id}`)} />
+            ))}
           </div>
-        </div>
-      )}
-
-      {/* Edit dialog */}
-      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="font-display">Edit Institution</DialogTitle>
-          </DialogHeader>
-          {editing && (
-            <InstitutionForm
-              initial={editing}
-              onSuccess={() => { setEditing(null); queryClient.invalidateQueries({ queryKey: ["institutions"] }); }}
-            />
+          {shown < filtered.length && (
+            <div className="text-center">
+              <Button variant="outline" onClick={() => setShown((s) => s + PAGE)}>
+                Show more ({(filtered.length - shown).toLocaleString()} left)
+              </Button>
+            </div>
           )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete confirm */}
-      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete this institution?</AlertDialogTitle>
-            <AlertDialogDescription>
-              {deleteTarget?.name} will be permanently removed along with its assessments, pipeline history, and related records. This cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
-              disabled={deleteMutation.isPending}
-            >
-              {deleteMutation.isPending ? "Deleting…" : "Delete"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        </>
+      )}
     </div>
   );
 }
 
-function InstitutionForm({ onSuccess, initial }: { onSuccess: () => void; initial?: any }) {
+export function InstitutionForm({ onSuccess, initial }: { onSuccess: (id?: string) => void; initial?: any }) {
   const [form, setForm] = useState({
     name: initial?.name ?? "",
     institution_type: (initial?.institution_type ?? "school") as any,
@@ -341,6 +285,7 @@ function InstitutionForm({ onSuccess, initial }: { onSuccess: () => void; initia
       notes: form.notes || null,
     };
     let assignedCode: string | null = null;
+    let newId: string | undefined;
     let errorMsg: string | null = null;
     if (isEdit) {
       const { error } = await supabase.from("institutions").update(payload).eq("id", initial.id);
@@ -349,10 +294,10 @@ function InstitutionForm({ onSuccess, initial }: { onSuccess: () => void; initia
       const { data, error } = await supabase
         .from("institutions")
         .insert(payload)
-        .select("institution_code")
+        .select("id, institution_code")
         .single();
       if (error) errorMsg = error.message;
-      else assignedCode = data?.institution_code ?? null;
+      else { assignedCode = data?.institution_code ?? null; newId = data?.id; }
     }
     setLoading(false);
     if (errorMsg) {
@@ -369,7 +314,7 @@ function InstitutionForm({ onSuccess, initial }: { onSuccess: () => void; initia
     } else {
       toast.success("Institution added");
     }
-    onSuccess();
+    onSuccess(isEdit ? initial.id : newId);
   };
 
   const set = (key: string, val: string) => setForm(prev => ({ ...prev, [key]: val }));

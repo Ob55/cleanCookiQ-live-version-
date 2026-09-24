@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
@@ -14,11 +14,14 @@ import { useState } from "react";
 import {
   ArrowLeft, Building2, MapPin, Flame, Users, Loader2, UserCheck,
   Phone, Mail, Clock, Utensils, Leaf, DollarSign, Camera, FileText,
-  BarChart3, Gauge, Plus, Bell, Factory, ShoppingCart,
+  BarChart3, Gauge, Plus, Bell, Factory, ShoppingCart, Pencil, Trash2,
 } from "lucide-react";
 import TransitionProductSelector from "@/components/institution/TransitionProductSelector";
 import ScenarioSection from "@/components/institution/ScenarioSection";
 import { TRANSITION_TARGET_LABELS } from "@/components/institution/TransitionTarget";
+import { InstitutionPipelinePanel } from "@/components/admin/InstitutionPipelinePanel";
+import { InstitutionForm } from "@/pages/admin/InstitutionManagement";
+import { runInstitutionValidation } from "@/lib/runInstitutionValidation";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood", charcoal: "Charcoal", lpg: "LPG",
@@ -115,6 +118,17 @@ export default function InstitutionDetail() {
     enabled: !!id,
   });
 
+  const [editOpen, setEditOpen] = useState(false);
+  const navigate = useNavigate();
+  const deleteInstitution = async () => {
+    if (!id || !confirm("Delete this institution permanently, with its assessments and related records?")) return;
+    const { error } = await supabase.from("institutions").delete().eq("id", id);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Institution deleted");
+    queryClient.invalidateQueries({ queryKey: ["institutions"] });
+    navigate("/admin/institutions");
+  };
+
   const addNeed = async () => {
     if (!needDesc.trim() || !id || !user) return;
     setNeedSaving(true);
@@ -172,8 +186,26 @@ export default function InstitutionDetail() {
             </div>
           </div>
         </div>
-        <Badge variant="secondary" className="capitalize text-sm px-3 py-1">{inst.pipeline_stage.replace(/_/g, " ")}</Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary" className="capitalize text-sm px-3 py-1">{inst.pipeline_stage.replace(/_/g, " ")}</Badge>
+          <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}><Pencil className="h-4 w-4 mr-1" /> Edit</Button>
+          <Button variant="outline" size="sm" className="text-destructive" onClick={deleteInstitution}><Trash2 className="h-4 w-4" /></Button>
+        </div>
       </div>
+
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader><DialogTitle className="font-display">Edit Institution</DialogTitle></DialogHeader>
+          <InstitutionForm initial={inst} onSuccess={async () => {
+            setEditOpen(false);
+            // Edited data is re-checked; a failing edit moves it back to Validation.
+            const r = await runInstitutionValidation([inst.id]).catch(() => null);
+            if (r && !r.passed) toast.warning("Now flagged by validation — see the Validation page");
+            queryClient.invalidateQueries({ queryKey: ["institution", id] });
+            queryClient.invalidateQueries({ queryKey: ["institutions"] });
+          }} />
+        </DialogContent>
+      </Dialog>
 
       {/* Summary stat cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -183,20 +215,8 @@ export default function InstitutionDetail() {
         <StatCard icon={<Clock className="h-5 w-5 text-primary" />} label="Cooking Time" value={inst.cooking_time_minutes ? `${(inst.cooking_time_minutes / 60).toFixed(1)} hrs` : "—"} />
       </div>
 
-      {/* Linked Funder */}
-      <Card>
-        <CardContent className="p-4 flex items-center gap-3">
-          <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-            <DollarSign className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Linked Funder / Financing Partner</p>
-            <p className="text-sm font-semibold">
-              {linkedFunder ? (linkedFunder as any).funder_profiles?.organisation_name || (linkedFunder as any).funder_profiles?.full_name || "Linked" : "N/A"}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Transition pipeline: validation → method → funder → login */}
+      <InstitutionPipelinePanel inst={inst} linkedFunder={linkedFunder as never} />
 
       {/* Transition Scenarios — costed pathways (admin is host → can edit) */}
       <ScenarioSection institutionId={inst.id} programmeId={(inst as { programme_id?: string | null }).programme_id ?? null} canEdit />

@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -72,7 +72,7 @@ const PortfolioManagement = lazy(() => import("@/pages/admin/PortfolioManagement
 const PortfolioAggregation = lazy(() => import("@/pages/admin/PortfolioAggregation"));
 const AdminTickets = lazy(() => import("@/pages/admin/AdminTickets"));
 const Subscribers = lazy(() => import("@/pages/admin/Subscribers"));
-const InstitutionImport = lazy(() => import("@/pages/admin/InstitutionImport"));
+const InstitutionValidation = lazy(() => import("@/pages/admin/InstitutionValidation"));
 const FinancingDesigner = lazy(() => import("@/pages/admin/FinancingDesigner"));
 const AdminDeliveries = lazy(() => import("@/pages/admin/AdminDeliveries"));
 const AdminDeliveryDetail = lazy(() => import("@/pages/admin/AdminDeliveryDetail"));
@@ -92,7 +92,6 @@ const AdminProductCategories = lazy(() => import("@/pages/admin/AdminProductCate
 const AdminCreditVerifications = lazy(() => import("@/pages/admin/AdminCreditVerifications"));
 const AdminEngagement = lazy(() => import("@/pages/admin/AdminEngagement"));
 const AssessmentEditor = lazy(() => import("@/pages/admin/AssessmentEditor"));
-const LinkInstitutionSupplier = lazy(() => import("@/pages/admin/LinkInstitutionSupplier"));
 const SupplierQuotes = lazy(() => import("@/pages/supplier/SupplierQuotes"));
 
 // Lazy loaded role pages
@@ -340,10 +339,10 @@ const App = () => (
                 <Route path="/admin/programmes" element={<ProgramManagement />} />
                 <Route path="/admin/programmes/:id" element={<ProgrammeDetail />} />
                 <Route path="/admin/institutions" element={<InstitutionManagement />} />
-                <Route path="/admin/institutions/import" element={<InstitutionImport />} />
+                <Route path="/admin/validation" element={<InstitutionValidation />} />
+                <Route path="/admin/institutions/import" element={<Navigate to="/admin/validation" replace />} />
                 <Route path="/admin/institutions/:id" element={<InstitutionDetail />} />
                 <Route path="/admin/providers" element={<ProviderManagement />} />
-                <Route path="/admin/link-institution-supplier" element={<LinkInstitutionSupplier />} />
                 <Route path="/admin/providers/:id" element={<ProviderDetail />} />
                 <Route path="/admin/assessments" element={<AssessmentQueue />} />
                 <Route path="/admin/assessments/:id/edit" element={<AssessmentEditor />} />

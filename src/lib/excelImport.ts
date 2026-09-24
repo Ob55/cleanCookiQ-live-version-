@@ -225,8 +225,8 @@ export function parseInstitutionSheet(aoa: unknown[][]): ImportResult {
 
 export function exampleTemplateRows(): unknown[][] {
   return [
-    ["name", "county", "institution_type", "current_fuel", "meals_per_day", "number_of_students", "contact_person", "contact_phone", "contact_email"],
-    ["St Mary's Primary School", "Kiambu", "school", "firewood", 600, 480, "Jane Wanjiru", "+254700000001", "head@stmarys.example"],
-    ["Mater Hospital — Eastleigh", "Nairobi", "hospital", "lpg", 1200, null, "Dr Juma", "+254700000002", "admin@mater-eastleigh.example"],
+    ["name", "county", "sub_county", "latitude", "longitude", "institution_type", "current_fuel", "meals_per_day", "number_of_students", "number_of_staff", "contact_person", "contact_phone", "contact_email"],
+    ["St Mary's Primary School", "Kiambu", "Kiambu Town", -1.1714, 36.8356, "school", "firewood", 1200, 480, 25, "Jane Wanjiru", "+254700000001", "head@stmarys.example"],
+    ["Mater Hospital — Eastleigh", "Nairobi", "Kamukunji", -1.2741, 36.8517, "hospital", "lpg", 1200, 300, 150, "Dr Juma", "+254700000002", "admin@mater-eastleigh.example"],
   ];
 }

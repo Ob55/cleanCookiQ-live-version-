@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { calculateAssessmentScore, loadReadinessWeights } from "@/lib/assessmentScoring";
 import { deriveStoredImpact } from "@/lib/institutionDerived";
 import TransitionNeedsSection from "@/components/institution/TransitionNeedsSection";
+import LoginDetailsCard from "@/components/account/LoginDetailsCard";
 
 const FUEL_LABELS: Record<string, string> = {
   firewood: "Firewood", charcoal: "Charcoal", lpg: "LPG",
@@ -206,7 +207,7 @@ export default function InstitutionProfile() {
         assessment_category: category,
         annual_savings_ksh: derived.annual_savings_ksh,
         co2_reduction_tonnes_pa: derived.co2_reduction_tonnes_pa,
-        recommended_solution: derived.recommended_solution,
+        // recommended_solution is owned by the admin pipeline (method proposal).
       };
 
       const { error } = await supabase
@@ -540,6 +541,7 @@ export default function InstitutionProfile() {
         </CardContent>
       </Card>
 
+      <LoginDetailsCard />
     </div>
   );
 }
