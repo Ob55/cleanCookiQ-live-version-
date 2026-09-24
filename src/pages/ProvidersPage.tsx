@@ -7,8 +7,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Factory, Search, CheckCircle, Star, MapPin } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DownloadReportButton, listColumn, filterSubtitle } from "@/components/admin/DownloadReportButton";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 export default function ProvidersPage() {
+  usePageMeta({
+    title: "Clean Cooking Providers",
+    description: "Directory of clean cooking technology and fuel providers serving Kenyan institutions — LPG, biogas, pellets, electric and improved charcoal.",
+    path: "/providers",
+  });
   const [search, setSearch] = useState("");
   const [countyFilter, setCountyFilter] = useState("all");
   const [techFilter, setTechFilter] = useState("all");

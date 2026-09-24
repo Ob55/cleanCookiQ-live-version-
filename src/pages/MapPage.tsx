@@ -11,8 +11,14 @@ import {
 import InstitutionMap from "@/components/programme/InstitutionMap";
 import { pipelineStages, labelFor, institutionTypeColors } from "@/lib/mapMarkers";
 import heroBg from "@/assets/hero-bg.jpg";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 export default function MapPage() {
+  usePageMeta({
+    title: "Institution Map",
+    description: "Interactive map of Kenyan institutions on the clean cooking pipeline, by county, institution type and transition stage.",
+    path: "/map",
+  });
   const [countyFilter, setCountyFilter] = useState("all");
   const [stageFilter, setStageFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");

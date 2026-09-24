@@ -16,6 +16,7 @@ import {
 } from "@/lib/knowledge";
 import { useAuth } from "@/contexts/AuthContext";
 import { DownloadReportButton, listColumn, dateColumn, filterSubtitle } from "@/components/admin/DownloadReportButton";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const TYPES: ResourceType[] = [
   "guide", "standard", "template", "report", "case_study",
@@ -23,6 +24,11 @@ const TYPES: ResourceType[] = [
 ];
 
 export default function ResourcesPage() {
+  usePageMeta({
+    title: "Resources",
+    description: "Guides, reports and toolkits for institutions moving to clean cooking in Kenya.",
+    path: "/resources",
+  });
   const { data, isLoading } = useResources();
   const [type, setType] = useState<ResourceType | "">("");
   const [search, setSearch] = useState("");

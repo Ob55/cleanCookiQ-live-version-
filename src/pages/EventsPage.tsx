@@ -10,8 +10,14 @@ import { eventToIcs, partitionEvents, type EventSummary } from "@/lib/knowledge"
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { DownloadReportButton, dateColumn, listColumn } from "@/components/admin/DownloadReportButton";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 export default function EventsPage() {
+  usePageMeta({
+    title: "Events",
+    description: "Upcoming clean cooking events, webinars and workshops in Kenya.",
+    path: "/events",
+  });
   const { data, isLoading } = useEvents();
   const [tab, setTab] = useState<"upcoming" | "past">("upcoming");
 

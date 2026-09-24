@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { sbAny } from "@/lib/sbAny";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const challenges: Array<{
   title: string;
@@ -212,6 +213,11 @@ function FlowArrow({ direction }: { direction: "right" | "down" }) {
 }
 
 export default function AboutPage() {
+  usePageMeta({
+    title: "About",
+    description: "CleanCookIQ by Ignis Innovation coordinates institutions, suppliers and funders to move Kenya's institutional kitchens to clean cooking.",
+    path: "/about",
+  });
   const location = useLocation();
 
   useEffect(() => {

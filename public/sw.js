@@ -14,7 +14,7 @@
  * IndexedDB sync queues for delivery_events and commissioning_checklists).
  */
 
-const CACHE_VERSION = "ccq-v1";
+const CACHE_VERSION = "ccq-v2";
 const APP_SHELL = [
   "/",
   "/manifest.webmanifest",

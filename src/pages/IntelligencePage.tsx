@@ -19,6 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import cleancookIqLogo from "@/assets/cleancookiq-mark.png";
 import { DownloadReportButton, filterSubtitle } from "@/components/admin/DownloadReportButton";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 type Row = {
   county: string | null;
@@ -106,6 +107,11 @@ const CHART_COMMON = {
 };
 
 export default function IntelligencePage() {
+  usePageMeta({
+    title: "Clean Cooking Intelligence",
+    description: "Market intelligence on Kenya's institutional clean cooking transition: fuel mix, readiness, costs and county-level trends.",
+    path: "/intelligence",
+  });
   const [countyFilter, setCountyFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [fuelFilter, setFuelFilter] = useState("all");
@@ -117,7 +123,8 @@ export default function IntelligencePage() {
         .from("institutions")
         .select(
           "county, institution_type, pipeline_stage, current_fuel, meals_per_day, number_of_students, number_of_staff, has_dedicated_kitchen, monthly_fuel_spend, co2_reduction_tonnes_pa, annual_savings_ksh, fuel_sourcing, grid_connected, ownership_type",
-        );
+        )
+        .eq("verification_status", "verified");
       if (error) throw error;
       return (data as Row[] | null) ?? [];
     },

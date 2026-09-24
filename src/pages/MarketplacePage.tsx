@@ -9,8 +9,14 @@ import { useMarketplaceProducts, useProductCategories } from "@/hooks/useMarketp
 import { useCounties } from "@/hooks/useCounties";
 import { applyMarketplaceFilters, type MarketplaceFilters, type MarketplaceProduct } from "@/lib/marketplace";
 import { DownloadReportButton, listColumn, filterSubtitle } from "@/components/admin/DownloadReportButton";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 export default function MarketplacePage() {
+  usePageMeta({
+    title: "Clean Cooking Marketplace",
+    description: "Browse certified clean cooking products and suppliers for institutional kitchens in Kenya.",
+    path: "/marketplace",
+  });
   const { data: products, isLoading: productsLoading } = useMarketplaceProducts();
   const { data: categories } = useProductCategories();
   const { data: counties } = useCounties();

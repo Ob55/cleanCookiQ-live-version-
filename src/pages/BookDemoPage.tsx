@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { sbAny } from "@/lib/sbAny";
 import { toEmbedUrl } from "@/lib/walkthroughVideo";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^[+\d][\d\s\-().]{6,}$/;
@@ -27,6 +28,11 @@ interface WalkthroughVideo {
 }
 
 export default function BookDemoPage() {
+  usePageMeta({
+    title: "Book a Demo",
+    description: "Book a CleanCookIQ demo for your institution, organisation, or funding programme.",
+    path: "/book-demo",
+  });
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");

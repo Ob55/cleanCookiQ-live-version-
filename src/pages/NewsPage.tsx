@@ -4,8 +4,14 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNews } from "@/hooks/useKnowledge";
 import { DownloadReportButton, dateColumn, listColumn } from "@/components/admin/DownloadReportButton";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 export default function NewsPage() {
+  usePageMeta({
+    title: "News",
+    description: "Latest news on clean cooking, institutional transitions and the CleanCookIQ programme in Kenya.",
+    path: "/news",
+  });
   const { data, isLoading, error } = useNews();
 
   return (

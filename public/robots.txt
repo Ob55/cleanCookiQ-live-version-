@@ -1,14 +1,19 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
+# CleanCookIQ — https://cleancookiq.com
 User-agent: *
 Allow: /
+
+# Signed-in areas: nothing useful to index, and they redirect to login anyway.
+Disallow: /admin
+Disallow: /auth/
+Disallow: /reset-password
+Disallow: /institution/
+Disallow: /supplier/
+Disallow: /funder/
+Disallow: /researcher/
+Disallow: /kplc/
+Disallow: /csr/
+Disallow: /ta/
+Disallow: /financing
+Disallow: /programme/
+
+Sitemap: https://cleancookiq.com/sitemap.xml

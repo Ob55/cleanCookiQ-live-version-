@@ -11,10 +11,19 @@ import {
 import { useActiveDataPoints } from "@/hooks/useDataPoints";
 import { resolveDataPoint, type FuelKey } from "@/lib/dataPoints";
 import { Sourced } from "@/components/Sourced";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 export default function CountyDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const { summary, isLoading, error } = useCountyBySlug(slug);
+  usePageMeta({
+    title: summary ? `${summary.county_name} County` : "County",
+    description: summary
+      ? `Clean cooking intelligence for ${summary.county_name} County, Kenya: institutions, assessments, transitions, fuel prices and policies.`
+      : undefined,
+    path: `/counties/${slug ?? ""}`,
+    noindex: !isLoading && !summary,
+  });
   const { data: fuelPrices, isLoading: pricesLoading } = useCountyFuelPrices(summary?.county_id);
   const { data: policies, isLoading: policiesLoading } = useCountyPolicies(summary?.county_id);
   const { data: nationalPoints = [] } = useActiveDataPoints(["fuel.cost_per_unit"]);

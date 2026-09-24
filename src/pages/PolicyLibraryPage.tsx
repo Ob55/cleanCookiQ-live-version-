@@ -7,8 +7,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { usePolicies } from "@/hooks/useKnowledge";
 import { policyStatusLabel } from "@/lib/knowledge";
 import { DownloadReportButton, dateColumn, listColumn, filterSubtitle } from "@/components/admin/DownloadReportButton";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 export default function PolicyLibraryPage() {
+  usePageMeta({
+    title: "Policy Library",
+    description: "National and county policies shaping Kenya's clean cooking transition.",
+    path: "/policy",
+  });
   const { data, isLoading, error } = usePolicies();
   const [search, setSearch] = useState("");
   const [jurisdiction, setJurisdiction] = useState<string>("");

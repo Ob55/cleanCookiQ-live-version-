@@ -8,8 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MapPin, Building2, Users, Search, X } from "lucide-react";
 import { DownloadReportButton, filterSubtitle } from "@/components/admin/DownloadReportButton";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 export default function CountiesIndexPage() {
+  usePageMeta({
+    title: "Kenya Counties",
+    description: "Clean cooking intelligence for all 47 Kenyan counties: institutions, assessments, transitions, dominant fuels and policies.",
+    path: "/counties",
+  });
   const { data, isLoading, error } = useCountyIntelligence();
   const [search, setSearch] = useState("");
   const [region, setRegion] = useState<string>("");
